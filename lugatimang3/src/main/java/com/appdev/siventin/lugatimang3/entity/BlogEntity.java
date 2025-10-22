@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "blog")
-public class Blog {
+public class BlogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int blogId;
@@ -25,8 +25,10 @@ public class Blog {
     @Column(name = "date_posted")
     private Date date_posted;
 
-    public Blog(){}
-    public Blog(int blogId, String title, String content, Date date_posted){
+    public BlogEntity(){
+        super();
+    }
+    public BlogEntity(int blogId, String title, String content, Date date_posted){
         super();
         this.blogId = blogId;
         this.title = title;
