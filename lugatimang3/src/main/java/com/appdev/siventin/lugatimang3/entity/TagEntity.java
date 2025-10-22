@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tag")
-public class Tag {
+public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int tagId;
@@ -20,8 +20,8 @@ public class Tag {
     @Column(name = "description")
     private String description;
 
-    public Tag(){}
-    public Tag(int tagId, String name, String description){
+    public TagEntity(){}
+    public TagEntity(int tagId, String name, String description){
         super();
         this.tagId = tagId;
         this.name = name;
