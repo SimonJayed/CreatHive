@@ -1,80 +1,118 @@
 package com.appdev.siventin.lugatimang3.entity;
 
-import java.time.LocalDateTime;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "artist")
-
 public class ArtistEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private int artistId;
-    private String username;
-    private String email;
-    private String password;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "bio", columnDefinition = "TEXT")
     private String bio;
-    private LocalDateTime dateCreated;
+
+    @Column(name = "interest")
+    private String interest;
+
+    @Column(name = "username", unique = true)
+    private String username;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "profile_image", columnDefinition = "LONGTEXT")
+    private String profileImage;
 
     public ArtistEntity() {
+        super();
     }
 
-    public ArtistEntity(int artistId, String username, String email, String password, String bio,
-            LocalDateTime dateCreated) {
+    public ArtistEntity(int artistId, String name, String bio, String interest, String username, String password,
+            String email) {
         super();
         this.artistId = artistId;
-        this.username = username;
-        this.email = email;
-        this.password = password;
+        this.name = name;
         this.bio = bio;
-        this.dateCreated = dateCreated;
+        this.interest = interest;
+        this.username = username;
+        this.password = password;
+        this.email = email;
     }
 
     public int getArtistId() {
         return artistId;
     }
 
-    public String getUsername() {
-        return username;
+    public void setArtistId(int artistId) {
+        this.artistId = artistId;
     }
 
-    public String getEmail() {
-        return email;
+    public String getName() {
+        return name;
     }
 
-    public String getPassword() {
-        return password;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBio() {
         return bio;
     }
 
-    public LocalDateTime getDateCreated() {
-        return dateCreated;
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getInterest() {
+        return interest;
+    }
+
+    public void setInterest(String interest) {
+        this.interest = interest;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public void setBio(String bio) {
-        this.bio = bio;
+    public String getEmail() {
+        return email;
     }
 
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 }

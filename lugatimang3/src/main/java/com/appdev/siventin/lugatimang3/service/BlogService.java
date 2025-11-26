@@ -23,6 +23,7 @@ public class BlogService {
         return brepo.findAll();
     }
 
+    @SuppressWarnings("finally")
     public BlogEntity updateBlog(int blogId, BlogEntity newBlogDetails){
         BlogEntity blog = new BlogEntity();
         try{

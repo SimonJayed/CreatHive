@@ -23,6 +23,7 @@ public class TagService {
             return trepo.findAll();
     }
 
+    @SuppressWarnings("finally")
     public TagEntity updateTag(int tagId, TagEntity newTagDetails){
         TagEntity tag = new TagEntity();
         try{

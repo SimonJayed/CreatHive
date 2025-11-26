@@ -24,26 +24,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ArtworkController {
 
     @Autowired
-    ArtworkService wservice;
+    ArtworkService awservice;
 
     @PostMapping("/insertArtwork")
     public ArtworkEntity insertArwork(@RequestBody ArtworkEntity artwork) {
-        return wservice.insertArtwork(artwork);
+        return awservice.insertArtwork(artwork);
     }
 
     @GetMapping("/getAllArworks")
     public List<ArtworkEntity> getAllArtworks() {
-        return wservice.getAllArtworks();
+        return awservice.getAllArtworks();
     }
 
     @PutMapping("/updateArtwork")
     public ArtworkEntity updateArtwork(@RequestParam int artworkId, @RequestBody ArtworkEntity newArtworkDetails) {
-        return wservice.updateArtwork(artworkId, newArtworkDetails);
+        return awservice.updateArtwork(artworkId, newArtworkDetails);
     }
 
     @DeleteMapping("/deleteArtwork/{artworkId}")
     public String deleteArtwork(@PathVariable int artworkId) {
-        return wservice.deleteArtwork(artworkId);
+        return awservice.deleteArtwork(artworkId);
     }
 
 }

@@ -15,43 +15,44 @@ import com.appdev.siventin.lugatimang3.repository.ArtworkRepository;
 public class ArtworkService {
 
     @Autowired
-    ArtworkRepository wrepo;
+    ArtworkRepository awrepo;
 
     public ArtworkService() {
     }
 
     // Create
     public ArtworkEntity insertArtwork(ArtworkEntity artwork) {
-        return wrepo.save(artwork);
+        return awrepo.save(artwork);
     }
 
     // Read
     public List<ArtworkEntity> getAllArtworks() {
-        return wrepo.findAll();
+        return awrepo.findAll();
     }
 
-    public ArtworkEntity getArtworkBydescription(String description) throws NameNotFoundException {
-        if (wrepo.findByDescription(description) != null)
-            return wrepo.findByDescription(description);
-        else
-            throw new NameNotFoundException(
-                    "There is no Artwork having that description " + description + " in the records.");
-
-    }
+    // public ArtworkEntity getArtworkBydescription(String description) throws
+    // NameNotFoundException {
+    // if (awrepo.findByDescription(description) != null)
+    // return awrepo.findByDescription(description);
+    // else
+    // throw new NameNotFoundException(
+    // "There is no Artwork having that description " + description + " in the
+    // records.");
+    // }
 
     // Update
     @SuppressWarnings("finally")
     public ArtworkEntity updateArtwork(int artworkId, ArtworkEntity newArtworkDetails) {
         ArtworkEntity Artwork = new ArtworkEntity();
         try {
-            Artwork = wrepo.findById(artworkId).get();
+            Artwork = awrepo.findById(artworkId).get();
             Artwork.setDescription(newArtworkDetails.getDescription());
             Artwork.setCreationDate(newArtworkDetails.getCreationDate());
             Artwork.setCategory(newArtworkDetails.getCategory());
         } catch (NoSuchElementException ex) {
             throw new NoSuchElementException("Artwork " + artworkId + " does not exist.");
         } finally {
-            return wrepo.save(Artwork);
+            return awrepo.save(Artwork);
         }
     }
 
@@ -60,8 +61,8 @@ public class ArtworkService {
     public String deleteArtwork(int artworkId) {
         String msg = "";
 
-        if (wrepo.findById(artworkId) != null) {
-            wrepo.deleteById(artworkId);
+        if (awrepo.findById(artworkId) != null) {
+            awrepo.deleteById(artworkId);
             msg = "Artwork " + artworkId + "is successfully deleted!";
         } else
             msg = "Artwork " + artworkId + " does not exist.";

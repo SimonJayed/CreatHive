@@ -3,8 +3,6 @@ package com.appdev.siventin.lugatimang3.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.naming.NameNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,58 +13,66 @@ import com.appdev.siventin.lugatimang3.repository.ArtistRepository;
 public class ArtistService {
 
     @Autowired
-    ArtistRepository irepo;
+    ArtistRepository arepo;
 
-    public ArtistService() {
-    }
-
-    // Create
     public ArtistEntity insertArtist(ArtistEntity artist) {
-        return irepo.save(artist);
+        return arepo.save(artist);
     }
 
-    // Read
     public List<ArtistEntity> getAllArtists() {
-        return irepo.findAll();
+        return arepo.findAll();
     }
 
-    public ArtistEntity getArtistByusername(String username) throws NameNotFoundException {
-        if (irepo.findByDescription(username) != null)
-            return irepo.findByDescription(username);
-        else
-            throw new NameNotFoundException("There is no Artist having that username " + username + " in the records.");
-
-    }
-
-    // Update
     @SuppressWarnings("finally")
     public ArtistEntity updateArtist(int artistId, ArtistEntity newArtistDetails) {
-        ArtistEntity Artist = new ArtistEntity();
+        ArtistEntity artist = new ArtistEntity();
         try {
-            Artist = irepo.findById(artistId).get();
-            Artist.setUsername(newArtistDetails.getUsername());
-            Artist.setEmail(newArtistDetails.getEmail());
-            Artist.setPassword(newArtistDetails.getPassword());
-            Artist.setBio(newArtistDetails.getBio());
-            Artist.setDateCreated(newArtistDetails.getDateCreated());
+            artist = arepo.findById(artistId).get();
+            artist.setName(newArtistDetails.getName());
+            artist.setBio(newArtistDetails.getBio());
+            artist.setInterest(newArtistDetails.getInterest());
+
+            if (newArtistDetails.getUsername() != null)
+                artist.setUsername(newArtistDetails.getUsername());
+            if (newArtistDetails.getPassword() != null)
+                artist.setPassword(newArtistDetails.getPassword());
+            if (newArtistDetails.getEmail() != null)
+                artist.setEmail(newArtistDetails.getEmail());
+            if (newArtistDetails.getProfileImage() != null)
+                artist.setProfileImage(newArtistDetails.getProfileImage());
+
         } catch (NoSuchElementException ex) {
             throw new NoSuchElementException("Artist " + artistId + " does not exist.");
         } finally {
-            return irepo.save(Artist);
+            return arepo.save(artist);
         }
     }
 
-    // Delete
-    @SuppressWarnings("unused")
     public String deleteArtist(int artistId) {
         String msg = "";
 
-        if (irepo.findById(artistId) != null) {
-            irepo.deleteById(artistId);
-            msg = "Artist " + artistId + "is successfully deleted!";
-        } else
+        if (arepo.findById(artistId).isPresent()) {
+            arepo.deleteById(artistId);
+            msg = "Artist " + artistId + " is successfully deleted!";
+        } else {
             msg = "Artist " + artistId + " does not exist.";
+        }
         return msg;
     }
 
+    public ArtistEntity getArtistById(int artistId) {
+        try {
+            return arepo.findById(artistId).orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public ArtistEntity login(String username, String password) {
+        ArtistEntity artist = arepo.findByUsername(username);
+        if (artist != null && artist.getPassword().equals(password)) {
+            return artist;
+        }
+        return null;
+    }
 }
