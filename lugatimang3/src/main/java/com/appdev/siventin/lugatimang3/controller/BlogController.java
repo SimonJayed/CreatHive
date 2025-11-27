@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
-
 @RestController
 @RequestMapping("/blogs")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -32,19 +30,24 @@ public class BlogController {
     public BlogEntity insertBlog(@RequestBody BlogEntity blog) {
         return bservice.insertBlog(blog);
     }
-    
+
     @GetMapping("/getAllBlogs")
     public List<BlogEntity> getAllBlogs() {
         return bservice.getAllBlogs();
     }
-    
+
+    @GetMapping("/getBlogsByArtistId/{artistId}")
+    public List<BlogEntity> getBlogsByArtistId(@PathVariable int artistId) {
+        return bservice.getBlogsByArtistId(artistId);
+    }
+
     @PutMapping("/updateBlog")
-    public BlogEntity updateBlog(@RequestParam int blogId, @RequestBody BlogEntity newBlogDetails){
+    public BlogEntity updateBlog(@RequestParam int blogId, @RequestBody BlogEntity newBlogDetails) {
         return bservice.updateBlog(blogId, newBlogDetails);
     }
 
     @DeleteMapping("/deleteBlog/{blogId}")
-    public String deleteBlog(@PathVariable int blogId){
+    public String deleteBlog(@PathVariable int blogId) {
         return bservice.deleteBlog(blogId);
     }
 

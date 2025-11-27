@@ -38,6 +38,9 @@ function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  // State for persisting registration form data when navigating to InterestPicker
+  const [pendingRegistrationData, setPendingRegistrationData] = useState(null);
+
   // Fetch full artist data on load to get the profile image without bloating localStorage
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -69,10 +72,13 @@ function App() {
     }
   }, [currentArtist]);
 
-  const handleRegisterSuccess = (artist) => {
+  const handleRegisterSuccess = (artist, formData) => {
     // Store both ID and full artist data in state
     setCurrentArtistId(artist.artistId);
     setCurrentArtist(artist);
+
+    // Store registration form data for potential back navigation
+    setPendingRegistrationData(formData);
 
     // Store ID and sanitized artist (no image) in localStorage
     localStorage.setItem("currentArtistId", JSON.stringify(artist.artistId));
@@ -84,8 +90,16 @@ function App() {
   };
 
   const handleInterestComplete = () => {
+    // Clear pending registration data after successful completion
+    setPendingRegistrationData(null);
     window.history.pushState({}, "", "/home");
     setActivePage("home");
+  };
+
+  const handleBackToRegister = () => {
+    // Navigate back to register page (data will persist via pendingRegistrationData)
+    window.history.pushState({}, "", "/register");
+    setActivePage("register");
   };
 
   const handleLoginSuccess = (artist) => {
@@ -108,6 +122,7 @@ function App() {
     setCurrentArtist(null);
     localStorage.removeItem("currentArtistId");
     localStorage.removeItem("currentArtist");
+    alert("Successfully logged out!");
     window.history.pushState({}, "", "/signin");
     setActivePage("signin");
   };
@@ -145,11 +160,23 @@ function App() {
   }
 
   if (activePage === "register") {
-    return <Register onRegisterSuccess={handleRegisterSuccess} />;
+    return (
+      <Register
+        onRegisterSuccess={handleRegisterSuccess}
+        initialData={pendingRegistrationData}
+        onClearPendingData={() => setPendingRegistrationData(null)}
+      />
+    );
   }
 
   if (activePage === "interests") {
-    return <InterestPicker artistId={currentArtistId} onComplete={handleInterestComplete} />;
+    return (
+      <InterestPicker
+        artistId={currentArtistId}
+        onComplete={handleInterestComplete}
+        onBack={handleBackToRegister}
+      />
+    );
   }
 
   if (activePage === "home") {

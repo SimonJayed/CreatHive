@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { register } from "../../api/artistApi";
 
-function Register({ onRegisterSuccess }) {
+function Register({ onRegisterSuccess, initialData, onClearPendingData }) {
     const [formData, setFormData] = useState({
         name: "",
         username: "",
@@ -11,11 +11,22 @@ function Register({ onRegisterSuccess }) {
     });
     const [error, setError] = useState("");
 
+    // Populate form with initial data if coming back from InterestPicker
+    useEffect(() => {
+        if (initialData) {
+            setFormData(initialData);
+        }
+    }, [initialData]);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
+        // Clear pending data when user starts typing (indicates new registration attempt)
+        if (initialData && onClearPendingData) {
+            onClearPendingData();
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -41,8 +52,8 @@ function Register({ onRegisterSuccess }) {
 
             const newArtist = await register(artistData);
             if (onRegisterSuccess) {
-                // Pass full artist object, not just ID
-                onRegisterSuccess(newArtist);
+                // Pass both artist object and form data for persistence
+                onRegisterSuccess(newArtist, formData);
             }
         } catch (err) {
             setError("Registration failed. Please try again.");
@@ -267,6 +278,10 @@ function Register({ onRegisterSuccess }) {
                     Already have an account?{' '}
                     <span
                         onClick={() => {
+                            // Clear pending registration data before navigating to sign in
+                            if (onClearPendingData) {
+                                onClearPendingData();
+                            }
                             window.history.pushState({}, "", "/signin");
                             window.location.reload();
                         }}

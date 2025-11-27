@@ -15,37 +15,41 @@ public class BlogService {
     @Autowired
     BlogRepository brepo;
 
-    public BlogEntity insertBlog(BlogEntity blog){
+    public BlogEntity insertBlog(BlogEntity blog) {
         return brepo.save(blog);
     }
 
-    public List<BlogEntity> getAllBlogs(){
+    public List<BlogEntity> getAllBlogs() {
         return brepo.findAll();
     }
 
+    public List<BlogEntity> getBlogsByArtistId(int artistId) {
+        return brepo.findByArtistId(artistId);
+    }
+
     @SuppressWarnings("finally")
-    public BlogEntity updateBlog(int blogId, BlogEntity newBlogDetails){
+    public BlogEntity updateBlog(int blogId, BlogEntity newBlogDetails) {
         BlogEntity blog = new BlogEntity();
-        try{
+        try {
             blog = brepo.findById(blogId).get();
             blog.setTitle(newBlogDetails.getTitle());
             blog.setContent(newBlogDetails.getContent());
-        }catch (NoSuchElementException ex){
+        } catch (NoSuchElementException ex) {
             throw new NoSuchElementException("Blog " + blogId + " does not exist.");
-        }finally {
+        } finally {
             return brepo.save(blog);
         }
     }
 
-    public String deleteBlog(int blogId){
-            String msg = "";
+    public String deleteBlog(int blogId) {
+        String msg = "";
 
-            if (brepo.findById(blogId) != null){
-                brepo.deleteById(blogId);
-                msg = "Blog " + blogId + "is successfully deleted!";
-            }else{
-                msg = "Blog " + blogId + " does not exist.";
-            }
-            return msg;
+        if (brepo.findById(blogId) != null) {
+            brepo.deleteById(blogId);
+            msg = "Blog " + blogId + "is successfully deleted!";
+        } else {
+            msg = "Blog " + blogId + " does not exist.";
+        }
+        return msg;
     }
 }

@@ -1,0 +1,169 @@
+.explore-container {
+    height: 100%;
+    padding: 60px 80px;
+    background-color: black;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=1600");
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.search-bar-container {
+    background-color: #FFB800;
+    border-radius: 50px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+    box-sizing: border-box;
+}
+
+.search-icon {
+    font-size: 20px;
+    margin-right: 12px;
+}
+
+.search-input {
+    flex: 1;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: black;
+    width: 100%;
+}
+
+.explore-content {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.featured-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #FFB800;
+    padding-bottom: 20px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.featured-title {
+    color: #FFB800;
+    font-size: clamp(24px, 4vw, 32px);
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+.featured-description {
+    color: #FFB800;
+    font-size: clamp(14px, 2vw, 16px);
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.tags-grid {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1200px;
+    padding-bottom: 40px;
+}
+
+.tag-card {
+    width: 280px;
+    height: 360px;
+    border-radius: 12px;
+    border: 3px solid #FFB800;
+    overflow: hidden;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.tag-card:hover {
+    transform: translateY(-5px);
+}
+
+.tag-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.tag-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.tag-name {
+    color: #FFB800;
+    font-size: 24px;
+    margin: 0;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.tag-icon {
+    font-size: 24px;
+}
+
+.tag-stats {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.btn-create {
+    background-color: #FFB800;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-create:hover {
+    background-color: #e6a600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .explore-container {
+        padding: 60px 20px 20px 20px;
+    }
+
+    .tag-card {
+        width: 100%;
+        max-width: 320px;
+        height: 300px;
+    }
+}

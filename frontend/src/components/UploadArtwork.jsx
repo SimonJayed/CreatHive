@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { insertArtwork } from '../api/artworkApi';
+import '../styles/UploadArtwork.css';
 
 function UploadArtwork({ artistData, onNavigate }) {
     const [formData, setFormData] = useState({
@@ -70,99 +71,35 @@ function UploadArtwork({ artistData, onNavigate }) {
     };
 
     return (
-        <div style={{
-            height: '100vh',
-            padding: '60px 40px 20px 40px',
-            backgroundImage: 'linear-gradient(rgba(101, 67, 33, 0.8), rgba(101, 67, 33, 0.8)), url("https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1600")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            boxSizing: 'border-box'
-        }}>
-            <div style={{ flexShrink: 0, width: '100%', maxWidth: '900px' }}>
-                <h1 style={{ color: '#FFB800', fontSize: '32px', marginBottom: '6px', marginTop: 0 }}>
-                    Upload Artwork
-                </h1>
-                <p style={{ color: '#FFB800', marginBottom: '16px', marginTop: 0, fontSize: '14px' }}>
+        <div className="upload-artwork-container">
+            <div className="upload-header">
+                <h1 className="upload-title">Upload Artwork</h1>
+                <p className="upload-subtitle">
                     Share your creative work with the Hiveminds community!
                 </p>
             </div>
 
-            <div style={{
-                backgroundColor: 'rgba(255, 248, 240, 0.95)',
-                borderRadius: '8px',
-                padding: '24px',
-                width: '100%',
-                maxWidth: '900px',
-                flex: 1,
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                <div style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    paddingRight: '4px',
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '16px',
-                    alignContent: 'start'
-                }}>
-                    {/* Artwork Image Upload - Spans 2 columns */}
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '6px',
-                            color: '#000',
-                            fontWeight: '600',
-                            fontSize: '14px'
-                        }}>
-                            Artwork Image*
-                        </label>
-                        <div style={{
-                            border: '2px dashed #FFB800',
-                            borderRadius: '8px',
-                            padding: '30px 20px',
-                            textAlign: 'center',
-                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                            cursor: 'pointer',
-                            position: 'relative'
-                        }}>
+            <div className="upload-form-card">
+                <div className="form-grid">
+                    {/* Artwork Image Upload - Spans full width */}
+                    <div className="full-width">
+                        <label className="form-label">Artwork Image*</label>
+                        <div className="image-upload-area">
                             <input
                                 type="file"
                                 accept="image/*"
                                 onChange={handleFileChange}
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    opacity: 0,
-                                    cursor: 'pointer'
-                                }}
+                                className="file-input"
                             />
-                            <div style={{ color: '#FFB800', fontSize: '32px', marginBottom: '6px' }}>↑</div>
-                            <p style={{ color: '#FFB800', fontWeight: '600', marginBottom: '4px', fontSize: '13px', margin: '0 0 4px 0' }}>
-                                Click to upload or drag and drop
-                            </p>
-                            <p style={{ color: '#999', fontSize: '11px', margin: 0 }}>
-                                PNG, JPG, GIF up to 10MB
-                            </p>
+                            <div className="upload-icon">↑</div>
+                            <p className="upload-text">Click to upload or drag and drop</p>
+                            <p className="upload-subtext">PNG, JPG, GIF up to 10MB</p>
                             {imageFile && (
-                                <div style={{ marginTop: '16px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+                                <div className="image-preview-container">
                                     <img
                                         src={URL.createObjectURL(imageFile)}
                                         alt="Preview"
-                                        style={{
-                                            maxWidth: '100%',
-                                            maxHeight: '200px',
-                                            borderRadius: '8px',
-                                            objectFit: 'contain'
-                                        }}
+                                        className="image-preview"
                                     />
                                 </div>
                             )}
@@ -172,57 +109,26 @@ function UploadArtwork({ artistData, onNavigate }) {
                     {/* Left Column */}
                     <div>
                         {/* Title */}
-                        <div style={{ marginBottom: '14px' }}>
-                            <label style={{
-                                display: 'block',
-                                marginBottom: '6px',
-                                color: '#000',
-                                fontWeight: '600',
-                                fontSize: '14px'
-                            }}>
-                                Title
-                            </label>
+                        <div className="form-group">
+                            <label className="form-label">Title</label>
                             <input
                                 type="text"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
                                 placeholder="Give your artwork a title"
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 10px',
-                                    borderRadius: '4px',
-                                    border: '1px solid #ddd',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
+                                className="form-input"
                             />
                         </div>
 
                         {/* Category */}
-                        <div style={{ marginBottom: '14px' }}>
-                            <label style={{
-                                display: 'block',
-                                marginBottom: '6px',
-                                color: '#000',
-                                fontWeight: '600',
-                                fontSize: '14px'
-                            }}>
-                                Category
-                            </label>
+                        <div className="form-group">
+                            <label className="form-label">Category</label>
                             <select
                                 name="category"
                                 value={formData.category}
                                 onChange={handleChange}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 10px',
-                                    borderRadius: '4px',
-                                    border: '1px solid #ddd',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box',
-                                    backgroundColor: 'white'
-                                }}
+                                className="form-select"
                             >
                                 <option value="">Select a category</option>
                                 <option value="digital">Digital Art</option>
@@ -233,32 +139,17 @@ function UploadArtwork({ artistData, onNavigate }) {
                         </div>
 
                         {/* Tags */}
-                        <div>
-                            <label style={{
-                                display: 'block',
-                                marginBottom: '6px',
-                                color: '#000',
-                                fontWeight: '600',
-                                fontSize: '14px'
-                            }}>
-                                Tags
-                            </label>
+                        <div className="form-group">
+                            <label className="form-label">Tags</label>
                             <input
                                 type="text"
                                 name="tags"
                                 value={formData.tags}
                                 onChange={handleChange}
                                 placeholder="digital art, fantasy..."
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 10px',
-                                    borderRadius: '4px',
-                                    border: '1px solid #ddd',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
+                                className="form-input"
                             />
-                            <p style={{ fontSize: '11px', color: '#666', marginTop: '3px', margin: '3px 0 0 0' }}>
+                            <p className="upload-subtext" style={{ marginTop: '4px' }}>
                                 Tags help others discover your artwork
                             </p>
                         </div>
@@ -267,124 +158,68 @@ function UploadArtwork({ artistData, onNavigate }) {
                     {/* Right Column */}
                     <div>
                         {/* Description */}
-                        <div style={{ marginBottom: '14px' }}>
-                            <label style={{
-                                display: 'block',
-                                marginBottom: '6px',
-                                color: '#000',
-                                fontWeight: '600',
-                                fontSize: '14px'
-                            }}>
-                                Description
-                            </label>
+                        <div className="form-group">
+                            <label className="form-label">Description</label>
                             <textarea
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
                                 placeholder="Tell us about your artwork..."
                                 rows="6"
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 10px',
-                                    borderRadius: '4px',
-                                    border: '1px solid #ddd',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box',
-                                    resize: 'none'
-                                }}
+                                className="form-textarea"
                             />
                         </div>
                     </div>
 
-                    {/* Visibility - Spans 2 columns */}
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '8px',
-                            color: '#000',
-                            fontWeight: '600',
-                            fontSize: '14px'
-                        }}>
-                            Visibility
-                        </label>
-                        <div style={{ display: 'flex', gap: '20px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    {/* Visibility - Spans full width */}
+                    <div className="full-width">
+                        <label className="form-label">Visibility</label>
+                        <div className="visibility-options">
+                            <label className="radio-label">
                                 <input
                                     type="radio"
                                     name="visibility"
                                     value="public"
                                     checked={formData.visibility === 'public'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '6px' }}
+                                    className="radio-input"
                                 />
-                                <span style={{ fontSize: '13px' }}><strong>Public</strong></span>
+                                <span className="radio-text"><strong>Public</strong></span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <label className="radio-label">
                                 <input
                                     type="radio"
                                     name="visibility"
                                     value="unlisted"
                                     checked={formData.visibility === 'unlisted'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '6px' }}
+                                    className="radio-input"
                                 />
-                                <span style={{ fontSize: '13px' }}><strong>Unlisted</strong></span>
+                                <span className="radio-text"><strong>Unlisted</strong></span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <label className="radio-label">
                                 <input
                                     type="radio"
                                     name="visibility"
                                     value="private"
                                     checked={formData.visibility === 'private'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '6px' }}
+                                    className="radio-input"
                                 />
-                                <span style={{ fontSize: '13px' }}><strong>Private</strong></span>
+                                <span className="radio-text"><strong>Private</strong></span>
                             </label>
                         </div>
                     </div>
-                </div>
 
-                {/* Buttons - Fixed at bottom */}
-                <div style={{
-                    gridColumn: '1 / -1',
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: '12px',
-                    paddingTop: '16px',
-                    borderTop: '1px solid #ddd',
-                    flexShrink: 0
-                }}>
-                    <button
-                        onClick={handleCancel}
-                        style={{
-                            padding: '8px 24px',
-                            backgroundColor: 'transparent',
-                            color: '#8B4513',
-                            border: '2px solid #8B4513',
-                            borderRadius: '8px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        style={{
-                            padding: '8px 24px',
-                            backgroundColor: '#FFB800',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        Upload Artwork
-                    </button>
+                    {/* Buttons */}
+                    <div className="form-actions">
+                        <button onClick={handleCancel} className="btn-cancel">
+                            Cancel
+                        </button>
+                        <button onClick={handleSubmit} className="btn-submit">
+                            Upload Artwork
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

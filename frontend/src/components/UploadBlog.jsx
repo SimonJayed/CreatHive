@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { insertBlog } from '../api/blogApi';
+import '../styles/UploadBlog.css';
 
-function UploadBlog() {
+function UploadBlog({ artistData }) {
     const [formData, setFormData] = useState({
         title: '',
         content: '',
@@ -20,7 +21,14 @@ function UploadBlog() {
         }
 
         try {
-            await insertBlog(formData);
+            // Include artistId in the blog data
+            const blogData = {
+                ...formData,
+                artistId: artistData?.artistId || 0
+            };
+            console.log("Uploading blog with data:", blogData);
+            console.log("Artist data:", artistData);
+            await insertBlog(blogData);
             alert('Blog uploaded successfully!');
             setFormData({ title: '', content: '', visibility: 'public' });
         } catch (error) {
@@ -34,143 +42,82 @@ function UploadBlog() {
     };
 
     return (
-        <div style={{
-            height: '100vh',
-            padding: '60px 40px 20px 40px',
-            backgroundColor: 'black',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            boxSizing: 'border-box'
-        }}>
-            <div style={{ flexShrink: 0, width: '100%', maxWidth: '800px' }}>
-                <h1 style={{ color: '#FFB800', fontSize: '32px', marginBottom: '6px', marginTop: 0 }}>
-                    Upload Blog
-                </h1>
-                <p style={{ color: '#FFB800', marginBottom: '16px', marginTop: 0, fontSize: '14px' }}>
+        <div className="upload-blog-container">
+            <div className="upload-header">
+                <h1 className="upload-title">Upload Blog</h1>
+                <p className="upload-subtitle">
                     Share your creative work with the Hiveminds community!
                 </p>
             </div>
 
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                padding: '24px',
-                width: '100%',
-                maxWidth: '800px',
-                flex: 1,
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
+            <div className="upload-form-card">
+                <div className="form-content">
                     {/* Title */}
-                    <div style={{ marginBottom: '16px' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '6px',
-                            color: '#000',
-                            fontWeight: '600',
-                            fontSize: '14px'
-                        }}>
-                            Title*
-                        </label>
+                    <div className="form-group">
+                        <label className="form-label">Title*</label>
                         <input
                             type="text"
                             name="title"
                             value={formData.title}
                             onChange={handleChange}
                             placeholder="Give your blog a title"
-                            style={{
-                                width: '100%',
-                                padding: '10px 12px',
-                                borderRadius: '4px',
-                                border: '1px solid #ddd',
-                                fontSize: '14px',
-                                boxSizing: 'border-box'
-                            }}
+                            className="form-input"
                         />
                     </div>
 
                     {/* Description */}
-                    <div style={{ marginBottom: '16px' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '6px',
-                            color: '#000',
-                            fontWeight: '600',
-                            fontSize: '14px'
-                        }}>
-                            Description
-                        </label>
+                    <div className="form-group">
+                        <label className="form-label">Description</label>
                         <textarea
                             name="content"
                             value={formData.content}
                             onChange={handleChange}
                             placeholder="Tell us about your thoughts..."
                             rows="4"
-                            style={{
-                                width: '100%',
-                                padding: '10px 12px',
-                                borderRadius: '4px',
-                                border: '1px solid #ddd',
-                                fontSize: '14px',
-                                boxSizing: 'border-box',
-                                resize: 'vertical',
-                                minHeight: '100px'
-                            }}
+                            className="form-textarea"
                         />
                     </div>
 
                     {/* Visibility */}
-                    <div style={{ marginBottom: '16px' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '10px',
-                            color: '#000',
-                            fontWeight: '600',
-                            fontSize: '14px'
-                        }}>
-                            Visibility
-                        </label>
-                        <div>
-                            <label style={{ display: 'flex', alignItems: 'center', marginBottom: '6px', cursor: 'pointer' }}>
+                    <div className="form-group">
+                        <label className="form-label" style={{ marginBottom: '10px' }}>Visibility</label>
+                        <div className="visibility-options">
+                            <label className="radio-label">
                                 <input
                                     type="radio"
                                     name="visibility"
                                     value="public"
                                     checked={formData.visibility === 'public'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '8px' }}
+                                    className="radio-input"
                                 />
-                                <span style={{ fontSize: '14px' }}>
+                                <span className="radio-text">
                                     <strong>Public</strong> - Anyone can see this artwork
                                 </span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', marginBottom: '6px', cursor: 'pointer' }}>
+                            <label className="radio-label">
                                 <input
                                     type="radio"
                                     name="visibility"
                                     value="unlisted"
                                     checked={formData.visibility === 'unlisted'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '8px' }}
+                                    className="radio-input"
                                 />
-                                <span style={{ fontSize: '14px' }}>
+                                <span className="radio-text">
                                     <strong>Unlisted</strong> - Only people with the link can see this artwork
                                 </span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <label className="radio-label">
                                 <input
                                     type="radio"
                                     name="visibility"
                                     value="private"
                                     checked={formData.visibility === 'private'}
                                     onChange={handleChange}
-                                    style={{ marginRight: '8px' }}
+                                    className="radio-input"
                                 />
-                                <span style={{ fontSize: '14px' }}>
+                                <span className="radio-text">
                                     <strong>Private</strong> - Only you can see this artwork
                                 </span>
                             </label>
@@ -178,43 +125,12 @@ function UploadBlog() {
                     </div>
                 </div>
 
-                {/* Buttons - Fixed at bottom */}
-                <div style={{
-                    flexShrink: 0,
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: '12px',
-                    paddingTop: '16px',
-                    borderTop: '1px solid #eee'
-                }}>
-                    <button
-                        onClick={handleCancel}
-                        style={{
-                            padding: '10px 28px',
-                            backgroundColor: 'white',
-                            color: '#FFB800',
-                            border: '2px solid #FFB800',
-                            borderRadius: '8px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
+                {/* Buttons */}
+                <div className="form-actions">
+                    <button onClick={handleCancel} className="btn-cancel">
                         Cancel
                     </button>
-                    <button
-                        onClick={handleSubmit}
-                        style={{
-                            padding: '10px 28px',
-                            backgroundColor: '#FFB800',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
+                    <button onClick={handleSubmit} className="btn-submit">
                         Upload Blog
                     </button>
                 </div>

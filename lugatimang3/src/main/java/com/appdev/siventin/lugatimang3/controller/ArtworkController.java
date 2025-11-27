@@ -31,9 +31,14 @@ public class ArtworkController {
         return awservice.insertArtwork(artwork);
     }
 
-    @GetMapping("/getAllArworks")
+    @GetMapping("/getAllArtworks")
     public List<ArtworkEntity> getAllArtworks() {
         return awservice.getAllArtworks();
+    }
+
+    @GetMapping("/getArtworksByArtistId/{artistId}")
+    public List<ArtworkEntity> getArtworksByArtistId(@PathVariable int artistId) {
+        return awservice.getArtworksByArtistId(artistId);
     }
 
     @PutMapping("/updateArtwork")

@@ -5,6 +5,12 @@ export async function getAllArtworks() {
     return res.json();
 }
 
+export async function getArtworksByArtistId(artistId) {
+    const res = await fetch(`${BASE_URL}/getArtworksByArtistId/${artistId}`);
+    if (!res.ok) return [];
+    return res.json();
+}
+
 export async function insertArtwork(artwork) {
     const res = await fetch(`${BASE_URL}/insertArtwork`, {
         method: "POST",
@@ -13,6 +19,3 @@ export async function insertArtwork(artwork) {
     });
     return res.json();
 }
-
-// TODO: Add getArtworksByArtistId when backend supports it
-// For now we might have to filter on frontend if backend doesn't support filtering

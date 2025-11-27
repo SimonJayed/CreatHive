@@ -23,29 +23,28 @@ public class ArtistService {
         return arepo.findAll();
     }
 
-    @SuppressWarnings("finally")
     public ArtistEntity updateArtist(int artistId, ArtistEntity newArtistDetails) {
-        ArtistEntity artist = new ArtistEntity();
-        try {
-            artist = arepo.findById(artistId).get();
+        ArtistEntity artist = arepo.findById(artistId)
+                .orElseThrow(() -> new NoSuchElementException("Artist " + artistId + " does not exist."));
+
+        if (newArtistDetails.getName() != null)
             artist.setName(newArtistDetails.getName());
+        if (newArtistDetails.getBio() != null)
             artist.setBio(newArtistDetails.getBio());
+        if (newArtistDetails.getInterest() != null)
             artist.setInterest(newArtistDetails.getInterest());
+        if (newArtistDetails.getWebsite() != null)
+            artist.setWebsite(newArtistDetails.getWebsite());
+        if (newArtistDetails.getUsername() != null)
+            artist.setUsername(newArtistDetails.getUsername());
+        if (newArtistDetails.getPassword() != null)
+            artist.setPassword(newArtistDetails.getPassword());
+        if (newArtistDetails.getEmail() != null)
+            artist.setEmail(newArtistDetails.getEmail());
+        if (newArtistDetails.getProfileImage() != null)
+            artist.setProfileImage(newArtistDetails.getProfileImage());
 
-            if (newArtistDetails.getUsername() != null)
-                artist.setUsername(newArtistDetails.getUsername());
-            if (newArtistDetails.getPassword() != null)
-                artist.setPassword(newArtistDetails.getPassword());
-            if (newArtistDetails.getEmail() != null)
-                artist.setEmail(newArtistDetails.getEmail());
-            if (newArtistDetails.getProfileImage() != null)
-                artist.setProfileImage(newArtistDetails.getProfileImage());
-
-        } catch (NoSuchElementException ex) {
-            throw new NoSuchElementException("Artist " + artistId + " does not exist.");
-        } finally {
-            return arepo.save(artist);
-        }
+        return arepo.save(artist);
     }
 
     public String deleteArtist(int artistId) {

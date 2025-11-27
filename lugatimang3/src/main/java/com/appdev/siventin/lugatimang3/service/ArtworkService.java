@@ -30,15 +30,18 @@ public class ArtworkService {
         return awrepo.findAll();
     }
 
-    // public ArtworkEntity getArtworkBydescription(String description) throws
-    // NameNotFoundException {
-    // if (awrepo.findByDescription(description) != null)
-    // return awrepo.findByDescription(description);
-    // else
-    // throw new NameNotFoundException(
-    // "There is no Artwork having that description " + description + " in the
-    // records.");
-    // }
+    public List<ArtworkEntity> getArtworksByArtistId(int artistId) {
+        return awrepo.findByArtistId(artistId);
+    }
+
+    public ArtworkEntity getArtworkBydescription(String description) throws NameNotFoundException {
+        if (awrepo.findByDescription(description) != null)
+            return awrepo.findByDescription(description);
+        else
+            throw new NameNotFoundException(
+                    "There is no Artwork having that description " + description + " in the records.");
+
+    }
 
     // Update
     @SuppressWarnings("finally")
@@ -60,7 +63,6 @@ public class ArtworkService {
     @SuppressWarnings("unused")
     public String deleteArtwork(int artworkId) {
         String msg = "";
-
         if (awrepo.findById(artworkId) != null) {
             awrepo.deleteById(artworkId);
             msg = "Artwork " + artworkId + "is successfully deleted!";

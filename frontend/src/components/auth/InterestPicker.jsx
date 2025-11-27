@@ -11,7 +11,7 @@ const INTERESTS = [
     "Surrealism", "Semi-Realism", "Vintage Style"
 ];
 
-function InterestPicker({ artistId, onComplete }) {
+function InterestPicker({ artistId, onComplete, onBack }) {
     const [selectedInterests, setSelectedInterests] = useState([]);
 
     const toggleInterest = (interest) => {
@@ -40,6 +40,14 @@ function InterestPicker({ artistId, onComplete }) {
         }
     };
 
+    const handleBack = () => {
+        if (onBack) {
+            onBack();
+        } else {
+            window.history.back();
+        }
+    };
+
     return (
         <div style={{
             minHeight: '100vh',
@@ -51,7 +59,7 @@ function InterestPicker({ artistId, onComplete }) {
         }}>
             <div style={{ width: '100%', maxWidth: '800px', position: 'relative' }}>
                 <button
-                    onClick={() => window.history.back()}
+                    onClick={handleBack}
                     style={{
                         position: 'absolute',
                         left: 0,

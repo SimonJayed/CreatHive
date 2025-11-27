@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/Settings.css';
 
 function Settings() {
     const [darkMode, setDarkMode] = useState(true);
@@ -13,53 +14,27 @@ function Settings() {
     const ToggleSwitch = ({ checked, onChange }) => (
         <div
             onClick={() => onChange(!checked)}
-            style={{
-                width: '50px',
-                height: '26px',
-                backgroundColor: checked ? '#FFB800' : '#ddd',
-                borderRadius: '13px',
-                position: 'relative',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s'
-            }}
+            className="toggle-switch"
+            style={{ backgroundColor: checked ? '#FFB800' : '#ddd' }}
         >
-            <div style={{
-                width: '22px',
-                height: '22px',
-                backgroundColor: 'white',
-                borderRadius: '50%',
-                position: 'absolute',
-                top: '2px',
-                left: checked ? '26px' : '2px',
-                transition: 'left 0.2s'
-            }} />
+            <div
+                className="toggle-knob"
+                style={{ left: checked ? '26px' : '2px' }}
+            />
         </div>
     );
 
     return (
-        <div style={{
-            height: '100vh',
-            padding: '60px 80px',
-            backgroundColor: 'black',
-            overflow: 'auto',
-            boxSizing: 'border-box'
-        }}>
-            <h1 style={{ color: '#FFB800', fontSize: '32px', marginBottom: '24px', marginTop: 0 }}>Settings</h1>
+        <div className="settings-container">
+            <h1 className="settings-title">Settings</h1>
 
             {/* Appearance Section */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                padding: '30px',
-                marginBottom: '24px'
-            }}>
-                <h2 style={{ color: '#FFB800', fontSize: '24px', marginTop: 0, marginBottom: '20px' }}>
-                    Appearance
-                </h2>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <h3 style={{ fontSize: '16px', marginBottom: '4px', marginTop: 0 }}>Dark Mode</h3>
-                        <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+            <div className="settings-section">
+                <h2 className="section-title">Appearance</h2>
+                <div className="setting-item">
+                    <div className="setting-info">
+                        <h3 className="setting-name">Dark Mode</h3>
+                        <p className="setting-description">
                             Toggle between light and dark theme
                         </p>
                     </div>
@@ -68,30 +43,23 @@ function Settings() {
             </div>
 
             {/* Notifications Section */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                padding: '30px',
-                marginBottom: '24px'
-            }}>
-                <h2 style={{ color: '#FFB800', fontSize: '24px', marginTop: 0, marginBottom: '20px' }}>
-                    Notifications
-                </h2>
+            <div className="settings-section">
+                <h2 className="section-title">Notifications</h2>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <div>
-                        <h3 style={{ fontSize: '16px', marginBottom: '4px', marginTop: 0 }}>Push Notifications</h3>
-                        <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+                <div className="setting-item">
+                    <div className="setting-info">
+                        <h3 className="setting-name">Push Notifications</h3>
+                        <p className="setting-description">
                             Receive notifications about your artworks and activities
                         </p>
                     </div>
                     <ToggleSwitch checked={pushNotifications} onChange={setPushNotifications} />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <h3 style={{ fontSize: '16px', marginBottom: '4px', marginTop: 0 }}>Email Notifications</h3>
-                        <p style={{ fontSize: '14px', color: '#666', margin: 0 }}>
+                <div className="setting-item">
+                    <div className="setting-info">
+                        <h3 className="setting-name">Email Notifications</h3>
+                        <p className="setting-description">
                             Get updates and announcements via email
                         </p>
                     </div>
@@ -100,29 +68,14 @@ function Settings() {
             </div>
 
             {/* Language Preferences Section */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                padding: '30px',
-                marginBottom: '24px'
-            }}>
-                <h2 style={{ color: '#FFB800', fontSize: '24px', marginTop: 0, marginBottom: '20px' }}>
-                    Language Preferences
-                </h2>
+            <div className="settings-section">
+                <h2 className="section-title">Language Preferences</h2>
                 <div>
-                    <h3 style={{ fontSize: '16px', marginBottom: '8px', marginTop: 0 }}>Language</h3>
+                    <h3 className="setting-name" style={{ marginBottom: '8px' }}>Language</h3>
                     <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            borderRadius: '8px',
-                            border: '1px solid #ddd',
-                            fontSize: '14px',
-                            backgroundColor: 'white',
-                            cursor: 'pointer'
-                        }}
+                        className="language-select"
                     >
                         <option value="">Select a language</option>
                         <option value="en">English</option>
@@ -137,32 +90,14 @@ function Settings() {
             </div>
 
             {/* Security Section */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                padding: '30px'
-            }}>
-                <h2 style={{ color: '#FFB800', fontSize: '24px', marginTop: 0, marginBottom: '20px' }}>
-                    Security
-                </h2>
+            <div className="settings-section">
+                <h2 className="section-title">Security</h2>
                 <div>
-                    <h3 style={{ fontSize: '16px', marginBottom: '4px', marginTop: 0 }}>Password Reset</h3>
-                    <p style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+                    <h3 className="setting-name">Password Reset</h3>
+                    <p className="setting-description" style={{ marginBottom: '16px' }}>
                         Request a password reset link via email
                     </p>
-                    <button
-                        onClick={handlePasswordReset}
-                        style={{
-                            backgroundColor: '#FFB800',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '10px 24px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                        }}
-                    >
+                    <button onClick={handlePasswordReset} className="btn-reset">
                         Reset Password
                     </button>
                 </div>

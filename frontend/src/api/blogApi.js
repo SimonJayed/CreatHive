@@ -5,6 +5,12 @@ export async function getAllBlogs() {
   return res.json();
 }
 
+export async function getBlogsByArtistId(artistId) {
+  const res = await fetch(`${BASE_URL}/getBlogsByArtistId/${artistId}`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
 export async function insertBlog(blog) {
   const res = await fetch(`${BASE_URL}/insertBlog`, {
     method: "POST",

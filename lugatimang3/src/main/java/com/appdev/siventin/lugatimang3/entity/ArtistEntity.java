@@ -33,15 +33,18 @@ public class ArtistEntity {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "profile_image", columnDefinition = "LONGTEXT")
+    @Column(name = "profile_pic_data", columnDefinition = "LONGTEXT")
     private String profileImage;
+
+    @Column(name = "website")
+    private String website;
 
     public ArtistEntity() {
         super();
     }
 
     public ArtistEntity(int artistId, String name, String bio, String interest, String username, String password,
-            String email) {
+            String email, String website) {
         super();
         this.artistId = artistId;
         this.name = name;
@@ -50,6 +53,7 @@ public class ArtistEntity {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.website = website;
     }
 
     public int getArtistId() {
@@ -114,5 +118,13 @@ public class ArtistEntity {
 
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

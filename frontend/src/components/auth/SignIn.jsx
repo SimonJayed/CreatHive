@@ -93,6 +93,7 @@ function SignIn({ onLoginSuccess }) {
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
+                            placeholder="Enter your username"
                             style={{
                                 width: '100%',
                                 padding: '10px 12px',
@@ -120,6 +121,7 @@ function SignIn({ onLoginSuccess }) {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
+                            placeholder="Enter your password"
                             style={{
                                 width: '100%',
                                 padding: '10px 12px',
