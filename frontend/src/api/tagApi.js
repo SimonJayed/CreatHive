@@ -29,3 +29,18 @@ export async function deleteTag(tagId) {
   });
   return res.text();
 }
+
+// Artwork Tag Association
+export async function getAllArtworkTags() {
+  const res = await fetch(`http://localhost:8080/artworkTag/getAll`);
+  return res.json();
+}
+
+export async function insertArtworkTag(artworkId, tagId) {
+  const res = await fetch(`http://localhost:8080/artworkTag/insert`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ artworkId, tagId }),
+  });
+  return res.json();
+}

@@ -12,7 +12,7 @@ function App() {
   const [activePage, setActivePage] = useState(() => {
     // Check if user is logged in
     const savedArtist = localStorage.getItem("currentArtist");
-    if (savedArtist) {
+    if (savedArtist && savedArtist !== "undefined") {
       // If logged in, check if current path is a valid homepage route
       const path = window.location.pathname;
       const validHomeRoutes = ["/home", "/upload-blog", "/upload-artwork", "/explore", "/profile", "/settings"];
@@ -24,18 +24,28 @@ function App() {
     // Default to signin if not logged in and on root
     const path = window.location.pathname;
     if (path === "/" || path === "/signin") return "signin";
-    if (path === "/register") return "register";
+    if (path === "/register" || path === "/interests") return "register";
     return "signin";
   });
 
   // Initialize state from localStorage if available
   const [currentArtistId, setCurrentArtistId] = useState(() => {
     const saved = localStorage.getItem("currentArtistId");
-    return saved ? JSON.parse(saved) : null;
+    if (!saved || saved === "undefined") return null;
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      return null;
+    }
   });
   const [currentArtist, setCurrentArtist] = useState(() => {
     const saved = localStorage.getItem("currentArtist");
-    return saved ? JSON.parse(saved) : null;
+    if (!saved || saved === "undefined") return null;
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      return null;
+    }
   });
 
   // State for persisting registration form data when navigating to InterestPicker
@@ -80,16 +90,21 @@ function App() {
     // Store registration form data for potential back navigation
     setPendingRegistrationData(formData);
 
-    // Store ID and sanitized artist (no image) in localStorage
-    localStorage.setItem("currentArtistId", JSON.stringify(artist.artistId));
-    const artistToSave = { ...artist, profileImage: null }; // Don't save image to localStorage
-    localStorage.setItem("currentArtist", JSON.stringify(artistToSave));
+    // NOTE: We do NOT save to localStorage yet. We wait until InterestPicker is done.
+    // This prevents "logging in" if the user refreshes during the interest step.
 
     window.history.pushState({}, "", "/interests");
     setActivePage("interests");
   };
 
   const handleInterestComplete = () => {
+    // Save to localStorage now that the flow is complete
+    if (currentArtist) {
+      localStorage.setItem("currentArtistId", JSON.stringify(currentArtist.artistId));
+      const artistToSave = { ...currentArtist, profileImage: null }; // Don't save image to localStorage
+      localStorage.setItem("currentArtist", JSON.stringify(artistToSave));
+    }
+
     // Clear pending registration data after successful completion
     setPendingRegistrationData(null);
     window.history.pushState({}, "", "/home");

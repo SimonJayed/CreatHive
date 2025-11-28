@@ -56,5 +56,11 @@ export async function register(artist) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(artist),
   });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Registration failed");
+  }
+
   return res.json();
 }

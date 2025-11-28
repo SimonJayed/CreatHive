@@ -27,8 +27,8 @@ public class BlogController {
     BlogService bservice;
 
     @PostMapping("/insertBlog")
-    public BlogEntity insertBlog(@RequestBody BlogEntity blog) {
-        return bservice.insertBlog(blog);
+    public BlogEntity insertBlog(@RequestBody BlogEntity blog, @RequestParam int artistId) {
+        return bservice.insertBlog(blog, artistId);
     }
 
     @GetMapping("/getAllBlogs")

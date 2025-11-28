@@ -27,8 +27,8 @@ public class ArtworkController {
     ArtworkService awservice;
 
     @PostMapping("/insertArtwork")
-    public ArtworkEntity insertArwork(@RequestBody ArtworkEntity artwork) {
-        return awservice.insertArtwork(artwork);
+    public ArtworkEntity insertArtwork(@RequestBody ArtworkEntity artwork, @RequestParam int artistId) {
+        return awservice.insertArtwork(artwork, artistId);
     }
 
     @GetMapping("/getAllArtworks")

@@ -22,13 +22,12 @@ public class ArtworkEntity {
     private String category;
     private String tags;
     private String visibility;
-    private int artistId; // Link to the artist
 
     public ArtworkEntity() {
     }
 
     public ArtworkEntity(int artworkId, String title, String image, String description, LocalDateTime creationDate,
-            String category, String tags, String visibility, int artistId) {
+            String category, String tags, String visibility) {
         super();
         this.artworkId = artworkId;
         this.title = title;
@@ -38,7 +37,6 @@ public class ArtworkEntity {
         this.category = category;
         this.tags = tags;
         this.visibility = visibility;
-        this.artistId = artistId;
     }
 
     public int getArtworkId() {
@@ -73,10 +71,6 @@ public class ArtworkEntity {
         return visibility;
     }
 
-    public int getArtistId() {
-        return artistId;
-    }
-
     public void setTitle(String title) {
         this.title = title;
     }
@@ -103,9 +97,5 @@ public class ArtworkEntity {
 
     public void setVisibility(String visibility) {
         this.visibility = visibility;
-    }
-
-    public void setArtistId(int artistId) {
-        this.artistId = artistId;
     }
 }

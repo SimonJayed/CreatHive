@@ -10,6 +10,48 @@
 -   **Authentication**: User login and registration are performed using the Artist entity.
 -   **Profile Data**: When passing user data to components (e.g., Profile page), the data comes from the Artist entity. Props like `userData` or `artistData` refer to the logged-in artist's information.
 
+## Entity Relationships & Usage Guide
+The application uses a **Many-to-Many** relationship model implemented via **Associative Entities**. This allows for greater flexibility and metadata on relationships (e.g., `dateFavorited`, `dateAssigned`).
+
+### Core Entities
+-   **Artist**: Represents the user.
+-   **Artwork**: Represents an uploaded image/creation.
+-   **Blog**: Represents a text post.
+-   **Comment**: Represents a comment (content only).
+-   **Tag**: Represents a category/tag.
+
+### Associative Entities (The "Link" Tables)
+Instead of direct Foreign Keys (e.g., `artist_id` in `Artwork` table), we use separate tables to link entities.
+
+1.  **UserArtwork (`user_artwork`)**: Links **Artist** and **Artwork**.
+    -   **Purpose**: Indicates ownership (Who uploaded this artwork?).
+    -   **Key**: Composite Key (`artworkId`, `artistId`).
+    -   **Usage**: To find an artist's artworks, query `UserArtworkRepository` for all records with the given `artistId`, then fetch the corresponding `Artwork` records.
+
+2.  **UserBlog (`user_blog`)**: Links **Artist** and **Blog**.
+    -   **Purpose**: Indicates ownership (Who wrote this blog?).
+    -   **Key**: Composite Key (`blogId`, `userId` [which is artistId]).
+
+3.  **Favorites (`favorites`)**: Links **Artist** and **Artwork**.
+    -   **Purpose**: Indicates "Likes" or "Favorites".
+    -   **Key**: Composite Key (`artworkId`, `artistId`).
+    -   **Extra Data**: `dateFavorited`.
+
+4.  **ArtworkTag (`artwork_tag`)**: Links **Artwork** and **Tag**.
+    -   **Purpose**: Categorization.
+    -   **Key**: Composite Key (`artworkId`, `tagId`).
+
+5.  **Comments**:
+    -   **UserComment**: Links **Artist** -> **Comment** (Who wrote it?).
+    -   **CommentOnArtwork**: Links **Comment** -> **Artwork** (Where is it posted?).
+    -   **CommentOnBlog**: Links **Comment** -> **Blog** (Where is it posted?).
+
+### API Usage for Uploads
+When creating a new resource (Artwork/Blog), you must:
+1.  **Insert the Resource**: POST to `/insert...` with the entity body.
+2.  **Provide the Owner**: Pass `artistId` as a query parameter (e.g., `?artistId=123`).
+3.  **Backend Logic**: The service will save the entity *and* automatically create the corresponding Associative Entity record (e.g., `UserArtwork`) to link it to the artist.
+
 ## Workflow Steps
 1.  **Exploration**:
     -   Analyzed the `lugatimang3` directory for Backend structure (Spring Boot).
@@ -50,23 +92,6 @@ To fully integrate the new components, they must be added to the application's r
 
 ## Quality Control
 **Double-checking modified files for errors is a MUST.**
-Before committing any changes, always:
-1. Review all modified files for syntax errors
-2. Test functionality in the browser
-3. Verify that changes follow **BOTH** System.md **AND** Styles.md guidelines
-4. **Double-check proper indentation and bracket matching**
-5. Ensure no regressions were introduced
-6. **Verify backend alignment**: When making frontend API changes, ALWAYS check the corresponding backend files:
-   - **Controller**: Verify endpoint paths, HTTP methods, and parameter names match
-   - **Entity**: Confirm field names and types align with frontend expectations
-   - **Repository**: Check that query methods exist and return expected data types
-   - **Service**: Ensure business logic matches frontend assumptions
-
-## Refactoring Standards
-To maintain code quality and readability, follow these guidelines when refactoring components:
-
-1.  **Component Decomposition**:
-    *   Break large components into smaller, focused subcomponents (e.g., `ProfileHeader`, `ProfileBio`).
     *   Extract common UI patterns into reusable components (e.g., `EditableText`).
 
 2.  **CSS Management**:
@@ -101,4 +126,65 @@ This ensures consistency across documentation.
     -   Clearing any user-related state in the application
     -   Redirecting to the login page
 -   **Protected Routes**: Routes that require authentication should verify the presence and validity of tokens before granting access.
--   **Token Refresh**: Implement token refresh mechanisms to maintain user sessions without requiring frequent re-authentication.
+## Functional Requirements & Status
+
+### Objective 1: User Registration & Profile Management
+**Goal**: Allow users to register and create personalized profiles.
+-   **Module 1: User Registration**
+    -   Transaction 1: System validates user information during registration. **[Implemented]**
+    -   Transaction 2: System restricts access for unregistered users. **[Implemented]**
+    -   Transaction 3: Students can choose their interests. **[Implemented]**
+    -   Transaction 4: Students can register to the application. **[Implemented]**
+-   **Module 2: Profile Management**
+    -   Transaction 1: Students can upload a profile picture and biography. **[Implemented]**
+    -   Transaction 2: Students can create and edit their personal profiles. **[Implemented]**
+
+### Objective 2: Artwork Upload & Tagging
+**Goal**: Provide a system for uploading OCs and artworks with tagging.
+-   **Module 1: Artwork Upload**
+    -   Transaction 1: Students can upload original characters (OCs) and artworks. **[Implemented]**
+    -   Transaction 2: System supports different file formats (e.g., JPG, PNG). **[Implemented]**
+    -   Transaction 3: Students can remove/delete a post. **[Implemented]**
+    -   Transaction 4: Students can archive/un-list a post. **[Partially Implemented]** (Visibility field exists, UI pending)
+-   **Module 2: Tagging and Categorization**
+    -   Transaction 1: System allows searching and filtering based on tags. **[Partially Implemented]** (Backend ready, Frontend UI pending)
+    -   Transaction 2: Students can assign tags to their uploads. **[Implemented]**
+    -   Transaction 3: Students can search using tags. **[Partially Implemented]**
+
+### Objective 3: Forums & Discussions
+**Goal**: Allow users to participate and engage in forums.
+-   **Module 1: Forum & Thread Management**
+    -   Transaction 1: Users can view discussion forums categorized by topics. **[Implemented]** (via Blogs)
+    -   Transaction 2: Users can create new threads and post replies. **[Implemented]** (Blogs & Comments)
+    -   Transaction 3: Users can edit or delete their own posts within a limited time. **[Partially Implemented]** (Edit/Delete exists, time limit pending)
+-   **Module 2: Moderation & Reporting**
+    -   Transaction 1: Users can report inappropriate content. **[Not Started]**
+    -   Transaction 2: Moderators can review reports and take action. **[Not Started]**
+    -   Transaction 3: Admins can assign moderator roles. **[Not Started]**
+
+### Objective 4: AI-Assisted Discovery
+**Goal**: Provide AI-assisted discovery and personalized assistance.
+-   **Module 1: AI-Powered Recommendation**
+    -   Transaction 1: System recommends artworks/artists based on interests. **[Not Started]**
+    -   Transaction 2: System personalizes suggestions for new artworks. **[Not Started]**
+-   **Module 2: Auto-Tagging & Description**
+    -   Transaction 1: AI suggests relevant tags and descriptions. **[Not Started]**
+    -   Transaction 2: AI suggests suitable categories/collections. **[Not Started]**
+
+### Objective 5: Creative Development
+**Goal**: Support student creatives in developing and sharing art.
+-   **Module 1: Creative Challenges**
+    -   Transaction 1: Students can participate in challenges (streaks). **[Not Started]**
+    -   Transaction 2: Students can access tutorials and resources. **[Not Started]**
+-   **Module 2: Community Gallery**
+    -   Transaction 1: Students can post to public gallery. **[Implemented]**
+    -   Transaction 2: Students can browse, like, comment, and share. **[Partially Implemented]** (Browse/Like/Comment done, Share pending)
+
+### Objective 6: Resources & Learning
+**Goal**: Provide access to art resources and learning materials.
+-   **Module 1: Interactive Learning**
+    -   Transaction 1: Students can pause/rewind video lessons and take notes. **[Not Started]**
+    -   Transaction 2: Students can access downloadable practice sheets. **[Not Started]**
+-   **Module 2: Personalized Dashboard**
+    -   Transaction 1: Students can track progress and receive certificates. **[Not Started]**
+    -   Transaction 2: Students can set learning goals and receive reminders. **[Not Started]**

@@ -24,7 +24,7 @@ public class ArtistEntity {
     @Column(name = "interest")
     private String interest;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username")
     private String username;
 
     @Column(name = "password")
@@ -39,8 +39,12 @@ public class ArtistEntity {
     @Column(name = "website")
     private String website;
 
+    @Column(name = "date_created")
+    private java.time.LocalDateTime dateCreated;
+
     public ArtistEntity() {
         super();
+        this.dateCreated = java.time.LocalDateTime.now();
     }
 
     public ArtistEntity(int artistId, String name, String bio, String interest, String username, String password,
@@ -54,6 +58,7 @@ public class ArtistEntity {
         this.password = password;
         this.email = email;
         this.website = website;
+        this.dateCreated = java.time.LocalDateTime.now();
     }
 
     public int getArtistId() {
@@ -126,5 +131,13 @@ public class ArtistEntity {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public java.time.LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(java.time.LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }

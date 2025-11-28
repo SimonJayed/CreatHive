@@ -28,7 +28,12 @@ function UploadBlog({ artistData }) {
             };
             console.log("Uploading blog with data:", blogData);
             console.log("Artist data:", artistData);
-            await insertBlog(blogData);
+            const artistId = artistData?.artistId || 0;
+            if (artistId === 0) {
+                alert('You must be logged in to upload a blog.');
+                return;
+            }
+            await insertBlog(blogData, artistId);
             alert('Blog uploaded successfully!');
             setFormData({ title: '', content: '', visibility: 'public' });
         } catch (error) {

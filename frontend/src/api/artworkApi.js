@@ -11,8 +11,8 @@ export async function getArtworksByArtistId(artistId) {
     return res.json();
 }
 
-export async function insertArtwork(artwork) {
-    const res = await fetch(`${BASE_URL}/insertArtwork`, {
+export async function insertArtwork(artwork, artistId) {
+    const res = await fetch(`${BASE_URL}/insertArtwork?artistId=${artistId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(artwork),

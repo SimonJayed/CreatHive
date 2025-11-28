@@ -50,10 +50,16 @@ function UploadArtwork({ artistData, onNavigate }) {
                     visibility: formData.visibility,
                     image: base64Image,
                     artistId: artistData.artistId,
-                    creationDate: new Date().toISOString()
+                    creationDate: new Date().toISOString().slice(0, 19) // Remove 'Z' for LocalDateTime compatibility
                 };
 
-                await insertArtwork(artworkData);
+                const user = JSON.parse(localStorage.getItem('currentArtist'));
+                if (!user || !user.artistId) {
+                    alert('You must be logged in to upload artwork.');
+                    return;
+                }
+                const artistId = user.artistId;
+                await insertArtwork(artworkData, artistId);
                 alert('Artwork uploaded successfully!');
                 setFormData({ title: '', category: '', description: '', tags: '', visibility: 'public' });
                 setImageFile(null);

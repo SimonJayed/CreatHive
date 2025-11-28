@@ -25,20 +25,16 @@ public class BlogEntity {
     @Column(name = "date_posted")
     private Date date_posted;
 
-    @Column(name = "artist_id")
-    private int artistId;
-
     public BlogEntity() {
         super();
     }
 
-    public BlogEntity(int blogId, String title, String content, Date date_posted, int artistId) {
+    public BlogEntity(int blogId, String title, String content, Date date_posted) {
         super();
         this.blogId = blogId;
         this.title = title;
         this.content = content;
         this.date_posted = date_posted;
-        this.artistId = artistId;
     }
 
     public int getBlogId() {
@@ -63,13 +59,5 @@ public class BlogEntity {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public int getArtistId() {
-        return artistId;
-    }
-
-    public void setArtistId(int artistId) {
-        this.artistId = artistId;
     }
 }

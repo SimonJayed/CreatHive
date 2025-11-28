@@ -15,8 +15,26 @@ public class BlogService {
     @Autowired
     BlogRepository brepo;
 
-    public BlogEntity insertBlog(BlogEntity blog) {
-        return brepo.save(blog);
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.UserBlogRepository userBlogRepository;
+
+    public BlogEntity insertBlog(BlogEntity blog, int artistId) {
+        try {
+            // 1. Save the Blog
+            BlogEntity savedBlog = brepo.save(blog);
+
+            // 2. Create the Association
+            com.appdev.siventin.lugatimang3.entity.UserBlogEntity userBlog = new com.appdev.siventin.lugatimang3.entity.UserBlogEntity();
+            com.appdev.siventin.lugatimang3.entity.UserBlogEntity.UserBlogKey id = new com.appdev.siventin.lugatimang3.entity.UserBlogEntity.UserBlogKey(
+                    savedBlog.getBlogId(), artistId);
+            userBlog.setId(id);
+            userBlogRepository.save(userBlog);
+
+            return savedBlog;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public List<BlogEntity> getAllBlogs() {
@@ -24,7 +42,19 @@ public class BlogService {
     }
 
     public List<BlogEntity> getBlogsByArtistId(int artistId) {
-        return brepo.findByArtistId(artistId);
+        try {
+            // Find all blog IDs associated with the artist
+            List<Integer> blogIds = userBlogRepository.findAll().stream()
+                    .filter(ub -> ub.getId().getUserId() == artistId)
+                    .map(ub -> ub.getId().getBlogId())
+                    .collect(java.util.stream.Collectors.toList());
+
+            // Fetch blogs by IDs
+            return brepo.findAllById(blogIds);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
+        }
     }
 
     @SuppressWarnings("finally")
