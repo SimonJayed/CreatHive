@@ -1,8 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import ArtworkCard from '../artworks/ArtworkCard';
+import { likeArtwork, favoriteArtwork, getFavoriteArtworks } from '../../api/artworkApi';
 
 function ArtistArtworks({ artworks, onNavigate }) {
-    // Sort artworks by most recent first (assuming artworkId is auto-increment)
-    const sortedArtworks = [...artworks].sort((a, b) => b.artworkId - a.artworkId);
+    const [localArtworks, setLocalArtworks] = useState(artworks);
+    const [favorites, setFavorites] = useState(new Set());
+
+    useEffect(() => {
+        setLocalArtworks(artworks);
+        fetchFavorites();
+    }, [artworks]);
+
+    const fetchFavorites = async () => {
+        const user = JSON.parse(localStorage.getItem('currentArtist'));
+        if (user) {
+            try {
+                const favs = await getFavoriteArtworks(user.artistId);
+                setFavorites(new Set(favs.map(f => f.artworkId)));
+            } catch (error) {
+                console.error("Failed to fetch favorites", error);
+            }
+        }
+    };
+
+    const handleLike = async (artworkId) => {
+        const user = JSON.parse(localStorage.getItem('currentArtist'));
+        if (!user) {
+            alert("Please login to like");
+            return;
+        }
+        try {
+            const updatedArtwork = await likeArtwork(artworkId, user.artistId);
+            setLocalArtworks(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount } : a));
+        } catch (error) {
+            console.error("Failed to like artwork", error);
+        }
+    };
+
+    const handleFavorite = async (artworkId) => {
+        const user = JSON.parse(localStorage.getItem('currentArtist'));
+        if (!user) {
+            alert("Please login to favorite");
+            return;
+        }
+        try {
+            await favoriteArtwork(artworkId, user.artistId);
+            setFavorites(prev => {
+                const newFavs = new Set(prev);
+                if (newFavs.has(artworkId)) {
+                    newFavs.delete(artworkId);
+                } else {
+                    newFavs.add(artworkId);
+                }
+                return newFavs;
+            });
+        } catch (error) {
+            console.error("Failed to favorite artwork", error);
+        }
+    };
+
+    // Sort artworks by most recent first
+    const sortedArtworks = [...localArtworks].sort((a, b) => b.artworkId - a.artworkId);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -10,64 +68,19 @@ function ArtistArtworks({ artworks, onNavigate }) {
                 Artworks
             </h3>
             {sortedArtworks.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ columnCount: 3, columnGap: '20px' }}>
                     {sortedArtworks.map((artwork) => (
-                        <div
+                        <ArtworkCard
                             key={artwork.artworkId}
-                            style={{
-                                backgroundColor: 'white',
-                                borderRadius: '8px',
-                                padding: '16px',
-                                border: '1px solid #eee'
-                            }}
-                        >
-                            {/* Artwork Image */}
-                            {artwork.image && (
-                                <div style={{
-                                    width: '100%',
-                                    aspectRatio: '16/9',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    marginBottom: '12px',
-                                    backgroundColor: '#f5f5f5'
-                                }}>
-                                    <img
-                                        src={artwork.image}
-                                        alt={artwork.title}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Title and Visibility */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#000' }}>
-                                    {artwork.title}
-                                </h4>
-                                <span style={{
-                                    fontSize: '12px',
-                                    padding: '4px 8px',
-                                    borderRadius: '4px',
-                                    backgroundColor: artwork.visibility === 'public' ? '#e8f5e9' : '#fff3e0',
-                                    color: artwork.visibility === 'public' ? '#2e7d32' : '#e65100',
-                                    fontWeight: '600'
-                                }}>
-                                    {artwork.visibility || 'public'}
-                                </span>
-                            </div>
-
-                            {/* Description */}
-                            {artwork.description && (
-                                <p style={{ margin: 0, fontSize: '14px', color: '#666', lineHeight: '1.5' }}>
-                                    {artwork.description}
-                                </p>
-                            )}
-                        </div>
-                    ))}
+                            artwork={artwork}
+                            onLike={handleLike}
+                            onFavorite={handleFavorite}
+                            isFavorited={favorites.has(artwork.artworkId)}
+                            showFavorite={true}
+                            onComment={() => console.log("Comment", artwork.artworkId)}
+                        />
+                    ))
+                    }
                 </div>
             ) : (
                 <div style={{

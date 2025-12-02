@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import BlogsFeed from './blogs/BlogsFeed';
 import UploadBlog from './UploadBlog';
+import ArtworksFeed from './artworks/ArtworksFeed';
 import UploadArtwork from './UploadArtwork';
 import Explore from './Explore';
 import Profile from './Profile';
@@ -13,7 +15,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
     // Initialize activeTab from URL
     const [activeTab, setActiveTabState] = useState(() => {
         const path = window.location.pathname.substring(1); // remove leading slash
-        const validTabs = ['home', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings'];
+        const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'artworks', 'upload-artwork', 'profile', 'settings'];
         return validTabs.includes(path) ? path : 'home';
     });
 
@@ -27,7 +29,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
     useEffect(() => {
         const handlePopState = () => {
             const path = window.location.pathname.substring(1);
-            const validTabs = ['home', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings'];
+            const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'artworks', 'upload-artwork', 'profile', 'settings'];
             if (validTabs.includes(path)) {
                 setActiveTabState(path);
             }
@@ -47,10 +49,14 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
                         <FeaturesSection />
                     </div>
                 );
+            case 'blogs':
+                return <BlogsFeed onNavigate={setActiveTab} />;
             case 'upload-blog':
                 return <UploadBlog artistData={artistData} />;
             case 'explore':
                 return <Explore />;
+            case 'artworks':
+                return <ArtworksFeed onNavigate={setActiveTab} />;
             case 'upload-artwork':
                 return <UploadArtwork artistData={artistData} onNavigate={setActiveTab} />;
             case 'profile':

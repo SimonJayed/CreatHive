@@ -1,0 +1,143 @@
+.blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.blog-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.2s ease;
+}
+
+.blog-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666666;
+}
+
+.blog-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #eee;
+    border: 1px solid #ddd;
+}
+
+.blog-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.blog-author {
+    font-weight: 600;
+    color: #000000;
+}
+
+.blog-date {
+    color: #999;
+    font-size: 12px;
+}
+
+.blog-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000000;
+}
+
+.blog-content {
+    margin: 0;
+    font-size: 14px;
+    color: #000000;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.blog-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.blog-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #666666;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.blog-action:hover {
+    background-color: #f5f5f5;
+}
+
+/* No blogs state */
+.no-blogs-container {
+    border-radius: 12px;
+    background-image: linear-gradient(rgba(139, 90, 43, 0.7), rgba(139, 90, 43, 0.7)), url("https://images.unsplash.com/photo-1501706362039-c06b2d715385?w=600");
+    background-size: cover;
+    background-position: center;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 250px;
+}
+
+.no-blogs-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.no-blogs-title {
+    color: #FFB800;
+    font-size: 24px;
+    margin: 0 0 12px 0;
+}
+
+.no-blogs-text {
+    color: white;
+    font-size: 14px;
+    margin: 0 0 20px 0;
+}
+
+.upload-blog-btn {
+    background-color: #FFB800;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.upload-blog-btn:hover {
+    background-color: #e6a600;
+}

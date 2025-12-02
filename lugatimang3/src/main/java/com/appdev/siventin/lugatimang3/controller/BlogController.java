@@ -51,4 +51,8 @@ public class BlogController {
         return bservice.deleteBlog(blogId);
     }
 
+    @PutMapping("/likeBlog/{blogId}/{userId}")
+    public BlogEntity likeBlog(@PathVariable int blogId, @PathVariable int userId) {
+        return bservice.likeBlog(blogId, userId);
+    }
 }

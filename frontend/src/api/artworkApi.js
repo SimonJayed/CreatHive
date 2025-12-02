@@ -19,3 +19,30 @@ export async function insertArtwork(artwork, artistId) {
     });
     return res.json();
 }
+
+export async function deleteArtwork(artworkId) {
+    const res = await fetch(`${BASE_URL}/deleteArtwork/${artworkId}`, {
+        method: 'DELETE',
+    });
+    return res.text();
+}
+
+export async function likeArtwork(artworkId, userId) {
+    const res = await fetch(`${BASE_URL}/likeArtwork/${artworkId}/${userId}`, {
+        method: 'PUT',
+    });
+    return res.json();
+}
+
+export async function favoriteArtwork(artworkId, userId) {
+    const res = await fetch(`${BASE_URL}/favoriteArtwork/${artworkId}/${userId}`, {
+        method: 'PUT',
+    });
+    if (!res.ok) throw new Error("Failed to toggle favorite");
+}
+
+export async function getFavoriteArtworks(userId) {
+    const res = await fetch(`${BASE_URL}/getFavoriteArtworks/${userId}`);
+    if (!res.ok) throw new Error("Failed to fetch favorite artworks");
+    return res.json();
+}

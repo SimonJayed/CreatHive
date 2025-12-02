@@ -33,19 +33,6 @@ Instead of direct Foreign Keys (e.g., `artist_id` in `Artwork` table), we use se
     -   **Key**: Composite Key (`blogId`, `userId` [which is artistId]).
 
 3.  **Favorites (`favorites`)**: Links **Artist** and **Artwork**.
-    -   **Purpose**: Indicates "Likes" or "Favorites".
-    -   **Key**: Composite Key (`artworkId`, `artistId`).
-    -   **Extra Data**: `dateFavorited`.
-
-4.  **ArtworkTag (`artwork_tag`)**: Links **Artwork** and **Tag**.
-    -   **Purpose**: Categorization.
-    -   **Key**: Composite Key (`artworkId`, `tagId`).
-
-5.  **Comments**:
-    -   **UserComment**: Links **Artist** -> **Comment** (Who wrote it?).
-    -   **CommentOnArtwork**: Links **Comment** -> **Artwork** (Where is it posted?).
-    -   **CommentOnBlog**: Links **Comment** -> **Blog** (Where is it posted?).
-
 ### API Usage for Uploads
 When creating a new resource (Artwork/Blog), you must:
 1.  **Insert the Resource**: POST to `/insert...` with the entity body.
@@ -58,7 +45,7 @@ When creating a new resource (Artwork/Blog), you must:
     -   Analyzed the `frontend` directory for Frontend structure (React).
 2.  **Pattern Analysis**:
     -   Checked `src/api/blogApi.js` to understand how the frontend communicates with the backend.
-    -   Checked `src/components/blogs/BlogCRUD.jsx` to understand the UI structure, state management, and styling.
+    -   Checked `src/components/blogs/BlogCRUD.jsx` and `src/components/blogs/BlogsFeed.jsx` to understand the UI structure, state management, and styling.
 3.  **Implementation**:
     -   **Backend**: Created Entity, Repository, Service, and Controller for the `Artist` feature.
     -   **Frontend**: Created API connector and CRUD component for the `Artist` feature, replicating the observed patterns.
@@ -109,11 +96,26 @@ To fully integrate the new components, they must be added to the application's r
     *   Extract styles to a `.css` file.
     *   Replace inline styles with `className`.
     *   Verify functionality remains identical.
+    *   **Verification**: Always check if users' artworks and blogs are showing up properly where they should be (Profile, Blogs Feed, and Artwork pages).
+
+## Iconography
+**Library**: `react-icons`
+-   **Standard**: Use FontAwesome (`react-icons/fa`) for consistency.
+-   **Usage**: Import specific icons (e.g., `FaHeart`) and use them as components.
+-   **Styling**: Icons are SVGs and can be styled with CSS (color, size).
+
+## Time Formatting
+-   **No Seconds**: When displaying time (e.g., in blogs, comments, or artworks), **never include seconds**. Use a format like `Dec 3, 2025, 06:15 PM`.
+    -   Use `hour: '2-digit', minute: '2-digit'` in `toLocaleString` options.
+    -   Omit `second` property.
 
 ## Documentation Updates
 **When adding to System.md, update BOTH locations:**
 1. The artifact System.md in `.gemini/antigravity/brain/[session-id]/System.md`
 2. The project System.md in `frontend/System.md`
+
+**Overhaul Log:**
+*   **ALWAYS** update `frontend/Overhaul.md`. This is the primary log for the project. Do not update the one in the root directory.
 
 This ensures consistency across documentation.
 

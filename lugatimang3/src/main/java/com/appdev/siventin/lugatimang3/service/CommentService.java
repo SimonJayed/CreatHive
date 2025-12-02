@@ -1,5 +1,6 @@
 package com.appdev.siventin.lugatimang3.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -7,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.appdev.siventin.lugatimang3.entity.CommentEntity;
+import com.appdev.siventin.lugatimang3.entity.CommentOnBlogEntity;
+import com.appdev.siventin.lugatimang3.entity.UserCommentEntity;
+import com.appdev.siventin.lugatimang3.repository.CommentOnBlogRepository;
 import com.appdev.siventin.lugatimang3.repository.CommentRepository;
+import com.appdev.siventin.lugatimang3.repository.UserCommentRepository;
 
 @Service
 public class CommentService {
@@ -15,32 +20,40 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public CommentEntity insertComment(CommentEntity comment) {
-        return commentRepository.save(comment);
+    @Autowired
+    private CommentOnBlogRepository commentOnBlogRepository;
+
+    @Autowired
+    private UserCommentRepository userCommentRepository;
+
+    public CommentEntity addComment(int blogId, int artistId, String content) {
+        // 1. Save Comment
+        CommentEntity comment = new CommentEntity();
+        comment.setContent(content);
+        comment.setDatePosted(java.time.LocalDateTime.now());
+        CommentEntity savedComment = commentRepository.save(comment);
+
+        // 2. Link to Blog
+        CommentOnBlogEntity commentOnBlog = new CommentOnBlogEntity(savedComment.getCommentId(), blogId);
+        commentOnBlogRepository.save(commentOnBlog);
+
+        // 3. Link to User
+        UserCommentEntity userComment = new UserCommentEntity(artistId, savedComment.getCommentId());
+        userCommentRepository.save(userComment);
+
+        return savedComment;
     }
 
-    public List<CommentEntity> getAllComments() {
-        return commentRepository.findAll();
-    }
+    public List<CommentEntity> getCommentsByBlogId(int blogId) {
+        List<CommentOnBlogEntity> links = commentOnBlogRepository.findAll();
+        List<Integer> commentIds = new ArrayList<>();
 
-    public CommentEntity getCommentById(int commentId) {
-        return commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("Comment " + commentId + " not found"));
-    }
-
-    public CommentEntity updateComment(int commentId, CommentEntity newCommentDetails) {
-        CommentEntity comment = getCommentById(commentId);
-        comment.setContent(newCommentDetails.getContent());
-        comment.setDatePosted(newCommentDetails.getDatePosted());
-        return commentRepository.save(comment);
-    }
-
-    public String deleteComment(int commentId) {
-        if (commentRepository.existsById(commentId)) {
-            commentRepository.deleteById(commentId);
-            return "Comment " + commentId + " deleted successfully";
-        } else {
-            return "Comment " + commentId + " not found";
+        for (CommentOnBlogEntity link : links) {
+            if (link.getId().getBlogId() == blogId) {
+                commentIds.add(link.getId().getCommentId());
+            }
         }
+
+        return commentRepository.findAllById(commentIds);
     }
 }

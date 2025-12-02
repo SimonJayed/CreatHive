@@ -1,0 +1,78 @@
+DATABASE SCHEMA
+================================================================================
+
+1. TABLE: artist
+   - artistId (PK)
+   - name
+   - bio (TEXT)
+   - interest
+   - username
+   - password
+   - email
+   - profile_pic_data (LONGTEXT)
+   - website
+   - date_created
+
+2. TABLE: artwork
+   - artworkId (PK)
+   - title
+   - image (LONGTEXT)
+   - description
+   - creationDate
+   - tags
+   - like_count
+
+3. TABLE: blog
+   - blogId (PK)
+   - title
+   - content
+   - date_posted
+   - like_count
+
+4. TABLE: comment
+   - commentId (PK)
+   - content (TEXT)
+   - date_posted
+
+5. TABLE: tag
+   - tagId (PK)
+   - name
+   - description
+
+6. TABLE: favorites
+   - artwork_id (PK, FK)
+   - artist_id (PK, FK)
+   - date_favorited
+
+7. TABLE: artwork_likes
+   - artwork_id (PK, FK)
+   - user_id (PK, FK)
+
+8. TABLE: blog_likes
+   - blog_id (PK, FK)
+   - user_id (PK, FK)
+
+9. TABLE: artwork_tag
+   - artwork_id (PK, FK)
+   - tag_id (PK, FK)
+   - date_assigned
+
+10. TABLE: user_artwork
+    - artwork_id (PK, FK)
+    - artist_id (PK, FK)
+
+11. TABLE: user_blog
+    - blog_id (PK, FK)
+    - user_id (PK, FK)
+
+12. TABLE: user_comment
+    - artist_id (PK, FK)
+    - comment_id (PK, FK)
+
+13. TABLE: comment_on_artwork
+    - comment_id (PK, FK)
+    - artwork_id (PK, FK)
+
+14. TABLE: comment_on_blog
+    - comment_id (PK, FK)
+    - blog_id (PK, FK)

@@ -1,14 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { likeBlog } from '../../api/blogApi';
+import { getAllBlogs, likeBlog } from '../../api/blogApi';
+import { getAllUserBlogs } from '../../api/userBlogApi';
+import { getAllArtists } from '../../api/artistApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
 import { getAllUserComments } from '../../api/userCommentApi';
-import { getAllArtists } from '../../api/artistApi';
 import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaRegFileAlt, FaSortAmountDown } from 'react-icons/fa';
-import './ArtistBlogs.css';
+import '../profile/ArtistBlogs.css'; // Reuse styles
 
-function ArtistBlogs({ blogs, artist, onNavigate }) {
-    // Sort blogs by most recent first
-    const [sortOrder, setSortOrder] = useState('newest');
+function BlogsFeed({ onNavigate }) {
+    const [blogs, setBlogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
+    const [activeCommentBlogId, setActiveCommentBlogId] = useState(null);
+    const [commentText, setCommentText] = useState('');
+    const [commentsMap, setCommentsMap] = useState({}); // blogId -> comments[]
+    const [artistsMap, setArtistsMap] = useState({}); // artistId -> Artist
+    const [commentUserMap, setCommentUserMap] = useState({}); // commentId -> artistId
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const [blogsData, userBlogsData, artistsData, userCommentsData] = await Promise.all([
+                getAllBlogs(),
+                getAllUserBlogs(),
+                getAllArtists(),
+                getAllUserComments()
+            ]);
+
+            // Map artists by ID for quick lookup
+            const aMap = {};
+            artistsData.forEach(artist => {
+                aMap[artist.artistId] = artist;
+            });
+            setArtistsMap(aMap);
+
+            // Map blogId to userId
+            const blogUserMap = {};
+            userBlogsData.forEach(link => {
+                blogUserMap[link.id.blogId] = link.id.userId;
+            });
+
+            // Map commentId to userId
+            const cUserMap = {};
+            userCommentsData.forEach(link => {
+                cUserMap[link.id.commentId] = link.id.artistId;
+            });
+            setCommentUserMap(cUserMap);
+
+            // Combine data
+            const enrichedBlogs = blogsData.map(blog => {
+                const userId = blogUserMap[blog.blogId];
+                const artist = aMap[userId];
+                return {
+                    ...blog,
+                    artist: artist || { name: 'Unknown Artist', profileImage: null }
+                };
+            });
+
+            console.log("Fetched blogs:", enrichedBlogs);
+            setBlogs(enrichedBlogs);
+        } catch (error) {
+            console.error("Failed to fetch blogs feed", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Sort blogs based on sortOrder
     const sortedBlogs = [...blogs].sort((a, b) => {
         const dateA = new Date(a.datePosted || 0).getTime();
         const dateB = new Date(b.datePosted || 0).getTime();
@@ -18,45 +79,6 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
             return dateA - dateB;
         }
     });
-
-    const [activeCommentBlogId, setActiveCommentBlogId] = useState(null);
-    const [commentText, setCommentText] = useState('');
-    const [commentsMap, setCommentsMap] = useState({}); // blogId -> comments[]
-    const [localBlogs, setLocalBlogs] = useState(sortedBlogs); // To update like counts locally
-    const [artistsMap, setArtistsMap] = useState({}); // artistId -> Artist
-    const [commentUserMap, setCommentUserMap] = useState({}); // commentId -> artistId
-
-    // Update localBlogs when props change
-    useEffect(() => {
-        setLocalBlogs(sortedBlogs);
-    }, [blogs, sortOrder]);
-
-    useEffect(() => {
-        fetchUserData();
-    }, []);
-
-    const fetchUserData = async () => {
-        try {
-            const [artistsData, userCommentsData] = await Promise.all([
-                getAllArtists(),
-                getAllUserComments()
-            ]);
-
-            const aMap = {};
-            artistsData.forEach(artist => {
-                aMap[artist.artistId] = artist;
-            });
-            setArtistsMap(aMap);
-
-            const cUserMap = {};
-            userCommentsData.forEach(link => {
-                cUserMap[link.id.commentId] = link.id.artistId;
-            });
-            setCommentUserMap(cUserMap);
-        } catch (error) {
-            console.error("Failed to fetch user data for comments", error);
-        }
-    };
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Unknown Date';
@@ -73,12 +95,12 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
     const handleLike = async (blogId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to vote");
+            alert("Please login to like");
             return;
         }
         try {
             const updatedBlog = await likeBlog(blogId, user.artistId);
-            setLocalBlogs(prev => prev.map(b => b.blogId === blogId ? { ...b, likeCount: updatedBlog.likeCount } : b));
+            setBlogs(prev => prev.map(b => b.blogId === blogId ? { ...b, likeCount: updatedBlog.likeCount } : b));
         } catch (error) {
             console.error("Failed to like blog", error);
         }
@@ -110,7 +132,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
         try {
             const newComment = await addComment(blogId, user.artistId, commentText);
 
-            // Update local maps
+            // Update local maps for the new comment
             setCommentUserMap(prev => ({ ...prev, [newComment.commentId]: user.artistId }));
 
             setCommentsMap(prev => ({
@@ -123,73 +145,80 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
         }
     };
 
+    if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading blogs...</div>;
+
     return (
-        <div className="artist-blogs-container">
+        <div className="blogs-feed-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ color: '#FFB800', margin: 0 }}>Artist's Blogs</h3>
-                {/* Sort Filter */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#FFB800' }}>
-                    <FaSortAmountDown />
-                    <span>Sort by:</span>
-                    <select
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
-                        style={{
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            color: '#FFB800',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            outline: 'none',
-                            fontWeight: '600'
-                        }}
-                    >
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                    </select>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <h2 style={{ color: '#FFB800', margin: 0 }}>Community Blogs</h2>
+
+                    {/* Sort Filter */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#FFB800' }}>
+                        <FaSortAmountDown />
+                        <span>Sort by:</span>
+                        <select
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                            style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                border: 'none',
+                                backgroundColor: 'transparent',
+                                color: '#FFB800', // Keep dropdown text readable
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                outline: 'none',
+                                fontWeight: '600'
+                            }}
+                        >
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </div>
                 </div>
+
+                <button
+                    onClick={() => onNavigate('upload-blog')}
+                    className="upload-blog-btn"
+                    style={{ padding: '8px 16px', fontSize: '14px', color: 'white' }}
+                >
+                    + Create Blog
+                </button>
             </div>
 
-            {localBlogs.length > 0 ? (
-                <div className="blog-list">
-                    {localBlogs.map((blog) => (
+            <div className="blog-list">
+                {sortedBlogs.length > 0 ? (
+                    sortedBlogs.map((blog) => (
                         <div key={blog.blogId} className="blog-card">
-                            {/* Header: Avatar, Name, Date */}
+                            {/* Header */}
                             <div className="blog-header">
                                 <img
-                                    src={artist?.profileImage || 'https://via.placeholder.com/32'}
-                                    alt={artist?.name || 'Artist'}
+                                    src={blog.artist?.profileImage || 'https://via.placeholder.com/32'}
+                                    alt={blog.artist?.name}
                                     className="blog-avatar"
                                 />
                                 <div className="blog-meta">
-                                    <span className="blog-author">{artist?.name || 'Artist'}</span>
+                                    <span className="blog-author">{blog.artist?.name}</span>
                                     <span className="blog-date">Posted {formatDate(blog.datePosted)}</span>
                                 </div>
                             </div>
 
                             {/* Title */}
-                            <h4 className="blog-title">
-                                {blog.title}
-                            </h4>
+                            <h4 className="blog-title">{blog.title}</h4>
 
                             {/* Content */}
-                            <p className="blog-content">
-                                {blog.content}
-                            </p>
+                            <p className="blog-content">{blog.content}</p>
 
-                            {/* Footer: Actions */}
+                            {/* Footer */}
                             <div className="blog-footer">
                                 <button className="blog-action" onClick={() => handleLike(blog.blogId)}>
-                                    {blog.likeCount > 0 ? <FaHeart color="#FFB800" /> : <FaRegHeart />} Vote ({blog.likeCount || 0})
+                                    {blog.likeCount > 0 ? <FaHeart color="#FFB800" /> : <FaRegHeart />} Like ({blog.likeCount || 0})
                                 </button>
                                 <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
                                     <FaRegComment /> Comments
                                 </button>
-                                <button className="blog-action">
-                                    <FaShare /> Share
-                                </button>
+                                <button className="blog-action"><FaShare /> Share</button>
                             </div>
 
                             {/* Comments Section */}
@@ -230,27 +259,17 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                                 </div>
                             )}
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="no-blogs-container">
-                    <span className="no-blogs-icon"><FaRegFileAlt /></span>
-                    <h3 className="no-blogs-title">
-                        No blogs yet
-                    </h3>
-                    <p className="no-blogs-text">
-                        Share your imagination and inspire the Hiveminds community!
-                    </p>
-                    <button
-                        onClick={() => onNavigate && onNavigate('upload-blog')}
-                        className="upload-blog-btn"
-                    >
-                        Upload your blog
-                    </button>
-                </div>
-            )}
+                    ))
+                ) : (
+                    <div className="no-blogs-container">
+                        <span className="no-blogs-icon"><FaRegFileAlt /></span>
+                        <h3 className="no-blogs-title">No blogs yet</h3>
+                        <p className="no-blogs-text">Be the first to share your thoughts!</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
 
-export default ArtistBlogs;
+export default BlogsFeed;

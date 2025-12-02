@@ -1,7 +1,5 @@
 package com.appdev.siventin.lugatimang3.entity;
 
-import java.sql.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,18 +21,18 @@ public class BlogEntity {
     private String content;
 
     @Column(name = "date_posted")
-    private Date date_posted;
+    private java.sql.Timestamp datePosted;
 
     public BlogEntity() {
         super();
     }
 
-    public BlogEntity(int blogId, String title, String content, Date date_posted) {
+    public BlogEntity(int blogId, String title, String content, java.sql.Timestamp datePosted) {
         super();
         this.blogId = blogId;
         this.title = title;
         this.content = content;
-        this.date_posted = date_posted;
+        this.datePosted = datePosted;
     }
 
     public int getBlogId() {
@@ -49,8 +47,8 @@ public class BlogEntity {
         return content;
     }
 
-    public Date getDate_posted() {
-        return date_posted;
+    public java.sql.Timestamp getDatePosted() {
+        return datePosted;
     }
 
     public void setTitle(String title) {
@@ -59,5 +57,20 @@ public class BlogEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setDatePosted(java.sql.Timestamp datePosted) {
+        this.datePosted = datePosted;
+    }
+
+    @Column(name = "like_count")
+    private Integer likeCount = 0;
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
     }
 }

@@ -1,75 +1,158 @@
-# System Overhaul Documentation
-    - `ArtworkTagEntity`: Links Artwork and Tag.
+# System Overhaul & Refactoring Log
 
-### 2. Repositories
-Created `JpaRepository` interfaces for all new entities.
+This document tracks significant changes, refactoring efforts, and architectural updates to the CreatHive system.
 
-### 3. Services
-Created service classes for all new entities to handle business logic and CRUD operations.
+## 2025-12-03: Blog System Overhaul
 
-### 4. Controllers
-Created REST controllers for all new entities.
+### Objective
+Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where users can view blogs from all users, while retaining the ability to upload new blogs.
 
-## Usage Guide
+### Changes Implemented
 
-### Creating Relationships
-Since direct foreign keys (like `artistId` in `Artwork`) have been removed, creating a relationship now involves two steps:
-1.  **Create the Core Entity**: e.g., create an `Artwork` using `/artwork/insert`.
-2.  **Create the Association**: e.g., link the `Artwork` to an `Artist` using `/userArtwork/insert`.
+#### Frontend
+1.  **New Component: `BlogsFeed`**
+    *   **Purpose**: Displays a feed of all blogs from all users.
+    *   **Features**:
+        *   **Sorting**: Added a "Sort by" dropdown to `BlogsFeed` to filter blogs by date (Newest/Oldest), defaulting to Newest. Dropdown styled according to `Styles.md`.
+    *   **Interactions**: Added Like (Vote) and Comment functionality to `BlogsFeed` and `ArtistBlogs`. **Removed Favorite functionality** as per user request.
+    *   **Cleanup**: Removed `xp` and `level` from Profile. Removed `visibility` options from Upload Artwork and Upload Blog forms.
+    *   **Fixes**: Fixed date display in blog feeds by handling potential null dates and ensuring correct formatting.
 
-### API Endpoints for Associations
+4.  **Backend Changes**
+    *   **`BlogEntity`**: Added `likeCount` field.
+    *   **`BlogService`**: Added `likeBlog` method. Removed `favoriteBlog`.
+    *   **`CommentService`**: Created to handle adding and retrieving comments.
+    *   **Cleanup**: Removed `visibility` field from `ArtworkEntity`. Deleted `BlogFavoritesEntity` and `BlogFavoritesRepository`.
+    *   **Fixes**: Changed `likeCount` in `BlogEntity` to `Integer` to handle potential null values and prevent backend crashes.
 
-| Relationship | Endpoint | Method | Payload |
-| :--- | :--- | :--- | :--- |
-| **User Creates Artwork** | `/userArtwork/insert` | POST | `{ "artistId": 1, "artworkId": 101 }` |
-| **User Authors Blog** | `/userBlog/insert` | POST | `{ "userId": 1, "blogId": 202 }` |
-| **User Writes Comment** | `/userComment/insert` | POST | `{ "artistId": 1, "commentId": 303 }` |
-| **User Favorites Artwork** | `/favorites/insert` | POST | `{ "artistId": 1, "artworkId": 101 }` |
-| **Comment on Artwork** | `/commentOnArtwork/insert` | POST | `{ "commentId": 303, "artworkId": 101 }` |
-| **Comment on Blog** | `/commentOnBlog/insert` | POST | `{ "commentId": 303, "blogId": 202 }` |
-| **Tag Artwork** | `/artworkTag/insert` | POST | `{ "artworkId": 101, "tagId": 5 }` |
+### Bug Fixes (2025-12-03)
+*   **Backend Crash**: Fixed `BlogService.getAllBlogs` crash by ensuring `BlogEntity.likeCount` can handle nulls (changed `int` to `Integer`).
+*   **Backend Bug**: Fixed `NullPointerException` in `BlogService.likeBlog` by handling null `likeCount` before incrementing.
+*   **Database**: Created and subsequently deleted `reset_db.sql` after resetting the database schema and dropping `blog_favorites`.
+*   **Cascade Delete**: Implemented cascade delete for `Artwork` -> `ArtworkTag` by adding `@OneToMany(cascade = CascadeType.ALL)` in `ArtworkEntity` and `@ManyToOne` in `ArtworkTagEntity`.
+*   **Frontend API**: Added error handling to `blogApi.js` to prevent unhandled promise rejections.
+*   **Sorting**: Fixed `ArtistBlogs.jsx` to correctly apply sorting by date (newest first).
+*   **Profile**: Removed `ProfileStats` (XP/Level) from `Profile.jsx`.
 
-### Retrieving Data
-- To get all artworks by an artist, you would now query the `UserArtwork` repository/service (or use the endpoint `/userArtwork/getAll` and filter, though a custom endpoint `getByArtistId` is recommended for production).
-- Similarly for other relationships.
+### Technical Debt / Future Improvements
+*   **N+1 Problem**: Currently, the frontend fetches all blogs, all links, and potentially all artists to join the data. This should be optimized on the backend by creating a DTO that includes author information in the `getAllBlogs` response.
+*   **Pagination**: The feed currently loads all blogs. Pagination should be implemented for scalability.
 
-## Functional Requirements Gap Analysis
-*(As of 2025-11-29)*
+### Feature Updates (2025-12-03)
+- **Category Removal**:
+    - Removed `category` field from `ArtworkEntity` and `UploadArtwork.jsx`.
+- **Blog Likes**:
+    - Implemented toggle-like functionality for blogs.
+    - Added `BlogLikesEntity` and updated `BlogService`.
+- **Artwork Interactions**:
+    - Added `likeCount` to `ArtworkEntity`.
+    - Created `ArtworkLikesEntity` and `ArtworkFavoritesEntity`.
+    - Implemented like and favorite toggle functionality.
+- **Profile Favorites**:
+    - Added a "Favorites" tab to the user profile.
+    - Created `FavoriteArtworks.jsx` to display favorited artworks.
+- **Renamed Upload Artwork to Artworks**:
+    - Renamed "Upload Artwork" navigation item to "Artworks".
+    - Created `ArtworksFeed.jsx` to display a feed of community artworks.
+    - Added "Upload Artwork" button within the `ArtworksFeed` page.
+    - Implemented `getAllUserArtworks` in `userArtworkApi.js` to map artists to artworks.
+    - Fixed duplicate import and data fetching logic in `ArtworksFeed.jsx`.
+# System Overhaul & Refactoring Log
 
-### Objective 1: User Registration & Profile Management
-- [x] **Registration**: Implemented (Name, Username, Email, Password).
-- [x] **Validation**: Implemented (Basic form validation).
-- [x] **Access Control**: Implemented (Login required for uploads).
-- [x] **Interests**: Implemented (InterestPicker UI), Backend persistence verified.
-- [x] **Profile**: Implemented (Pic, Bio, Edit).
+This document tracks significant changes, refactoring efforts, and architectural updates to the CreatHive system.
 
-### Objective 2: Artwork Upload & Tagging
-- [x] **Upload**: Implemented (Image, Title, Desc, Visibility).
-- [x] **Formats**: Implemented (JPG, PNG supported via Base64).
-- [x] **Delete**: Implemented (API endpoint exists, UI needs verification).
-- [ ] **Archive/Un-list**: Partially Implemented (`visibility` field exists: Public/Unlisted/Private).
-- [x] **Tagging**: Implemented (Assign tags on upload).
-- [ ] **Search/Filter**: Backend `findByTag` exists? Needs verification. Frontend Search UI missing.
+## 2025-12-03: Blog System Overhaul
 
-### Objective 3: Forums & Discussions
-- [x] **Threads**: Implemented via `Blog` entity.
-- [x] **Replies**: Implemented via `Comment` entity.
-- [ ] **Categorization**: `Blog` has no category field? Needs verification.
-- [ ] **Edit/Delete**: `deleteBlog` exists. `editBlog` exists. Time window constraint missing.
-- [ ] **Moderation**: Reporting/Moderator roles NOT implemented.
+### Objective
+Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where users can view blogs from all users, while retaining the ability to upload new blogs.
 
-### Objective 4: AI-Assisted Discovery
-- [ ] **Recommendations**: NOT implemented.
-- [ ] **Auto-Tagging**: NOT implemented.
+### Changes Implemented
 
-### Objective 5: Creative Development
-- [ ] **Challenges**: NOT implemented.
-- [x] **Community Gallery**: Implemented (Homepage feed).
-- [x] **Interactions**: Like (Favorites) & Comment implemented. Share NOT implemented.
+#### Frontend
+1.  **New Component: `BlogsFeed`**
+    *   **Purpose**: Displays a feed of all blogs from all users.
+    *   **Features**:
+        *   **Sorting**: Added a "Sort by" dropdown to `BlogsFeed` to filter blogs by date (Newest/Oldest), defaulting to Newest. Dropdown styled according to `Styles.md`.
+    *   **Interactions**: Added Like (Vote) and Comment functionality to `BlogsFeed` and `ArtistBlogs`. **Removed Favorite functionality** as per user request.
+    *   **Cleanup**: Removed `xp` and `level` from Profile. Removed `visibility` options from Upload Artwork and Upload Blog forms.
+    *   **Fixes**: Fixed date display in blog feeds by handling potential null dates and ensuring correct formatting.
 
-### Objective 6: Resources & Learning
-- [ ] **Learning Modules**: NOT implemented.
-- [ ] **Dashboard**: NOT implemented.
+4.  **Backend Changes**
+    *   **`BlogEntity`**: Added `likeCount` field.
+    *   **`BlogService`**: Added `likeBlog` method. Removed `favoriteBlog`.
+    *   **`CommentService`**: Created to handle adding and retrieving comments.
+    *   **Cleanup**: Removed `visibility` field from `ArtworkEntity`. Deleted `BlogFavoritesEntity` and `BlogFavoritesRepository`.
+    *   **Fixes**: Changed `likeCount` in `BlogEntity` to `Integer` to handle potential null values and prevent backend crashes.
 
-### Summary
-The Core features (Objectives 1 & 2) are largely complete. The Social features (Objective 3) are partially met by Blogs/Comments. Advanced features (Objectives 4, 5, 6) are currently out of scope/not started.
+### Bug Fixes (2025-12-03)
+*   **Backend Crash**: Fixed `BlogService.getAllBlogs` crash by ensuring `BlogEntity.likeCount` can handle nulls (changed `int` to `Integer`).
+*   **Backend Bug**: Fixed `NullPointerException` in `BlogService.likeBlog` by handling null `likeCount` before incrementing.
+*   **Database**: Created and subsequently deleted `reset_db.sql` after resetting the database schema and dropping `blog_favorites`.
+*   **Cascade Delete**: Implemented cascade delete for `Artwork` -> `ArtworkTag` by adding `@OneToMany(cascade = CascadeType.ALL)` in `ArtworkEntity` and `@ManyToOne` in `ArtworkTagEntity`.
+*   **Frontend API**: Added error handling to `blogApi.js` to prevent unhandled promise rejections.
+*   **Sorting**: Fixed `ArtistBlogs.jsx` to correctly apply sorting by date (newest first).
+*   **Profile**: Removed `ProfileStats` (XP/Level) from `Profile.jsx`.
+
+### Technical Debt / Future Improvements
+*   **N+1 Problem**: Currently, the frontend fetches all blogs, all links, and potentially all artists to join the data. This should be optimized on the backend by creating a DTO that includes author information in the `getAllBlogs` response.
+*   **Pagination**: The feed currently loads all blogs. Pagination should be implemented for scalability.
+
+### Feature Updates (2025-12-03)
+- **Category Removal**:
+    - Removed `category` field from `ArtworkEntity` and `UploadArtwork.jsx`.
+- **Blog Likes**:
+    - Implemented toggle-like functionality for blogs.
+    - Added `BlogLikesEntity` and updated `BlogService`.
+- **Artwork Interactions**:
+    - Added `likeCount` to `ArtworkEntity`.
+    - Created `ArtworkLikesEntity` and `ArtworkFavoritesEntity`.
+    - Implemented like and favorite toggle functionality.
+- **Profile Favorites**:
+    - Added a "Favorites" tab to the user profile.
+    - Created `FavoriteArtworks.jsx` to display favorited artworks.
+- **Renamed Upload Artwork to Artworks**:
+    - Renamed "Upload Artwork" navigation item to "Artworks".
+    - Created `ArtworksFeed.jsx` to display a feed of community artworks.
+    - Added "Upload Artwork" button within the `ArtworksFeed` page.
+    - Implemented `getAllUserArtworks` in `userArtworkApi.js` to map artists to artworks.
+    - Fixed duplicate import and data fetching logic in `ArtworksFeed.jsx`.
+    - Removed incorrect CSS import in `ArtworksFeed.jsx` to fix "Module not found" error.
+    - Implemented Pinterest-style masonry layout in `ArtworksFeed.jsx` and `ArtistArtworks.jsx`.
+    - Re-introduced `BlogLikesEntity` and `ArtworkLikesEntity` to enforce "once per user" like rule, as per user request.
+    - Created reusable `ArtworkCard.jsx` component for consistent artwork display and interactions (Like, Comment, Share, Favorite).
+    - Created `FavoriteArtworks.jsx` to display user's favorited artworks.
+    - Fixed CORS issue in `UserArtworkController` to resolve data fetching errors.
+    - Updated `Styles.md` with button text color rules and universal icon definitions.
+    - Switched `ArtworkService` to use `FavoritesEntity` (legacy) instead of `ArtworkFavoritesEntity` as per user request.
+    - Deleted obsolete `ArtworkFavoritesEntity` and `ArtworkFavoritesRepository`.
+    - **Iconography**:
+        - Installed `react-icons` library.
+        - Updated `Styles.md` to define standard icons (FontAwesome).
+        - Replaced emojis with customizable SVG icons in `ArtworkCard`, `BlogsFeed`, and `ArtistBlogs`.
+    - **UI Improvements**:
+        - Updated Sort Filter in `ArtworksFeed` and `BlogsFeed`:
+            - Moved filter underneath the page title.
+            - Added `FaSortAmountDown` icon.
+            - Styled for a cleaner, minimal look.
+    - **Sidebar Redesign**:
+        -   Implemented vertical sidebar with black background and `#FFB800` icons/text.
+        -   Used `react-icons` for all navigation items.
+    -   **Enhanced Comments**:
+        -   Comments now display the user's name and profile picture.
+        -   Added date/time timestamps to comments.
+    -   **General UI Polish**:
+        -   Added date/time display to `ArtworkCard` and `BlogsFeed`.
+        -   Fixed button colors and filter text colors to match primary theme.
+    -   **Layout Alignment**:
+        -   Fixed sidebar overlap issue by adding `margin-left: 250px` to main content wrapper.
+        -   Ensured consistent container widths across Feeds and Profile.
+        -   Added primary color border (`1px solid #FFB800`) to sidebar right edge.
+        -   Fixed sort filter text color to `#FFB800` for visibility on dark background.
+        -   Updated date format in `BlogsFeed` and `ArtistBlogs` to exclude seconds for a cleaner display.
+        -   Updated comment date format in `BlogsFeed` and `ArtistBlogs` to exclude seconds.
+        -   Added "Time Formatting" rule to `System.md` to enforce no-seconds display.
+        -   Fixed `UploadArtwork` image preview to fill the entire upload area (`object-fit: cover`).
+        -   Fixed `ArtworkCard` favorite button not toggling visually (implemented `isFavorited` prop).
+        -   Fixed `ArtworkCard` comment button not being clickable (added `onComment` handler).
+        -   Implemented like and favorite interactions in `ArtistArtworks.jsx` (profile page).
+        -   Fixed `FavoriteArtworks.jsx` to correctly display favorited state (`isFavorited={true}`).

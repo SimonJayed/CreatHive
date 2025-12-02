@@ -1,6 +1,7 @@
 package com.appdev.siventin.lugatimang3.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -19,24 +20,27 @@ public class ArtworkEntity {
     private String image; // Base64 string
     private String description;
     private LocalDateTime creationDate;
-    private String category;
     private String tags;
-    private String visibility;
+
+    @Column(name = "like_count")
+    private Integer likeCount = 0;
+
+    @OneToMany(mappedBy = "artwork", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArtworkTagEntity> artworkTags;
 
     public ArtworkEntity() {
     }
 
     public ArtworkEntity(int artworkId, String title, String image, String description, LocalDateTime creationDate,
-            String category, String tags, String visibility) {
+            String tags) {
         super();
         this.artworkId = artworkId;
         this.title = title;
         this.image = image;
         this.description = description;
         this.creationDate = creationDate;
-        this.category = category;
         this.tags = tags;
-        this.visibility = visibility;
+        this.likeCount = 0;
     }
 
     public int getArtworkId() {
@@ -59,16 +63,12 @@ public class ArtworkEntity {
         return creationDate;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
     public String getTags() {
         return tags;
     }
 
-    public String getVisibility() {
-        return visibility;
+    public Integer getLikeCount() {
+        return likeCount;
     }
 
     public void setTitle(String title) {
@@ -87,15 +87,19 @@ public class ArtworkEntity {
         this.creationDate = creationDate;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public void setTags(String tags) {
         this.tags = tags;
     }
 
-    public void setVisibility(String visibility) {
-        this.visibility = visibility;
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public List<ArtworkTagEntity> getArtworkTags() {
+        return artworkTags;
+    }
+
+    public void setArtworkTags(List<ArtworkTagEntity> artworkTags) {
+        this.artworkTags = artworkTags;
     }
 }

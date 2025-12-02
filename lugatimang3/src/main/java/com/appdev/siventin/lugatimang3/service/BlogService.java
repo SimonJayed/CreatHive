@@ -21,6 +21,9 @@ public class BlogService {
     public BlogEntity insertBlog(BlogEntity blog, int artistId) {
         try {
             // 1. Save the Blog
+            if (blog.getDatePosted() == null) {
+                blog.setDatePosted(new java.sql.Timestamp(System.currentTimeMillis()));
+            }
             BlogEntity savedBlog = brepo.save(blog);
 
             // 2. Create the Association
@@ -81,5 +84,32 @@ public class BlogService {
             msg = "Blog " + blogId + " does not exist.";
         }
         return msg;
+    }
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.BlogLikesRepository blogLikesRepository;
+
+    public BlogEntity likeBlog(int blogId, int userId) {
+        BlogEntity blog = brepo.findById(blogId)
+                .orElseThrow(() -> new NoSuchElementException("Blog " + blogId + " does not exist."));
+
+        com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey key = new com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey(
+                blogId, userId);
+
+        if (blogLikesRepository.existsById(key)) {
+            // Unlike
+            blogLikesRepository.deleteById(key);
+            int currentLikes = blog.getLikeCount() == null ? 0 : blog.getLikeCount();
+            blog.setLikeCount(Math.max(0, currentLikes - 1));
+        } else {
+            // Like
+            com.appdev.siventin.lugatimang3.entity.BlogLikesEntity like = new com.appdev.siventin.lugatimang3.entity.BlogLikesEntity(
+                    blogId, userId);
+            blogLikesRepository.save(like);
+            int currentLikes = blog.getLikeCount() == null ? 0 : blog.getLikeCount();
+            blog.setLikeCount(currentLikes + 1);
+        }
+
+        return brepo.save(blog);
     }
 }

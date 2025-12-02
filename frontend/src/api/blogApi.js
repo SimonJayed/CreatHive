@@ -1,14 +1,25 @@
 const BASE_URL = "http://localhost:8080/blogs";
 
 export async function getAllBlogs() {
-  const res = await fetch(`${BASE_URL}/getAllBlogs`);
-  return res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/getAllBlogs`);
+    if (!res.ok) throw new Error("Failed to fetch blogs");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching all blogs:", error);
+    return [];
+  }
 }
 
 export async function getBlogsByArtistId(artistId) {
-  const res = await fetch(`${BASE_URL}/getBlogsByArtistId/${artistId}`);
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/getBlogsByArtistId/${artistId}`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (error) {
+    console.error(`Error fetching blogs for artist ${artistId}:`, error);
+    return [];
+  }
 }
 
 export async function insertBlog(blog, artistId) {
@@ -34,4 +45,11 @@ export async function deleteBlog(blogId) {
     method: "DELETE",
   });
   return res.text();
+}
+
+export async function likeBlog(blogId, userId) {
+  const res = await fetch(`${BASE_URL}/likeBlog/${blogId}/${userId}`, {
+    method: "PUT",
+  });
+  return res.json();
 }

@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.appdev.siventin.lugatimang3.entity.UserCommentEntity;
 import com.appdev.siventin.lugatimang3.service.UserCommentService;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 @RestController
 @RequestMapping("/userComment")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserCommentController {
 
     @Autowired

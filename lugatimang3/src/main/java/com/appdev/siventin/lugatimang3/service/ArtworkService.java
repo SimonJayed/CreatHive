@@ -84,7 +84,7 @@ public class ArtworkService {
             Artwork = awrepo.findById(artworkId).get();
             Artwork.setDescription(newArtworkDetails.getDescription());
             Artwork.setCreationDate(newArtworkDetails.getCreationDate());
-            Artwork.setCategory(newArtworkDetails.getCategory());
+
         } catch (NoSuchElementException ex) {
             throw new NoSuchElementException("Artwork " + artworkId + " does not exist.");
         } finally {
@@ -102,6 +102,62 @@ public class ArtworkService {
         } else
             msg = "Artwork " + artworkId + " does not exist.";
         return msg;
+    }
+
+    // Interactions
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.ArtworkLikesRepository artworkLikesRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.FavoritesRepository favoritesRepository;
+
+    public ArtworkEntity likeArtwork(int artworkId, int userId) {
+        ArtworkEntity artwork = awrepo.findById(artworkId)
+                .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
+
+        com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
+                artworkId, userId);
+
+        if (artworkLikesRepository.existsById(key)) {
+            // Unlike
+            artworkLikesRepository.deleteById(key);
+            int currentLikes = artwork.getLikeCount() == null ? 0 : artwork.getLikeCount();
+            artwork.setLikeCount(Math.max(0, currentLikes - 1));
+        } else {
+            // Like
+            com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity like = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity(
+                    artworkId, userId);
+            artworkLikesRepository.save(like);
+            int currentLikes = artwork.getLikeCount() == null ? 0 : artwork.getLikeCount();
+            artwork.setLikeCount(currentLikes + 1);
+        }
+
+        return awrepo.save(artwork);
+    }
+
+    public void favoriteArtwork(int artworkId, int userId) {
+        // userId is treated as artistId in FavoritesEntity
+        com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey key = new com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey(
+                artworkId, userId);
+
+        if (favoritesRepository.existsById(key)) {
+            // Unfavorite
+            favoritesRepository.deleteById(key);
+        } else {
+            // Favorite
+            com.appdev.siventin.lugatimang3.entity.FavoritesEntity favorite = new com.appdev.siventin.lugatimang3.entity.FavoritesEntity(
+                    artworkId, userId);
+            favoritesRepository.save(favorite);
+        }
+    }
+
+    public List<ArtworkEntity> getFavoriteArtworks(int userId) {
+        List<Integer> artworkIds = favoritesRepository.findAll().stream()
+                .filter(fav -> fav.getId().getArtistId() == userId)
+                .map(fav -> fav.getId().getArtworkId())
+                .collect(Collectors.toList());
+
+        return awrepo.findAllById(artworkIds);
     }
 
 }

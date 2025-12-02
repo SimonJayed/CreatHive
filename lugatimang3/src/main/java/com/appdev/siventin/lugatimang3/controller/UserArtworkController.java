@@ -15,6 +15,7 @@ import com.appdev.siventin.lugatimang3.service.UserArtworkService;
 
 @RestController
 @RequestMapping("/userArtwork")
+@org.springframework.web.bind.annotation.CrossOrigin(origins = "http://localhost:3000")
 public class UserArtworkController {
 
     @Autowired

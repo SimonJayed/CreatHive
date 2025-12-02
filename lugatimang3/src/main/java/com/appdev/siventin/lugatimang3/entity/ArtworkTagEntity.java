@@ -17,6 +17,11 @@ public class ArtworkTagEntity {
     @EmbeddedId
     private ArtworkTagKey id;
 
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.MapsId("artworkId")
+    @jakarta.persistence.JoinColumn(name = "artwork_id")
+    private ArtworkEntity artwork;
+
     @Column(name = "date_assigned")
     private LocalDateTime dateAssigned;
 
@@ -43,6 +48,14 @@ public class ArtworkTagEntity {
 
     public void setDateAssigned(LocalDateTime dateAssigned) {
         this.dateAssigned = dateAssigned;
+    }
+
+    public ArtworkEntity getArtwork() {
+        return artwork;
+    }
+
+    public void setArtwork(ArtworkEntity artwork) {
+        this.artwork = artwork;
     }
 
     @Embeddable

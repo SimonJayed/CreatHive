@@ -15,7 +15,7 @@ function App() {
     if (savedArtist && savedArtist !== "undefined") {
       // If logged in, check if current path is a valid homepage route
       const path = window.location.pathname;
-      const validHomeRoutes = ["/home", "/upload-blog", "/upload-artwork", "/explore", "/profile", "/settings"];
+      const validHomeRoutes = ["/home", "/blogs", "/upload-blog", "/upload-artwork", "/explore", "/profile", "/settings"];
       if (validHomeRoutes.includes(path)) {
         return "home";
       }

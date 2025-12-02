@@ -5,17 +5,17 @@ import { getBlogsByArtistId } from '../api/blogApi';
 import { resizeImage } from '../utils/imageUtils';
 import ArtistArtworks from './profile/ArtistArtworks';
 import ArtistBlogs from './profile/ArtistBlogs';
+import FavoriteArtworks from './profile/FavoriteArtworks';
 import ProfileHeader from './profile/ProfileHeader';
 import ProfileBio from './profile/ProfileBio';
-import ProfileStats from './profile/ProfileStats';
 import '../styles/Profile.css';
 
 function Profile({ userData, onNavigate, onProfileUpdate }) {
     const [isEditing, setIsEditing] = useState(false);
     const [profileData, setProfileData] = useState({
         name: 'John Doe', email: 'johndoe@gmail.com', bio: '', interest: '',
-        website: '', profileImage: '', level: 1, xp: 0,
-        joinedDate: 'November 2025', artworks: 0, totalXP: 0, levels: 1,
+        website: '', profileImage: '',
+        joinedDate: 'November 2025', artworks: 0,
         ...userData
     });
     const [userArtworks, setUserArtworks] = useState([]);
@@ -93,7 +93,6 @@ function Profile({ userData, onNavigate, onProfileUpdate }) {
                     onBioChange={updateField('bio')}
                     onWebsiteChange={updateField('website')}
                 />
-                <ProfileStats profileData={profileData} />
             </div>
 
             {/* Tab Navigation */}
@@ -110,6 +109,12 @@ function Profile({ userData, onNavigate, onProfileUpdate }) {
                 >
                     Blogs
                 </button>
+                <button
+                    className={`tab-button ${activeTab === 'favorites' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('favorites')}
+                >
+                    Favorites
+                </button>
             </div>
 
             {/* Tab Content */}
@@ -121,7 +126,12 @@ function Profile({ userData, onNavigate, onProfileUpdate }) {
                 )}
                 {activeTab === 'blogs' && (
                     <div className="tab-content-wrapper">
-                        <ArtistBlogs blogs={userBlogs} onNavigate={onNavigate} />
+                        <ArtistBlogs blogs={userBlogs} artist={profileData} onNavigate={onNavigate} />
+                    </div>
+                )}
+                {activeTab === 'favorites' && (
+                    <div className="tab-content-wrapper">
+                        <FavoriteArtworks userId={userData.artistId} onNavigate={onNavigate} />
                     </div>
                 )}
             </div>

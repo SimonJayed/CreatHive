@@ -5,8 +5,7 @@ import '../styles/UploadBlog.css';
 function UploadBlog({ artistData }) {
     const [formData, setFormData] = useState({
         title: '',
-        content: '',
-        visibility: 'public'
+        content: ''
     });
 
     const handleChange = (e) => {
@@ -35,7 +34,7 @@ function UploadBlog({ artistData }) {
             }
             await insertBlog(blogData, artistId);
             alert('Blog uploaded successfully!');
-            setFormData({ title: '', content: '', visibility: 'public' });
+            setFormData({ title: '', content: '' });
         } catch (error) {
             console.error('Failed to upload blog:', error);
             alert('Failed to upload blog. Please try again.');
@@ -43,7 +42,7 @@ function UploadBlog({ artistData }) {
     };
 
     const handleCancel = () => {
-        setFormData({ title: '', content: '', visibility: 'public' });
+        setFormData({ title: '', content: '' });
     };
 
     return (
@@ -83,51 +82,6 @@ function UploadBlog({ artistData }) {
                         />
                     </div>
 
-                    {/* Visibility */}
-                    <div className="form-group">
-                        <label className="form-label" style={{ marginBottom: '10px' }}>Visibility</label>
-                        <div className="visibility-options">
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="public"
-                                    checked={formData.visibility === 'public'}
-                                    onChange={handleChange}
-                                    className="radio-input"
-                                />
-                                <span className="radio-text">
-                                    <strong>Public</strong> - Anyone can see this artwork
-                                </span>
-                            </label>
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="unlisted"
-                                    checked={formData.visibility === 'unlisted'}
-                                    onChange={handleChange}
-                                    className="radio-input"
-                                />
-                                <span className="radio-text">
-                                    <strong>Unlisted</strong> - Only people with the link can see this artwork
-                                </span>
-                            </label>
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="private"
-                                    checked={formData.visibility === 'private'}
-                                    onChange={handleChange}
-                                    className="radio-input"
-                                />
-                                <span className="radio-text">
-                                    <strong>Private</strong> - Only you can see this artwork
-                                </span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Buttons */}

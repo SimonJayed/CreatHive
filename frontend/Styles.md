@@ -38,6 +38,12 @@ This document defines the global style tokens and design values used throughout 
 | `borderRadius` | `4px` | Standard border radius for inputs, buttons, and cards. |
 | `borderRadiusLarge` | `8px` | Border radius for larger containers like modals and cards. |
 
+## Masonry Layout
+For artwork feeds, use a masonry layout to display images of varying heights.
+- **Container**: `column-count: 3; column-gap: 20px;`
+- **Item**: `break-inside: avoid; margin-bottom: 20px;`
+- **Responsive**: Adjust column count for smaller screens (e.g., 2 columns for tablet, 1 for mobile).
+
 ## Usage Examples
 
 ### Primary Button
@@ -63,3 +69,26 @@ box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 background-color: rgba(0, 0, 0, 0.8);
 z-index: 1000;
 ```
+
+## Universal Icons
+Use these icons from `react-icons/fa` (FontAwesome) consistently across the application.
+- **Like**: `FaHeart` (Filled), `FaRegHeart` (Outline)
+- **Comment**: `FaRegComment`
+- **Share**: `FaShare`
+- **Favorite**: `FaStar` (Filled), `FaRegStar` (Outline)
+- **Upload**: `FaUpload`
+- **Sort**: `FaSortAmountDown`
+- **Sidebar**: `FaHome`, `FaCommentDots`, `FaSearch`, `FaImages`, `FaUser`, `FaCog`, `FaSignOutAlt`, `FaPalette`
+- **No Data**: `FaRegFileAlt`
+
+## Component Rules
+
+### Sidebar
+- **Background**: `black`
+- **Text/Icon Color**: `#FFB800` (Primary)
+- **Border**: `1px solid #FFB800` (Right edge)
+- **Width**: `250px` (Fixed)
+- **Layout**: Vertical, fixed position
+- **Logo**: Centered, `#FFB800`
+
+- **Primary Buttons**: If background is `primaryColor` (#FFB800), text color MUST be `white` (#FFFFFF).

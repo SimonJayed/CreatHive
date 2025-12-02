@@ -5,10 +5,8 @@ import '../styles/UploadArtwork.css';
 function UploadArtwork({ artistData, onNavigate }) {
     const [formData, setFormData] = useState({
         title: '',
-        category: '',
         description: '',
-        tags: '',
-        visibility: 'public'
+        tags: ''
     });
     const [imageFile, setImageFile] = useState(null);
 
@@ -44,10 +42,8 @@ function UploadArtwork({ artistData, onNavigate }) {
 
                 const artworkData = {
                     title: formData.title,
-                    category: formData.category,
                     description: formData.description,
                     tags: formData.tags,
-                    visibility: formData.visibility,
                     image: base64Image,
                     artistId: artistData.artistId,
                     creationDate: new Date().toISOString().slice(0, 19) // Remove 'Z' for LocalDateTime compatibility
@@ -61,7 +57,7 @@ function UploadArtwork({ artistData, onNavigate }) {
                 const artistId = user.artistId;
                 await insertArtwork(artworkData, artistId);
                 alert('Artwork uploaded successfully!');
-                setFormData({ title: '', category: '', description: '', tags: '', visibility: 'public' });
+                setFormData({ title: '', description: '', tags: '' });
                 setImageFile(null);
                 if (onNavigate) onNavigate('profile');
             };
@@ -72,7 +68,7 @@ function UploadArtwork({ artistData, onNavigate }) {
     };
 
     const handleCancel = () => {
-        setFormData({ title: '', category: '', description: '', tags: '', visibility: 'public' });
+        setFormData({ title: '', description: '', tags: '' });
         setImageFile(null);
     };
 
@@ -101,11 +97,29 @@ function UploadArtwork({ artistData, onNavigate }) {
                             <p className="upload-text">Click to upload or drag and drop</p>
                             <p className="upload-subtext">PNG, JPG, GIF up to 10MB</p>
                             {imageFile && (
-                                <div className="image-preview-container">
+                                <div className="image-preview-container" style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    margin: 0,
+                                    borderRadius: '12px',
+                                    overflow: 'hidden',
+                                    zIndex: 5,
+                                    backgroundColor: '#f8f8f8'
+                                }}>
                                     <img
                                         src={URL.createObjectURL(imageFile)}
                                         alt="Preview"
                                         className="image-preview"
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            maxHeight: 'none',
+                                            maxWidth: 'none'
+                                        }}
                                     />
                                 </div>
                             )}
@@ -127,22 +141,7 @@ function UploadArtwork({ artistData, onNavigate }) {
                             />
                         </div>
 
-                        {/* Category */}
-                        <div className="form-group">
-                            <label className="form-label">Category</label>
-                            <select
-                                name="category"
-                                value={formData.category}
-                                onChange={handleChange}
-                                className="form-select"
-                            >
-                                <option value="">Select a category</option>
-                                <option value="digital">Digital Art</option>
-                                <option value="traditional">Traditional Art</option>
-                                <option value="3d">3D Art</option>
-                                <option value="photography">Photography</option>
-                            </select>
-                        </div>
+
 
                         {/* Tags */}
                         <div className="form-group">
@@ -174,46 +173,6 @@ function UploadArtwork({ artistData, onNavigate }) {
                                 rows="6"
                                 className="form-textarea"
                             />
-                        </div>
-                    </div>
-
-                    {/* Visibility - Spans full width */}
-                    <div className="full-width">
-                        <label className="form-label">Visibility</label>
-                        <div className="visibility-options">
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="public"
-                                    checked={formData.visibility === 'public'}
-                                    onChange={handleChange}
-                                    className="radio-input"
-                                />
-                                <span className="radio-text"><strong>Public</strong></span>
-                            </label>
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="unlisted"
-                                    checked={formData.visibility === 'unlisted'}
-                                    onChange={handleChange}
-                                    className="radio-input"
-                                />
-                                <span className="radio-text"><strong>Unlisted</strong></span>
-                            </label>
-                            <label className="radio-label">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="private"
-                                    checked={formData.visibility === 'private'}
-                                    onChange={handleChange}
-                                    className="radio-input"
-                                />
-                                <span className="radio-text"><strong>Private</strong></span>
-                            </label>
                         </div>
                     </div>
 

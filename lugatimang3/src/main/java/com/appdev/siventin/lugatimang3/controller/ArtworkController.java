@@ -51,4 +51,19 @@ public class ArtworkController {
         return awservice.deleteArtwork(artworkId);
     }
 
+    @PutMapping("/likeArtwork/{artworkId}/{userId}")
+    public ArtworkEntity likeArtwork(@PathVariable int artworkId, @PathVariable int userId) {
+        return awservice.likeArtwork(artworkId, userId);
+    }
+
+    @PutMapping("/favoriteArtwork/{artworkId}/{userId}")
+    public void favoriteArtwork(@PathVariable int artworkId, @PathVariable int userId) {
+        awservice.favoriteArtwork(artworkId, userId);
+    }
+
+    @GetMapping("/getFavoriteArtworks/{userId}")
+    public List<ArtworkEntity> getFavoriteArtworks(@PathVariable int userId) {
+        return awservice.getFavoriteArtworks(userId);
+    }
+
 }
