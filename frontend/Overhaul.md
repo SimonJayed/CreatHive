@@ -156,3 +156,13 @@ Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where use
         -   Fixed `ArtworkCard` comment button not being clickable (added `onComment` handler).
         -   Implemented like and favorite interactions in `ArtistArtworks.jsx` (profile page).
         -   Fixed `FavoriteArtworks.jsx` to correctly display favorited state (`isFavorited={true}`).
+    -   **Delete Functionality**:
+        -   Implemented delete functionality for Artworks and Blogs.
+        -   Updated `ArtworkService` and `BlogService` to handle cascade deletion of related records (likes, favorites, tags, comments).
+        -   Added "Delete" button (trash icon) to `BlogsFeed`, `ArtistBlogs`, and `ArtworkCard` (in Profile).
+        -   Ensured delete button is only visible to the content owner.
+    -   **Style Refactoring**:
+        -   Refactored frontend components to use new design system (CSS variables and utility classes).
+        -   Updated Auth, Profile, Artworks, Blogs, Tags, Artists, and Homepage components.
+        -   Created new CSS files for components that previously used inline styles.
+        -   Fixed lint errors and verified build.

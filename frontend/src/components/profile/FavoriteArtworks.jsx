@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getFavoriteArtworks, likeArtwork, favoriteArtwork } from '../../api/artworkApi';
 import ArtworkCard from '../artworks/ArtworkCard';
+import '../../styles/FavoriteArtworks.css';
 
 function FavoriteArtworks() {
     const [favorites, setFavorites] = useState([]);
@@ -49,12 +50,12 @@ function FavoriteArtworks() {
         }
     };
 
-    if (loading) return <div style={{ color: 'white', textAlign: 'center', padding: '20px' }}>Loading favorites...</div>;
+    if (loading) return <div className="loading-text">Loading favorites...</div>;
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h3 style={{ color: '#FFB800', margin: '0 0 20px 0', fontSize: '24px' }}>My Favorites</h3>
-            <div className="artworks-masonry" style={{ columnCount: 3, columnGap: '20px' }}>
+        <div className="favorite-artworks-container">
+            <h3 className="favorites-title">My Favorites</h3>
+            <div className="artworks-masonry">
                 {favorites.length > 0 ? (
                     favorites.map((artwork) => (
                         <ArtworkCard
@@ -68,7 +69,7 @@ function FavoriteArtworks() {
                         />
                     ))
                 ) : (
-                    <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    <div className="no-favorites">
                         You haven't favorited any artworks yet.
                     </div>
                 )}

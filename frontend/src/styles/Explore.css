@@ -12,7 +12,7 @@
 }
 
 .search-bar-container {
-    background-color: #FFB800;
+    background-color: var(--primary-color);
     border-radius: 50px;
     padding: 12px 24px;
     display: flex;
@@ -23,11 +23,13 @@
     max-width: 800px;
     margin: 0 auto 40px auto;
     box-sizing: border-box;
+    box-shadow: var(--shadow-md);
 }
 
 .search-icon {
     font-size: 20px;
     margin-right: 12px;
+    color: black;
 }
 
 .search-input {
@@ -38,6 +40,7 @@
     font-size: 16px;
     color: black;
     width: 100%;
+    font-family: var(--font-family);
 }
 
 .explore-content {
@@ -52,25 +55,27 @@
 .featured-header {
     text-align: center;
     margin-bottom: 30px;
-    border-bottom: 2px solid #FFB800;
+    border-bottom: 2px solid var(--primary-color);
     padding-bottom: 20px;
     width: 100%;
     max-width: 900px;
 }
 
 .featured-title {
-    color: #FFB800;
+    color: var(--primary-color);
     font-size: clamp(24px, 4vw, 32px);
     margin-bottom: 12px;
     margin-top: 0;
+    font-family: var(--font-family);
 }
 
 .featured-description {
-    color: #FFB800;
+    color: var(--primary-color);
     font-size: clamp(14px, 2vw, 16px);
     line-height: 1.6;
     max-width: 700px;
     margin: 0 auto;
+    font-family: var(--font-family);
 }
 
 .tags-grid {
@@ -87,17 +92,19 @@
     width: 280px;
     height: 360px;
     border-radius: 12px;
-    border: 3px solid #FFB800;
+    border: 3px solid var(--primary-color);
     overflow: hidden;
     position: relative;
     background-size: cover;
     background-position: center;
     flex-shrink: 0;
-    transition: transform 0.2s;
+    transition: transform var(--duration-normal) var(--ease-smooth);
+    box-shadow: var(--shadow-md);
 }
 
 .tag-card:hover {
     transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
 }
 
 .tag-overlay {
@@ -120,11 +127,12 @@
 }
 
 .tag-name {
-    color: #FFB800;
+    color: var(--primary-color);
     font-size: 24px;
     margin: 0;
     font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: var(--font-family);
 }
 
 .tag-icon {
@@ -136,10 +144,11 @@
     font-size: 14px;
     margin-bottom: 12px;
     font-weight: 500;
+    font-family: var(--font-family);
 }
 
 .btn-create {
-    background-color: #FFB800;
+    background-color: var(--primary-color);
     color: black;
     border: none;
     border-radius: 8px;
@@ -148,11 +157,12 @@
     font-weight: 600;
     cursor: pointer;
     width: 100%;
-    transition: background-color 0.2s;
+    transition: background-color var(--duration-normal) var(--ease-smooth);
+    font-family: var(--font-family);
 }
 
 .btn-create:hover {
-    background-color: #e6a600;
+    background-color: var(--primary-hover);
 }
 
 /* Responsive Adjustments */

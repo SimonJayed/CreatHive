@@ -5,6 +5,7 @@ import {
   updateTag,
   deleteTag,
 } from "../../api/tagApi";
+import "../../styles/TagCRUD.css";
 
 function TagModal({ isOpen, onClose, onSubmit, editingTag }) {
   const [form, setForm] = useState({
@@ -33,56 +34,20 @@ function TagModal({ isOpen, onClose, onSubmit, editingTag }) {
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: '#000',
-        borderRadius: '8px',
-        width: '90%',
-        maxWidth: '600px',
-        boxShadow: '0 4px 20px rgba(255, 193, 7, 0.3)',
-        border: '2px solid #FFC107'
-      }}>
-        <div style={{
-          padding: '24px',
-          borderBottom: '1px solid #333'
-        }}>
-          <h2 style={{
-            fontSize: '24px',
-            fontWeight: 'bold',
-            color: '#FFC107',
-            margin: '0 0 8px 0'
-          }}>
+    <div className="tag-crud-overlay">
+      <div className="tag-crud-modal">
+        <div className="tag-crud-header">
+          <h2 className="tag-crud-title">
             {editingTag ? "Edit Tag" : "Create Tag"}
           </h2>
-          <p style={{
-            fontSize: '14px',
-            color: '#999',
-            margin: 0
-          }}>
+          <p className="tag-crud-subtitle">
             Add tags to help organize and discover content!
           </p>
         </div>
 
-        <div style={{ padding: '24px', backgroundColor: '#fff' }}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#000',
-              marginBottom: '8px'
-            }}>
+        <div className="tag-crud-body">
+          <div className="tag-crud-form-group">
+            <label className="tag-crud-label">
               Tag Name*
             </label>
             <input
@@ -90,25 +55,12 @@ function TagModal({ isOpen, onClose, onSubmit, editingTag }) {
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Enter tag name"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
+              className="tag-crud-input"
             />
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#000',
-              marginBottom: '8px'
-            }}>
+          <div className="tag-crud-form-group">
+            <label className="tag-crud-label">
               Description
             </label>
             <textarea
@@ -116,47 +68,20 @@ function TagModal({ isOpen, onClose, onSubmit, editingTag }) {
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Describe what this tag represents..."
               rows="4"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '14px',
-                resize: 'none',
-                boxSizing: 'border-box',
-                fontFamily: 'inherit'
-              }}
+              className="tag-crud-textarea"
             />
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+          <div className="tag-crud-actions">
             <button
               onClick={onClose}
-              style={{
-                padding: '10px 24px',
-                backgroundColor: 'white',
-                color: '#000',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
+              className="tag-crud-btn-cancel"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
-              style={{
-                padding: '10px 24px',
-                backgroundColor: '#FFC107',
-                color: '#000',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600'
-              }}
+              className="tag-crud-btn-submit"
             >
               {editingTag ? "Update Tag" : "Create Tag"}
             </button>
@@ -198,24 +123,30 @@ function TagCRUD() {
   };
 
   return (
-    <div>
-      <h2>Tag CRUD</h2>
+    <div className="tag-crud-container">
+      <h2 className="tag-crud-heading">Tag CRUD</h2>
 
       <button onClick={() => {
         setEditingTag(null);
         setIsModalOpen(true);
-      }}>
+      }}
+        className="tag-crud-create-btn"
+      >
         Create
       </button>
 
-      <h3>Tags:</h3>
+      <h3 className="tag-crud-heading">Tags:</h3>
       {tags.map((tag) => (
-        <div key={tag.tagId}>
-          <strong>{tag.name}</strong> — {tag.description}
-          <button onClick={() => handleEdit(tag)}>Edit</button>
-          <button onClick={() => deleteTag(tag.tagId).then(loadTags)}>
-            Delete
-          </button>
+        <div key={tag.tagId} className="tag-item">
+          <div className="tag-item-content">
+            <strong>{tag.name}</strong> — {tag.description}
+          </div>
+          <div className="tag-item-actions">
+            <button onClick={() => handleEdit(tag)} className="tag-item-btn tag-item-btn-edit">Edit</button>
+            <button onClick={() => deleteTag(tag.tagId).then(loadTags)} className="tag-item-btn tag-item-btn-delete">
+              Delete
+            </button>
+          </div>
         </div>
       ))}
 

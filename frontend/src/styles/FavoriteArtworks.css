@@ -1,0 +1,42 @@
+.favorite-artworks-container {
+    padding: 20px;
+}
+
+.favorites-title {
+    color: var(--primary-color);
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    font-family: var(--font-family);
+}
+
+.artworks-masonry {
+    column-count: 3;
+    column-gap: 20px;
+}
+
+.no-favorites {
+    text-align: center;
+    padding: 40px;
+    color: var(--secondary-text-color);
+    font-family: var(--font-family);
+}
+
+.loading-text {
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-family: var(--font-family);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .artworks-masonry {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 600px) {
+    .artworks-masonry {
+        column-count: 1;
+    }
+}

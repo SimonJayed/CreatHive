@@ -4,6 +4,7 @@ import { getAllUserArtworks } from '../../api/userArtworkApi';
 import { getAllArtists } from '../../api/artistApi';
 import ArtworkCard from './ArtworkCard';
 import { FaSortAmountDown } from 'react-icons/fa';
+import '../../styles/ArtworksFeed.css';
 
 function ArtworksFeed({ onNavigate }) {
     const [artworks, setArtworks] = useState([]);
@@ -112,31 +113,20 @@ function ArtworksFeed({ onNavigate }) {
         }
     };
 
-    if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading artworks...</div>;
+    if (loading) return <div className="loading-text">Loading artworks...</div>;
 
     return (
-        <div className="artworks-feed-container" style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
-            {/* ... (header remains same) */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <h2 style={{ color: '#FFB800', margin: 0 }}>Community Artworks</h2>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#FFB800' }}>
+        <div className="artworks-feed-container">
+            <div className="feed-header">
+                <div className="feed-title-group">
+                    <h2 className="feed-title">Community Artworks</h2>
+                    <div className="sort-controls">
                         <FaSortAmountDown />
                         <span>Sort by:</span>
                         <select
                             value={sortOrder}
                             onChange={(e) => setSortOrder(e.target.value)}
-                            style={{
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                border: 'none',
-                                backgroundColor: 'transparent',
-                                color: '#FFB800',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                outline: 'none',
-                                fontWeight: '600'
-                            }}
+                            className="sort-select"
                         >
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
@@ -147,22 +137,12 @@ function ArtworksFeed({ onNavigate }) {
                 <button
                     onClick={() => onNavigate('upload-artwork')}
                     className="upload-artwork-btn"
-                    style={{
-                        padding: '8px 16px',
-                        fontSize: '14px',
-                        backgroundColor: '#FFB800',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontWeight: '600',
-                        cursor: 'pointer'
-                    }}
                 >
                     + Upload Artwork
                 </button>
             </div>
 
-            <div className="artworks-masonry" style={{ columnCount: 3, columnGap: '20px' }}>
+            <div className="artworks-masonry">
                 {sortedArtworks.length > 0 ? (
                     sortedArtworks.map((artwork) => (
                         <ArtworkCard
@@ -175,7 +155,7 @@ function ArtworksFeed({ onNavigate }) {
                         />
                     ))
                 ) : (
-                    <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                    <div className="no-artworks">
                         No artworks found.
                     </div>
                 )}

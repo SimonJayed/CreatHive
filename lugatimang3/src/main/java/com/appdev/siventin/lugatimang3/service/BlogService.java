@@ -77,9 +77,30 @@ public class BlogService {
     public String deleteBlog(int blogId) {
         String msg = "";
 
-        if (brepo.findById(blogId) != null) {
+        if (brepo.existsById(blogId)) {
+            // 1. Delete from UserBlog (Link to Artist)
+            List<com.appdev.siventin.lugatimang3.entity.UserBlogEntity> userBlogs = userBlogRepository.findAll()
+                    .stream()
+                    .filter(ub -> ub.getId().getBlogId() == blogId)
+                    .collect(java.util.stream.Collectors.toList());
+            userBlogRepository.deleteAll(userBlogs);
+
+            // 2. Delete from BlogLikes
+            List<com.appdev.siventin.lugatimang3.entity.BlogLikesEntity> likes = blogLikesRepository.findAll().stream()
+                    .filter(l -> l.getId().getBlogId() == blogId)
+                    .collect(java.util.stream.Collectors.toList());
+            blogLikesRepository.deleteAll(likes);
+
+            // 3. Delete from CommentOnBlog (Link to Comments)
+            List<com.appdev.siventin.lugatimang3.entity.CommentOnBlogEntity> commentLinks = commentOnBlogRepository
+                    .findAll().stream()
+                    .filter(c -> c.getId().getBlogId() == blogId)
+                    .collect(java.util.stream.Collectors.toList());
+            commentOnBlogRepository.deleteAll(commentLinks);
+
+            // 4. Delete the Blog itself
             brepo.deleteById(blogId);
-            msg = "Blog " + blogId + "is successfully deleted!";
+            msg = "Blog " + blogId + " is successfully deleted!";
         } else {
             msg = "Blog " + blogId + " does not exist.";
         }
@@ -88,6 +109,9 @@ public class BlogService {
 
     @Autowired
     com.appdev.siventin.lugatimang3.repository.BlogLikesRepository blogLikesRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.CommentOnBlogRepository commentOnBlogRepository;
 
     public BlogEntity likeBlog(int blogId, int userId) {
         BlogEntity blog = brepo.findById(blogId)

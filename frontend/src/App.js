@@ -5,6 +5,7 @@ import SignIn from "./components/auth/SignIn";
 import Register from "./components/auth/Register";
 import InterestPicker from "./components/auth/InterestPicker";
 import Homepage from "./components/Homepage";
+import './App.css';
 
 import { getArtistById } from "./api/artistApi";
 
@@ -151,25 +152,6 @@ function App() {
     localStorage.setItem("currentArtist", JSON.stringify(artistToSave));
   };
 
-  const buttonStyle = {
-    padding: "10px 24px",
-    backgroundColor: "#FFB800",
-    color: "#ffffffff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "14px",
-    fontWeight: "600",
-    margin: "10px",
-  };
-
-  const backButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: "transparent",
-    border: "2px solid #FFB800",
-    color: "#FFB800",
-  };
-
   if (activePage === "signin") {
     return <SignIn onLoginSuccess={handleLoginSuccess} />;
   }
@@ -199,36 +181,28 @@ function App() {
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: "black",
-        minHeight: "100vh",
-        color: "#FFB800",
-        padding: "20px",
-        textAlign: "center",
-      }}
-    >
+    <div className="app-container">
       {/* MENU PAGE */}
       {!activePage && (
         <div>
-          <h1 style={{ color: "#FFB800" }}>CreatHive</h1>
+          <h1 className="app-title">CreatHive</h1>
 
-          <button style={buttonStyle} onClick={() => setActivePage("blogs")}>
+          <button className="app-btn" onClick={() => setActivePage("blogs")}>
             Manage Blogs
           </button>
 
-          <button style={buttonStyle} onClick={() => setActivePage("tags")}>
+          <button className="app-btn" onClick={() => setActivePage("tags")}>
             Manage Tags
           </button>
 
-          <button style={buttonStyle} onClick={() => {
+          <button className="app-btn" onClick={() => {
             window.history.pushState({}, "", "/signin");
             setActivePage("signin");
           }}>
             Sign In
           </button>
 
-          <button style={buttonStyle} onClick={() => {
+          <button className="app-btn" onClick={() => {
             window.history.pushState({}, "", "/register");
             setActivePage("register");
           }}>
@@ -240,7 +214,7 @@ function App() {
       {/* BLOG CRUD */}
       {activePage === "blogs" && (
         <>
-          <button style={backButtonStyle} onClick={() => setActivePage(null)}>
+          <button className="app-back-btn" onClick={() => setActivePage(null)}>
             Back
           </button>
           <BlogCRUD />
@@ -250,7 +224,7 @@ function App() {
       {/* TAG CRUD */}
       {activePage === "tags" && (
         <>
-          <button style={backButtonStyle} onClick={() => setActivePage(null)}>
+          <button className="app-back-btn" onClick={() => setActivePage(null)}>
             Back
           </button>
           <TagCRUD />

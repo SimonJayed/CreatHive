@@ -1,0 +1,117 @@
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: white;
+}
+
+.auth-card {
+    background-color: white;
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid var(--primary-color);
+    box-sizing: border-box;
+}
+
+.auth-title {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: var(--font-family);
+    margin-top: 0;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--secondary-text-color);
+    font-size: 14px;
+    margin-bottom: 24px;
+    margin-top: 0;
+    font-family: var(--font-family);
+}
+
+.auth-error {
+    background-color: #ffebee;
+    color: var(--danger-color);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 14px;
+    font-family: var(--font-family);
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 14px;
+    font-family: var(--font-family);
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+    transition: border-color var(--duration-normal) var(--ease-smooth);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 184, 0, 0.1);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--duration-normal) var(--ease-smooth);
+    font-family: var(--font-family);
+    margin-top: 8px;
+}
+
+.auth-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+.auth-link {
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: 600;
+    transition: color var(--duration-normal) var(--ease-smooth);
+}
+
+.auth-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}

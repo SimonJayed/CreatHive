@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { likeBlog } from '../../api/blogApi';
+import { likeBlog, deleteBlog } from '../../api/blogApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
 import { getAllUserComments } from '../../api/userCommentApi';
 import { getAllArtists } from '../../api/artistApi';
-import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaRegFileAlt, FaSortAmountDown } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaRegFileAlt, FaSortAmountDown, FaTrash } from 'react-icons/fa';
 import './ArtistBlogs.css';
 
 function ArtistBlogs({ blogs, artist, onNavigate }) {
@@ -73,7 +73,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
     const handleLike = async (blogId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to vote");
+            alert("Please login to like");
             return;
         }
         try {
@@ -123,31 +123,41 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
         }
     };
 
+    const handleDelete = async (blogId) => {
+        if (!window.confirm("Are you sure you want to delete this blog?")) return;
+        try {
+            await deleteBlog(blogId);
+            setLocalBlogs(prev => prev.filter(b => b.blogId !== blogId));
+        } catch (error) {
+            console.error("Failed to delete blog", error);
+            alert("Failed to delete blog");
+        }
+    };
+
     return (
         <div className="artist-blogs-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ color: '#FFB800', margin: 0 }}>Artist's Blogs</h3>
+                <h3 style={{ color: 'var(--primary-color)', margin: 0, fontFamily: 'var(--font-family)' }}>Artist's Blogs</h3>
                 {/* Sort Filter */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#FFB800' }}>
-                    <FaSortAmountDown />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--primary-color)' }}>
+                    <FaSortAmountDown className="icon" />
                     <span>Sort by:</span>
                     <select
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value)}
+                        className="input"
                         style={{
                             padding: '4px 8px',
-                            borderRadius: '4px',
-                            border: 'none',
+                            width: 'auto',
                             backgroundColor: 'transparent',
-                            color: '#FFB800',
+                            color: 'var(--primary-color)',
+                            border: 'none',
                             cursor: 'pointer',
-                            fontSize: '14px',
-                            outline: 'none',
                             fontWeight: '600'
                         }}
                     >
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
+                        <option value="newest" style={{ color: 'black' }}>Newest First</option>
+                        <option value="oldest" style={{ color: 'black' }}>Oldest First</option>
                     </select>
                 </div>
             </div>
@@ -155,7 +165,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
             {localBlogs.length > 0 ? (
                 <div className="blog-list">
                     {localBlogs.map((blog) => (
-                        <div key={blog.blogId} className="blog-card">
+                        <div key={blog.blogId} className="card blog-card">
                             {/* Header: Avatar, Name, Date */}
                             <div className="blog-header">
                                 <img
@@ -167,6 +177,23 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                                     <span className="blog-author">{artist?.name || 'Artist'}</span>
                                     <span className="blog-date">Posted {formatDate(blog.datePosted)}</span>
                                 </div>
+                                {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === artist?.artistId && (
+                                    <button
+                                        onClick={() => handleDelete(blog.blogId)}
+                                        style={{
+                                            marginLeft: 'auto',
+                                            background: 'none',
+                                            border: 'none',
+                                            color: 'var(--danger-color)',
+                                            cursor: 'pointer',
+                                            padding: '4px'
+                                        }}
+                                        title="Delete Blog"
+                                        className="icon"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                )}
                             </div>
 
                             {/* Title */}
@@ -182,28 +209,29 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                             {/* Footer: Actions */}
                             <div className="blog-footer">
                                 <button className="blog-action" onClick={() => handleLike(blog.blogId)}>
-                                    {blog.likeCount > 0 ? <FaHeart color="#FFB800" /> : <FaRegHeart />} Vote ({blog.likeCount || 0})
+                                    <span className="icon">{blog.likeCount > 0 ? <FaHeart color="var(--primary-color)" /> : <FaRegHeart />}</span> Like ({blog.likeCount || 0})
                                 </button>
                                 <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
-                                    <FaRegComment /> Comments
+                                    <span className="icon"><FaRegComment /></span> Comments
                                 </button>
                                 <button className="blog-action">
-                                    <FaShare /> Share
+                                    <span className="icon"><FaShare /></span> Share
                                 </button>
                             </div>
 
                             {/* Comments Section */}
                             {activeCommentBlogId === blog.blogId && (
-                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #eee' }}>
+                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
                                     <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                                         <input
                                             type="text"
                                             value={commentText}
                                             onChange={(e) => setCommentText(e.target.value)}
                                             placeholder="Write a comment..."
-                                            style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                                            className="input"
+                                            style={{ flex: 1 }}
                                         />
-                                        <button onClick={() => handleAddComment(blog.blogId)} style={{ padding: '8px 16px', backgroundColor: '#FFB800', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Post</button>
+                                        <button onClick={() => handleAddComment(blog.blogId)} className="button" style={{ padding: '8px 16px' }}>Post</button>
                                     </div>
                                     <div className="comments-list">
                                         {commentsMap[blog.blogId]?.map(comment => {
@@ -218,10 +246,10 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                                                     />
                                                     <div>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                            <span style={{ fontWeight: '600', fontSize: '13px' }}>{commenter.name}</span>
-                                                            <span style={{ fontSize: '10px', color: '#999' }}>{formatDate(comment.datePosted)}</span>
+                                                            <span style={{ fontWeight: '600', fontSize: '13px', fontFamily: 'var(--font-family)' }}>{commenter.name}</span>
+                                                            <span style={{ fontSize: '10px', color: '#999', fontFamily: 'var(--font-family)' }}>{formatDate(comment.datePosted)}</span>
                                                         </div>
-                                                        <p style={{ margin: '4px 0 0', fontSize: '14px' }}>{comment.content}</p>
+                                                        <p style={{ margin: '4px 0 0', fontSize: '14px', fontFamily: 'var(--font-family)' }}>{comment.content}</p>
                                                     </div>
                                                 </div>
                                             );
@@ -243,7 +271,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                     </p>
                     <button
                         onClick={() => onNavigate && onNavigate('upload-blog')}
-                        className="upload-blog-btn"
+                        className="button"
                     >
                         Upload your blog
                     </button>

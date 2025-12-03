@@ -121,7 +121,11 @@ function Profile({ userData, onNavigate, onProfileUpdate }) {
             <div className="profile-content-area">
                 {activeTab === 'artworks' && (
                     <div className="tab-content-wrapper">
-                        <ArtistArtworks artworks={userArtworks} onNavigate={onNavigate} />
+                        <ArtistArtworks
+                            artworks={userArtworks}
+                            onNavigate={onNavigate}
+                            isOwner={JSON.parse(localStorage.getItem('currentArtist'))?.artistId === userData?.artistId}
+                        />
                     </div>
                 )}
                 {activeTab === 'blogs' && (

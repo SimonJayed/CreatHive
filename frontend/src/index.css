@@ -1,13 +1,186 @@
+:root {
+  /* Colors */
+  --primary-color: #FFB800;
+  --primary-hover: #FFA500;
+  --secondary-color: #FFFFFF;
+  --background-color: #000000;
+  --text-color: #000000;
+  --secondary-text-color: #666666;
+  --danger-color: #ff4444;
+  --danger-hover: #ff0000;
+  --border-color: #ddd;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color-hover: rgba(255, 184, 0, 0.3);
+
+  /* Typography */
+  --font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --header-font-size: 24px;
+  --sub-header-font-size: 18px;
+  --body-font-size: 14px;
+  --small-font-size: 13px;
+
+  /* Spacing */
+  --modal-padding: 24px;
+  --card-padding: 16px;
+  --input-padding: 10px 12px;
+  --button-padding: 10px 24px;
+  --small-button-padding: 6px 12px;
+  --border-radius: 4px;
+  --border-radius-large: 8px;
+
+  /* Animations */
+  --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+  /* Light background for content area */
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Utility Classes */
+
+.button {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  padding: var(--button-padding);
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color-hover);
+}
+
+.button:active {
+  transform: translateY(0);
+  transition-duration: 100ms;
+}
+
+.card {
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-large);
+  padding: var(--card-padding);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  transition: all var(--duration-normal) var(--ease-smooth);
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.input {
+  padding: var(--input-padding);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--body-font-size);
+  transition: all var(--duration-normal) var(--ease-smooth);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.1);
+  transform: scale(1.01);
+}
+
+.icon {
+  transition: transform var(--duration-normal) var(--ease-bounce);
+}
+
+.icon:hover {
+  transform: scale(1.2);
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  animation: modalFadeIn var(--duration-normal) ease-out;
+  backdrop-filter: blur(4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  animation: modalSlideIn var(--duration-slow) var(--ease-elastic);
+  background: white;
+  padding: var(--modal-padding);
+  border-radius: var(--border-radius-large);
+  max-width: 500px;
+  width: 90%;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

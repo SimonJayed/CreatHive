@@ -94,13 +94,50 @@ public class ArtworkService {
 
     // Delete
     @SuppressWarnings("unused")
+    // Delete
     public String deleteArtwork(int artworkId) {
         String msg = "";
-        if (awrepo.findById(artworkId) != null) {
+        if (awrepo.existsById(artworkId)) {
+            // 1. Delete from UserArtwork (Link to Artist)
+            List<UserArtworkEntity> userArtworks = userArtworkRepository.findAll().stream()
+                    .filter(ua -> ua.getId().getArtworkId() == artworkId)
+                    .collect(Collectors.toList());
+            userArtworkRepository.deleteAll(userArtworks);
+
+            // 2. Delete from Favorites
+            List<com.appdev.siventin.lugatimang3.entity.FavoritesEntity> favorites = favoritesRepository.findAll()
+                    .stream()
+                    .filter(f -> f.getId().getArtworkId() == artworkId)
+                    .collect(Collectors.toList());
+            favoritesRepository.deleteAll(favorites);
+
+            // 3. Delete from ArtworkLikes
+            List<com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity> likes = artworkLikesRepository.findAll()
+                    .stream()
+                    .filter(l -> l.getId().getArtworkId() == artworkId)
+                    .collect(Collectors.toList());
+            artworkLikesRepository.deleteAll(likes);
+
+            // 4. Delete from ArtworkTags
+            List<com.appdev.siventin.lugatimang3.entity.ArtworkTagEntity> tags = artworkTagRepository.findAll()
+                    .stream()
+                    .filter(t -> t.getId().getArtworkId() == artworkId)
+                    .collect(Collectors.toList());
+            artworkTagRepository.deleteAll(tags);
+
+            // 5. Delete from CommentOnArtwork (Link to Comments)
+            List<com.appdev.siventin.lugatimang3.entity.CommentOnArtworkEntity> commentLinks = commentOnArtworkRepository
+                    .findAll().stream()
+                    .filter(c -> c.getId().getArtworkId() == artworkId)
+                    .collect(Collectors.toList());
+            commentOnArtworkRepository.deleteAll(commentLinks);
+
+            // 6. Delete the Artwork itself
             awrepo.deleteById(artworkId);
-            msg = "Artwork " + artworkId + "is successfully deleted!";
-        } else
+            msg = "Artwork " + artworkId + " is successfully deleted!";
+        } else {
             msg = "Artwork " + artworkId + " does not exist.";
+        }
         return msg;
     }
 
@@ -110,6 +147,12 @@ public class ArtworkService {
 
     @Autowired
     com.appdev.siventin.lugatimang3.repository.FavoritesRepository favoritesRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.ArtworkTagRepository artworkTagRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.CommentOnArtworkRepository commentOnArtworkRepository;
 
     public ArtworkEntity likeArtwork(int artworkId, int userId) {
         ArtworkEntity artwork = awrepo.findById(artworkId)

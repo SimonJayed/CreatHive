@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { updateArtist } from "../../api/artistApi";
+import '../../styles/InterestPicker.css';
 
 const INTERESTS = [
     "Anime", "Abstract", "Cartoon Style",
@@ -49,84 +50,40 @@ function InterestPicker({ artistId, onComplete, onBack }) {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            backgroundColor: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
-        }}>
-            <div style={{ width: '100%', maxWidth: '800px', position: 'relative' }}>
+        <div className="interest-picker-container">
+            <div className="interest-content">
                 <button
                     onClick={handleBack}
-                    style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        padding: '10px 20px',
-                        backgroundColor: '#FFB800',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                    }}
+                    className="back-btn"
                 >
                     Back
                 </button>
 
-                <div style={{ textAlign: 'center', marginTop: '60px', marginBottom: '40px' }}>
-                    <h1 style={{ color: '#FFB800', fontSize: '36px', marginBottom: '10px' }}>
+                <div className="interest-header">
+                    <h1 className="interest-title">
                         Pick your interest
                     </h1>
-                    <p style={{ color: '#333', fontSize: '18px' }}>
+                    <p className="interest-subtitle">
                         Select at least three categories
                     </p>
                 </div>
 
-                <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    gap: '15px',
-                    marginBottom: '40px'
-                }}>
+                <div className="interests-grid">
                     {INTERESTS.map((interest) => (
                         <button
                             key={interest}
                             onClick={() => toggleInterest(interest)}
-                            style={{
-                                padding: '12px 24px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                backgroundColor: selectedInterests.includes(interest) ? '#FFB800' : '#FFC107', // Active vs Inactive yellow
-                                color: 'white',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                opacity: selectedInterests.includes(interest) ? 1 : 0.7,
-                                transition: 'all 0.2s'
-                            }}
+                            className={`interest-btn ${selectedInterests.includes(interest) ? 'selected' : ''}`}
                         >
                             {interest}
                         </button>
                     ))}
                 </div>
 
-                <div style={{ textAlign: 'right' }}>
+                <div className="continue-container">
                     <button
                         onClick={handleContinue}
-                        style={{
-                            padding: '12px 40px',
-                            backgroundColor: '#FFB800',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer'
-                        }}
+                        className="continue-btn"
                     >
                         Continue →
                     </button>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getAllBlogs, likeBlog } from '../../api/blogApi';
+import { getAllBlogs, likeBlog, deleteBlog } from '../../api/blogApi';
 import { getAllUserBlogs } from '../../api/userBlogApi';
 import { getAllArtists } from '../../api/artistApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
 import { getAllUserComments } from '../../api/userCommentApi';
-import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaRegFileAlt, FaSortAmountDown } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaRegFileAlt, FaSortAmountDown, FaTrash } from 'react-icons/fa';
 import '../profile/ArtistBlogs.css'; // Reuse styles
 
 function BlogsFeed({ onNavigate }) {
@@ -145,43 +145,52 @@ function BlogsFeed({ onNavigate }) {
         }
     };
 
+    const handleDelete = async (blogId) => {
+        if (!window.confirm("Are you sure you want to delete this blog?")) return;
+        try {
+            await deleteBlog(blogId);
+            setBlogs(prev => prev.filter(b => b.blogId !== blogId));
+        } catch (error) {
+            console.error("Failed to delete blog", error);
+            alert("Failed to delete blog");
+        }
+    };
+
     if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading blogs...</div>;
 
     return (
         <div className="blogs-feed-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <h2 style={{ color: '#FFB800', margin: 0 }}>Community Blogs</h2>
+                    <h2 style={{ color: 'var(--primary-color)', margin: 0, fontFamily: 'var(--font-family)' }}>Community Blogs</h2>
 
                     {/* Sort Filter */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#FFB800' }}>
-                        <FaSortAmountDown />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--primary-color)' }}>
+                        <FaSortAmountDown className="icon" />
                         <span>Sort by:</span>
                         <select
                             value={sortOrder}
                             onChange={(e) => setSortOrder(e.target.value)}
+                            className="input"
                             style={{
                                 padding: '4px 8px',
-                                borderRadius: '4px',
-                                border: 'none',
+                                width: 'auto',
                                 backgroundColor: 'transparent',
-                                color: '#FFB800', // Keep dropdown text readable
+                                color: 'var(--primary-color)',
+                                border: 'none',
                                 cursor: 'pointer',
-                                fontSize: '14px',
-                                outline: 'none',
                                 fontWeight: '600'
                             }}
                         >
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
+                            <option value="newest" style={{ color: 'black' }}>Newest First</option>
+                            <option value="oldest" style={{ color: 'black' }}>Oldest First</option>
                         </select>
                     </div>
                 </div>
 
                 <button
                     onClick={() => onNavigate('upload-blog')}
-                    className="upload-blog-btn"
-                    style={{ padding: '8px 16px', fontSize: '14px', color: 'white' }}
+                    className="button"
                 >
                     + Create Blog
                 </button>
@@ -190,7 +199,7 @@ function BlogsFeed({ onNavigate }) {
             <div className="blog-list">
                 {sortedBlogs.length > 0 ? (
                     sortedBlogs.map((blog) => (
-                        <div key={blog.blogId} className="blog-card">
+                        <div key={blog.blogId} className="card blog-card">
                             {/* Header */}
                             <div className="blog-header">
                                 <img
@@ -202,6 +211,23 @@ function BlogsFeed({ onNavigate }) {
                                     <span className="blog-author">{blog.artist?.name}</span>
                                     <span className="blog-date">Posted {formatDate(blog.datePosted)}</span>
                                 </div>
+                                {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === blog.artist?.artistId && (
+                                    <button
+                                        onClick={() => handleDelete(blog.blogId)}
+                                        style={{
+                                            marginLeft: 'auto',
+                                            background: 'none',
+                                            border: 'none',
+                                            color: 'var(--danger-color)',
+                                            cursor: 'pointer',
+                                            padding: '4px'
+                                        }}
+                                        title="Delete Blog"
+                                        className="icon"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                )}
                             </div>
 
                             {/* Title */}
@@ -213,26 +239,27 @@ function BlogsFeed({ onNavigate }) {
                             {/* Footer */}
                             <div className="blog-footer">
                                 <button className="blog-action" onClick={() => handleLike(blog.blogId)}>
-                                    {blog.likeCount > 0 ? <FaHeart color="#FFB800" /> : <FaRegHeart />} Like ({blog.likeCount || 0})
+                                    <span className="icon">{blog.likeCount > 0 ? <FaHeart color="var(--primary-color)" /> : <FaRegHeart />}</span> Like ({blog.likeCount || 0})
                                 </button>
                                 <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
-                                    <FaRegComment /> Comments
+                                    <span className="icon"><FaRegComment /></span> Comments
                                 </button>
-                                <button className="blog-action"><FaShare /> Share</button>
+                                <button className="blog-action"><span className="icon"><FaShare /></span> Share</button>
                             </div>
 
                             {/* Comments Section */}
                             {activeCommentBlogId === blog.blogId && (
-                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #eee' }}>
+                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
                                     <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                                         <input
                                             type="text"
                                             value={commentText}
                                             onChange={(e) => setCommentText(e.target.value)}
                                             placeholder="Write a comment..."
-                                            style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                                            className="input"
+                                            style={{ flex: 1 }}
                                         />
-                                        <button onClick={() => handleAddComment(blog.blogId)} style={{ padding: '8px 16px', backgroundColor: '#FFB800', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Post</button>
+                                        <button onClick={() => handleAddComment(blog.blogId)} className="button" style={{ padding: '8px 16px' }}>Post</button>
                                     </div>
                                     <div className="comments-list">
                                         {commentsMap[blog.blogId]?.map(comment => {
@@ -247,10 +274,10 @@ function BlogsFeed({ onNavigate }) {
                                                     />
                                                     <div>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                            <span style={{ fontWeight: '600', fontSize: '13px' }}>{commenter.name}</span>
-                                                            <span style={{ fontSize: '10px', color: '#999' }}>{formatDate(comment.datePosted)}</span>
+                                                            <span style={{ fontWeight: '600', fontSize: '13px', fontFamily: 'var(--font-family)' }}>{commenter.name}</span>
+                                                            <span style={{ fontSize: '10px', color: '#999', fontFamily: 'var(--font-family)' }}>{formatDate(comment.datePosted)}</span>
                                                         </div>
-                                                        <p style={{ margin: '4px 0 0', fontSize: '14px' }}>{comment.content}</p>
+                                                        <p style={{ margin: '4px 0 0', fontSize: '14px', fontFamily: 'var(--font-family)' }}>{comment.content}</p>
                                                     </div>
                                                 </div>
                                             );
