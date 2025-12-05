@@ -1,22 +1,22 @@
 import React from 'react';
-import { FaHome, FaCommentDots, FaSearch, FaImages, FaUser, FaCog, FaSignOutAlt, FaPalette } from 'react-icons/fa';
+import { Home, MessageSquare, Search, Image, User, Settings, LogOut, Hexagon } from 'lucide-react';
 import './Sidebar.css';
 
 function Sidebar({ activeTab, setActiveTab, onLogout }) {
     const navItems = [
-        { id: 'home', icon: <FaHome />, title: 'Home' },
-        { id: 'blogs', icon: <FaCommentDots />, title: 'Blog' },
-        { id: 'explore', icon: <FaSearch />, title: 'Explore' },
-        { id: 'artworks', icon: <FaImages />, title: 'Artworks' },
-        { id: 'profile', icon: <FaUser />, title: 'Profile' },
-        { id: 'settings', icon: <FaCog />, title: 'Settings' }
+        { id: 'home', icon: <Home size={20} />, title: 'Home' },
+        { id: 'blogs', icon: <MessageSquare size={20} />, title: 'Blog' },
+        { id: 'explore', icon: <Search size={20} />, title: 'Explore' },
+        { id: 'artworks', icon: <Image size={20} />, title: 'Artworks' },
+        { id: 'profile', icon: <User size={20} />, title: 'Profile' },
+        { id: 'settings', icon: <Settings size={20} />, title: 'Settings' }
     ];
 
     return (
         <div className="sidebar">
             {/* Logo */}
             <div className="sidebar-logo">
-                <FaPalette size={40} color="#FFB800" className="icon" />
+                <Hexagon size={40} color="#FFB800" fill="#FFB800" fillOpacity={0.2} strokeWidth={2} className="icon-hexagon" />
                 <h1>CreatHive</h1>
             </div>
 
@@ -28,7 +28,7 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
                         onClick={() => setActiveTab(item.id)}
                         className={`sidebar-item ${activeTab === item.id ? 'active' : ''}`}
                     >
-                        <span style={{ fontSize: '20px' }} className="icon">{item.icon}</span>
+                        <span className="icon-hexagon">{item.icon}</span>
                         <span>{item.title}</span>
                     </button>
                 ))}
@@ -40,7 +40,7 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
                     onClick={onLogout}
                     className="sidebar-item"
                 >
-                    <FaSignOutAlt size={20} className="icon" />
+                    <LogOut size={20} className="icon-hexagon" />
                     <span>Logout</span>
                 </button>
             </div>

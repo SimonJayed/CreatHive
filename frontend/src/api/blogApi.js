@@ -1,8 +1,8 @@
 const BASE_URL = "http://localhost:8080/blogs";
 
-export async function getAllBlogs() {
+export async function getAllBlogs(userId = 0) {
   try {
-    const res = await fetch(`${BASE_URL}/getAllBlogs`);
+    const res = await fetch(`${BASE_URL}/getAllBlogs?userId=${userId}`);
     if (!res.ok) throw new Error("Failed to fetch blogs");
     return await res.json();
   } catch (error) {
@@ -11,9 +11,9 @@ export async function getAllBlogs() {
   }
 }
 
-export async function getBlogsByArtistId(artistId) {
+export async function getBlogsByArtistId(artistId, userId = 0) {
   try {
-    const res = await fetch(`${BASE_URL}/getBlogsByArtistId/${artistId}`);
+    const res = await fetch(`${BASE_URL}/getBlogsByArtistId/${artistId}?userId=${userId}`);
     if (!res.ok) return [];
     return await res.json();
   } catch (error) {

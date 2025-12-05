@@ -1,22 +1,23 @@
-# System Styles
+# System Styles - Hive Theme
 
-This document defines the global style tokens and design values used throughout the application to ensure consistency.
+This document defines the global style tokens and design values used throughout the application to ensure consistency with our honeycomb/hive aesthetic.
 
 ## Colors
 
 | Token Name | Value | Description |
 | :--- | :--- | :--- |
-| `primaryColor` | `#FFB800` | Main brand color. Used for buttons, borders, highlights, and active states. |
+| `primaryColor` | `#FFB800` | Main brand color (Golden Honey). Used for buttons, borders, highlights, and active states. |
 | `primaryHover` | `#FFA500` | Hover state for primary color elements. |
 | `secondaryColor` | `#FFFFFF` | Used for card backgrounds, input backgrounds, and secondary button backgrounds. |
-| `backgroundColor` | `#000000` | Used for modal overlays and dark theme containers. |
+| `backgroundColor` | `#000000` | Used for modal overlays and dark theme containers (Hive Black). |
 | `textColor` | `#000000` | Primary text color for readability on light backgrounds. |
 | `secondaryTextColor` | `#666666` | Used for subtitles, hints, and less important text. |
 | `dangerColor` | `#ff4444` | Used for destructive actions (e.g., Delete button). |
 | `dangerHover` | `#ff0000` | Hover state for danger/destructive actions. |
 | `borderColor` | `#ddd` | Standard border color for inputs and cards. |
 | `shadowColor` | `rgba(0, 0, 0, 0.1)` | Base shadow color for cards and elevated elements. |
-| `shadowColorHover` | `rgba(255, 184, 0, 0.3)` | Primary color shadow for hover states. |
+| `shadowColorHover` | `rgba(255, 184, 0, 0.3)` | Primary color shadow for hover states (Golden Glow). |
+| `honeycombOverlay` | `rgba(255, 184, 0, 0.05)` | Subtle honeycomb pattern overlay color. |
 
 ## Typography
 
@@ -29,6 +30,7 @@ This document defines the global style tokens and design values used throughout 
 | `smallFontSize` | `13px` | Size for secondary text and small buttons. |
 | `fontWeightBold` | `bold` / `700` | Bold weight for headers. |
 | `fontWeightSemiBold` | `600` | Semi-bold weight for labels and buttons. |
+| `letterSpacingWide` | `1px` | Letter spacing for branding and headers. |
 
 ## Spacing & Layout
 
@@ -36,196 +38,14 @@ This document defines the global style tokens and design values used throughout 
 | :--- | :--- | :--- |
 | `modalPadding` | `24px` | Padding inside modal content areas. |
 | `cardPadding` | `16px` | Padding inside content cards. |
-| `inputPadding` | `10px 12px` | Padding for text inputs and textareas. |
-| `buttonPadding` | `10px 24px` | Standard padding for primary action buttons. |
+| `inputPadding` | `12px 12px 12px 40px` | Padding for text inputs (with icon space). |
+| `buttonPadding` | `12px 28px` | Standard padding for primary action buttons (hexagonal). |
 | `smallButtonPadding` | `6px 12px` | Padding for smaller action buttons (Edit/Delete). |
-| `borderRadius` | `4px` | Standard border radius for inputs, buttons, and cards. |
-| `borderRadiusLarge` | `8px` | Border radius for larger containers like modals and cards. |
-
-## Animations & Transitions
-
-### Timing Functions
-```css
---ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
---ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
---ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-```
-
-### Animation Durations
-```css
---duration-fast: 150ms;
---duration-normal: 250ms;
---duration-slow: 350ms;
-```
-
-### Button Animations
-```css
-.button {
-  transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3);
-}
-
-.button:active {
-  transform: translateY(0);
-  transition-duration: 100ms;
-}
-```
-
-### Card Hover Effects
-```css
-.card {
-  transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-```
-
-### Input Focus States
-```css
-.input {
-  transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-  border: 1px solid #ddd;
-}
-
-.input:focus {
-  outline: none;
-  border-color: #FFB800;
-  box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.1);
-  transform: scale(1.01);
-}
-```
-
-### Icon Animations
-```css
-.icon {
-  transition: transform 250ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.icon:hover {
-  transform: scale(1.2);
-}
-
-.icon-like.active {
-  animation: heartbeat 0.5s ease-in-out;
-}
-
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  25% { transform: scale(1.3); }
-  50% { transform: scale(1.1); }
-  75% { transform: scale(1.25); }
-}
-```
-
-### Modal Entrance Animations
-```css
-@keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.modal-overlay {
-  animation: modalFadeIn 250ms ease-out;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  animation: modalSlideIn 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-```
-
-### Image Gallery Hover
-```css
-.gallery-item {
-  transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-  overflow: hidden;
-}
-
-.gallery-item:hover {
-  transform: scale(1.02);
-}
-
-.gallery-item img {
-  transition: transform 350ms ease;
-}
-
-.gallery-item:hover img {
-  transform: scale(1.05);
-}
-```
-
-## Masonry Layout
-For artwork feeds, use a masonry layout to display images of varying heights.
-- **Container**: `column-count: 3; column-gap: 20px;`
-- **Item**: `break-inside: avoid; margin-bottom: 20px; transition: all 250ms ease;`
-- **Responsive**: 
-  - Desktop (>1200px): 3 columns
-  - Tablet (768px-1199px): 2 columns
-  - Mobile (<768px): 1 column
-
-## Usage Examples
-
-### Primary Button
-```css
-background-color: #FFB800;
-color: #FFFFFF;
-padding: 10px 24px;
-border-radius: 4px;
-font-weight: 600;
-border: none;
-cursor: pointer;
-transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-position: relative;
-overflow: hidden;
-```
-
-**Hover State:**
-```css
-background-color: #FFA500;
-transform: translateY(-2px);
-box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3);
-```
-
-**Active State:**
-```css
-transform: translateY(0);
-```
-
-### Card Container
-```css
-background-color: #FFFFFF;
-border: 1px solid #ddd;
-border-radius: 8px;
-padding: 16px;
-box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
-cursor: pointer;
-```
-
-**Hover State:**
-```css
-transform: translateY(-4px);
-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+| `borderRadius` | `0` | Border radius removed for hexagonal theme. |
+| `borderRadiusLarge` | `0` | Border radius removed for hexagonal theme. |
+| `borderWidth` | `2px` | Standard border width for hive theme (thicker borders). |
+box-shadow: 0 8px 20px rgba(255, 184, 0, 0.3);
+border-color: #FFB800;
 ```
 
 ### Modal Overlay
@@ -234,62 +54,91 @@ background-color: rgba(0, 0, 0, 0.8);
 z-index: 1000;
 animation: modalFadeIn 250ms ease-out;
 backdrop-filter: blur(4px);
+/* Optional honeycomb pattern */
+background-image: url("data:image/svg+xml,...");
+background-size: 100px 100px;
 ```
 
-### Input Fields
+### Input Fields (Hexagonal)
 ```css
-padding: 10px 12px;
-border: 1px solid #ddd;
-border-radius: 4px;
+padding: 12px 12px 12px 40px;
+border: 2px solid #ddd;
+clip-path: polygon(4% 0%, 96% 0%, 100% 50%, 96% 100%, 4% 100%, 0% 50%);
 font-size: 14px;
 transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
 outline: none;
+background: #fff;
 ```
 
 **Focus State:**
 ```css
 border-color: #FFB800;
-box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.1);
-transform: scale(1.01);
+box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.2);
+transform: scale(1.02);
 ```
 
 ## Universal Icons
-Use these icons from `react-icons/fa` (FontAwesome) consistently across the application.
-- **Like**: `FaHeart` (Filled), `FaRegHeart` (Outline)
-- **Comment**: `FaRegComment`
-- **Share**: `FaShare`
-- **Favorite**: `FaStar` (Filled), `FaRegStar` (Outline)
-- **Upload**: `FaUpload`
-- **Sort**: `FaSortAmountDown`
-- **Sidebar**: `FaHome`, `FaCommentDots`, `FaSearch`, `FaImages`, `FaUser`, `FaCog`, `FaSignOutAlt`, `FaPalette`
-- **No Data**: `FaRegFileAlt`
+
+### Primary Icons (Lucide React)
+Use these icons from `lucide-react` consistently across the application:
+- **Like/Favorite**: `Hexagon` (Use fill for active state)
+- **Comment**: `MessageCircle`
+- **Share**: `Share2`
+- **Upload**: `Upload`
+- **Sort**: Use custom icon or `ArrowUpDown`
+- **Sidebar**: `Home`, `MessageSquare`, `Search`, `Image`, `User`, `Settings`, `LogOut`, `Hexagon`
+- **No Data**: `FileQuestion`
+
+### Hive Branding Icon
+- **Logo**: `Hexagon` (Filled with `#FFB800`, stroke-width: 2)
+- Size: 40-50px for logo display
 
 **Icon Behavior:**
 - All interactive icons should have: `transition: transform 250ms cubic-bezier(0.68, -0.55, 0.265, 1.55);`
-- On hover: `transform: scale(1.2);`
-- For like/favorite actions: Use heartbeat animation on activation
+- On hover: `transform: scale(1.2) rotate(5deg);`
+- For like/favorite actions: Use hexPulse animation on activation
+- Use hexagon icon for likes instead of hearts to maintain theme consistency
 
 ## Component Rules
 
-### Sidebar
+### Sidebar (Hive Theme)
 ```css
 background: #000000;
 color: #FFB800;
-border-right: 1px solid #FFB800;
+border-right: 2px solid #FFB800;
 width: 250px;
 position: fixed;
 height: 100vh;
 transition: all 250ms ease;
+/* Honeycomb background pattern */
+background-image: url("data:image/svg+xml,...");
+background-size: 100px 100px;
+```
+
+**Logo Section:**
+```css
+padding: 24px;
+text-align: center;
+border-bottom: 2px solid #FFB800;
+background: rgba(0, 0, 0, 0.8); /* Semi-transparent to show pattern */
+```
+
+**Logo Text:**
+```css
+font-size: 20px;
+letter-spacing: 1px;
+font-weight: bold;
 ```
 
 **Sidebar Items:**
 ```css
-padding: 12px 20px;
+padding: 14px 20px;
 transition: all 200ms ease;
 cursor: pointer;
 display: flex;
 align-items: center;
 gap: 12px;
+margin: 4px 0;
 ```
 
 **Hover State:**
@@ -301,31 +150,45 @@ padding-left: 24px;
 **Active State:**
 ```css
 background: rgba(255, 184, 0, 0.2);
-border-left: 3px solid #FFB800;
+border-left: 4px solid #FFB800;
+clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
 ```
 
-**Logo Section:**
-- Center aligned
-- Color: `#FFB800`
-- Bottom border: `1px solid #FFB800`
-
-### Loading Spinner
+### Main Content Area
 ```css
-@keyframes spin {
+background: #fafafa;
+/* Honeycomb background pattern */
+background-image: url("data:image/svg+xml,...");
+background-size: 100px 100px;
+```
+
+### Header Bar
+```css
+background: #fff;
+padding: 20px 40px;
+border-bottom: 2px solid #FFB800;
+box-shadow: 0 4px 8px rgba(255, 184, 0, 0.1);
+position: sticky;
+top: 0;
+z-index: 100;
+```
+
+### Loading Spinner (Hexagonal)
+```css
+@keyframes hexSpin {
   to { transform: rotate(360deg); }
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #FFB800;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.spinner-hexagon {
+  width: 50px;
+  height: 50px;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  background: #FFB800;
+  animation: hexSpin 1.5s linear infinite;
 }
 ```
 
-### Skeleton Loading
+### Skeleton Loading (Honeycomb)
 ```css
 @keyframes shimmer {
   0% { background-position: -1000px 0; }
@@ -336,11 +199,12 @@ border-left: 3px solid #FFB800;
   background: linear-gradient(
     90deg,
     #f0f0f0 25%,
-    #e0e0e0 50%,
+    #FFB800 50%,
     #f0f0f0 75%
   );
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
+  clip-path: polygon(0% 2.5%, 50% 0%, 100% 2.5%, 100% 97.5%, 50% 100%, 0% 97.5%);
 }
 ```
 
@@ -349,16 +213,21 @@ border-left: 3px solid #FFB800;
 - **Avoid animating** `width`, `height`, `top`, `left` (causes layout recalculation)
 - **Prefer `transition`** over `animation` for simple state changes
 - **Use `will-change`** sparingly for complex animations only
+- **Clip-path animations** are GPU accelerated but use sparingly on many elements
 
 ## Accessibility
 - Ensure all interactive elements have visible focus states
 - Maintain color contrast ratios (WCAG AA minimum)
+  - `#FFB800` on `#000000` = 9.87:1 (AAA compliant)
+  - `#000000` on `#FFFFFF` = 21:1 (AAA compliant)
 - Provide alternative text for icon-only buttons
 - Consider `prefers-reduced-motion` for users who prefer minimal animation:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -366,10 +235,16 @@ border-left: 3px solid #FFB800;
 }
 ```
 
-## Critical Rules
+## Critical Rules - Hive Theme
 - **Primary Buttons**: If background is `primaryColor` (#FFB800), text color MUST be `white` (#FFFFFF).
 - **All interactive elements** must have hover states with smooth transitions.
 - **All animations** should use the defined timing functions for consistency.
 - **Use transform** instead of position changes for better performance.
-- **Icons** should scale on hover using the bounce easing function.
-- **Cards** should lift on hover with shadow enhancement.
+- **Icons** should scale and rotate slightly on hover using the bounce easing function.
+- **Cards** must use hexagonal clip-path for theme consistency.
+- **Buttons and inputs** must use appropriate hexagonal clip-paths.
+- **Use hexagon icons** for likes/favorites instead of hearts.
+- **Logo must be Hexagon icon** filled with `#FFB800`.
+- **Borders should be 2px** for emphasis on the hive structure.
+- **Apply honeycomb background pattern** to sidebar and main content areas.
+- **Maintain letter-spacing** on branding elements for premium feel.

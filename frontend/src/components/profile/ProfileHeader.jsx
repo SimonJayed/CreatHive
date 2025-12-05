@@ -14,7 +14,7 @@ function ProfileHeader({
                 {/* Profile Picture */}
                 <div className={`profile-image-container ${isEditing ? 'editable' : ''}`}>
                     <img
-                        src={profileData.profileImage || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"}
+                        src={profileData.profileImage || "/images/profile/default_profile.png"}
                         alt="Profile"
                         className="profile-image"
                     />
@@ -47,7 +47,7 @@ function ProfileHeader({
             </div>
 
             {/* Edit/Save Button */}
-            <button onClick={onEditToggle} className="edit-button">
+            <button onClick={onEditToggle} className="button-hexagon edit-button">
                 {isEditing ? 'Save Changes' : 'Edit Profile'}
             </button>
         </div>

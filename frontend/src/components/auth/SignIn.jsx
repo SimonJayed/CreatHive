@@ -78,7 +78,7 @@ function SignIn({ onLoginSuccess }) {
 
                     <button
                         type="submit"
-                        className="auth-btn"
+                        className="button-hexagon auth-btn"
                     >
                         Sign In
                     </button>

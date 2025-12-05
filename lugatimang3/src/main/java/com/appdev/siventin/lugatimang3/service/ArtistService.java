@@ -16,6 +16,12 @@ public class ArtistService {
     ArtistRepository arepo;
 
     public ArtistEntity insertArtist(ArtistEntity artist) {
+        if (arepo.existsByUsername(artist.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        if (arepo.existsByEmail(artist.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
         return arepo.save(artist);
     }
 

@@ -20,8 +20,10 @@ public class TagEntity {
     @Column(name = "description")
     private String description;
 
-    public TagEntity(){}
-    public TagEntity(int tagId, String name, String description){
+    public TagEntity() {
+    }
+
+    public TagEntity(int tagId, String name, String description) {
         super();
         this.tagId = tagId;
         this.name = name;
@@ -31,9 +33,11 @@ public class TagEntity {
     public int getTagId() {
         return tagId;
     }
+
     public String getName() {
         return name;
     }
+
     public String getDescription() {
         return description;
     }
@@ -41,7 +45,41 @@ public class TagEntity {
     public void setName(String name) {
         this.name = name;
     }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @jakarta.persistence.Transient
+    private int submissionCount;
+
+    @jakarta.persistence.Transient
+    private boolean isLiked;
+
+    @jakarta.persistence.Transient
+    private String firstArtworkImage;
+
+    public int getSubmissionCount() {
+        return submissionCount;
+    }
+
+    public void setSubmissionCount(int submissionCount) {
+        this.submissionCount = submissionCount;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public String getFirstArtworkImage() {
+        return firstArtworkImage;
+    }
+
+    public void setFirstArtworkImage(String firstArtworkImage) {
+        this.firstArtworkImage = firstArtworkImage;
     }
 }

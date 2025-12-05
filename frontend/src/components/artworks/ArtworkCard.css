@@ -1,0 +1,84 @@
+.artwork-card-image-container {
+    width: 100%;
+    position: relative;
+}
+
+.artwork-card-image {
+    width: 100%;
+    display: block;
+    height: auto;
+}
+
+.artwork-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+}
+
+.artwork-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-family: var(--font-family);
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.artwork-card-artist {
+    margin: 4px 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+    font-family: var(--font-family);
+}
+
+.artwork-card-artist-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.artwork-card-date {
+    margin: 2px 0 0;
+    font-size: 10px;
+    opacity: 0.7;
+    font-family: var(--font-family);
+}
+
+.artwork-card-footer {
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid var(--border-color);
+}
+
+.artwork-card-actions-left {
+    display: flex;
+    gap: 12px;
+}
+
+.artwork-card-actions-right {
+    display: flex;
+    gap: 8px;
+}
+
+.artwork-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+.artwork-action-btn.favorite {
+    color: var(--primary-color);
+}
+
+.artwork-action-btn.delete {
+    color: var(--danger-color);
+}

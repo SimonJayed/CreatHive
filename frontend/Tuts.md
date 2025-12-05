@@ -51,3 +51,8 @@ This guide documents the process of ensuring the application handles both "zoomi
 - [ ] Is `flex-wrap: wrap` enabled for row layouts?
 - [ ] Are font sizes using `clamp()` or relative units?
 - [ ] Does the layout stack vertically on mobile?
+
+## 5. Troubleshooting & Fixes
+### Common Issues
+-   **Variable Redeclaration**: Be careful when copy-pasting code blocks (e.g., `likeArtwork` logic). Ensure variables like `updatedArtwork` are not declared twice in the same scope.
+    *   *Fix*: Remove the duplicate `const` declaration.

@@ -58,8 +58,8 @@ export async function register(artist) {
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Registration failed");
+    const errorText = await res.text();
+    throw new Error(errorText || "Registration failed");
   }
 
   return res.json();

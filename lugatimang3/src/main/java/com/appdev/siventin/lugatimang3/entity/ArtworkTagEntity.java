@@ -20,7 +20,13 @@ public class ArtworkTagEntity {
     @jakarta.persistence.ManyToOne
     @jakarta.persistence.MapsId("artworkId")
     @jakarta.persistence.JoinColumn(name = "artwork_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private ArtworkEntity artwork;
+
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.MapsId("tagId")
+    @jakarta.persistence.JoinColumn(name = "tag_id")
+    private TagEntity tag;
 
     @Column(name = "date_assigned")
     private LocalDateTime dateAssigned;
@@ -56,6 +62,14 @@ public class ArtworkTagEntity {
 
     public void setArtwork(ArtworkEntity artwork) {
         this.artwork = artwork;
+    }
+
+    public TagEntity getTag() {
+        return tag;
+    }
+
+    public void setTag(TagEntity tag) {
+        this.tag = tag;
     }
 
     @Embeddable

@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { usePopup } from '../context/PopupContext';
 import { insertArtwork } from '../api/artworkApi';
+import { getAllTags, insertTag, insertArtworkTag } from '../api/tagApi';
 import '../styles/UploadArtwork.css';
 
 function UploadArtwork({ artistData, onNavigate }) {
+    const { showAlert } = usePopup();
     const [formData, setFormData] = useState({
         title: '',
-        description: '',
-        tags: ''
+        description: ''
     });
     const [imageFile, setImageFile] = useState(null);
+    const [tagInput, setTagInput] = useState('');
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [availableTags, setAvailableTags] = useState([]);
+
+    useEffect(() => {
+        loadTags();
+    }, []);
+
+    const loadTags = async () => {
+        try {
+            const tags = await getAllTags();
+            setAvailableTags(tags);
+        } catch (error) {
+            console.error("Failed to load tags", error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,14 +40,33 @@ function UploadArtwork({ artistData, onNavigate }) {
         }
     };
 
+    const handleTagKeyDown = (e) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            addTag(tagInput);
+        }
+    };
+
+    const addTag = (tagName) => {
+        const trimmedTag = tagName.trim();
+        if (trimmedTag && !selectedTags.includes(trimmedTag)) {
+            setSelectedTags([...selectedTags, trimmedTag]);
+            setTagInput('');
+        }
+    };
+
+    const removeTag = (tagToRemove) => {
+        setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+    };
+
     const handleSubmit = async () => {
         if (!formData.title || !imageFile) {
-            alert('Please fill in all required fields and upload an image');
+            showAlert("Validation Error", "Please fill in all required fields and upload an image");
             return;
         }
 
         if (!artistData || !artistData.artistId) {
-            alert('User session not found. Please log in again.');
+            showAlert("Session Error", "User session not found. Please log in again.");
             return;
         }
 
@@ -43,32 +80,53 @@ function UploadArtwork({ artistData, onNavigate }) {
                 const artworkData = {
                     title: formData.title,
                     description: formData.description,
-                    tags: formData.tags,
                     image: base64Image,
                     artistId: artistData.artistId,
-                    creationDate: new Date().toISOString().slice(0, 19) // Remove 'Z' for LocalDateTime compatibility
+                    creationDate: new Date().toISOString().slice(0, 19)
                 };
 
-                const user = JSON.parse(localStorage.getItem('currentArtist'));
-                if (!user || !user.artistId) {
-                    alert('You must be logged in to upload artwork.');
-                    return;
+                // 1. Insert Artwork
+                const savedArtwork = await insertArtwork(artworkData, artistData.artistId);
+
+                // 2. Handle Tags
+                for (const tagName of selectedTags) {
+                    let tagId;
+                    // Check if tag exists
+                    const existingTag = availableTags.find(t => t.name.toLowerCase() === tagName.toLowerCase());
+
+                    if (existingTag) {
+                        tagId = existingTag.tagId;
+                    } else {
+                        // Create new tag
+                        const newTag = await insertTag({ name: tagName, description: 'User created tag' });
+                        tagId = newTag.tagId;
+                    }
+
+                    // Link tag to artwork
+                    try {
+                        await insertArtworkTag(savedArtwork.artworkId, tagId);
+                    } catch (tagError) {
+                        console.error(`Failed to link tag ${tagName} to artwork`, tagError);
+                        // Continue linking other tags even if one fails
+                    }
                 }
-                const artistId = user.artistId;
-                await insertArtwork(artworkData, artistId);
-                alert('Artwork uploaded successfully!');
-                setFormData({ title: '', description: '', tags: '' });
+
+                showAlert("Success", "Artwork uploaded successfully!", () => {
+                    if (onNavigate) onNavigate('profile');
+                });
+                setFormData({ title: '', description: '' });
+                setSelectedTags([]);
                 setImageFile(null);
-                if (onNavigate) onNavigate('profile');
             };
         } catch (error) {
             console.error('Failed to upload artwork:', error);
-            alert('Failed to upload artwork. Please try again.');
+            showAlert("Error", "Failed to upload artwork. Please try again.");
         }
     };
 
     const handleCancel = () => {
-        setFormData({ title: '', description: '', tags: '' });
+        setFormData({ title: '', description: '' });
+        setSelectedTags([]);
         setImageFile(null);
     };
 
@@ -83,7 +141,7 @@ function UploadArtwork({ artistData, onNavigate }) {
 
             <div className="upload-form-card">
                 <div className="form-grid">
-                    {/* Artwork Image Upload - Spans full width */}
+                    {/* Artwork Image Upload */}
                     <div className="full-width">
                         <label className="form-label">Artwork Image*</label>
                         <div className="image-upload-area">
@@ -97,29 +155,11 @@ function UploadArtwork({ artistData, onNavigate }) {
                             <p className="upload-text">Click to upload or drag and drop</p>
                             <p className="upload-subtext">PNG, JPG, GIF up to 10MB</p>
                             {imageFile && (
-                                <div className="image-preview-container" style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    margin: 0,
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                    zIndex: 5,
-                                    backgroundColor: '#f8f8f8'
-                                }}>
+                                <div className="image-preview-container">
                                     <img
                                         src={URL.createObjectURL(imageFile)}
                                         alt="Preview"
                                         className="image-preview"
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover',
-                                            maxHeight: 'none',
-                                            maxWidth: 'none'
-                                        }}
                                     />
                                 </div>
                             )}
@@ -141,21 +181,54 @@ function UploadArtwork({ artistData, onNavigate }) {
                             />
                         </div>
 
-
-
                         {/* Tags */}
                         <div className="form-group">
                             <label className="form-label">Tags</label>
-                            <input
-                                type="text"
-                                name="tags"
-                                value={formData.tags}
-                                onChange={handleChange}
-                                placeholder="digital art, fantasy..."
-                                className="form-input"
-                            />
-                            <p className="upload-subtext" style={{ marginTop: '4px' }}>
-                                Tags help others discover your artwork
+
+                            {/* Dropdown for existing tags */}
+                            <select
+                                className="form-input tag-select"
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        addTag(e.target.value);
+                                        e.target.value = ""; // Reset select
+                                    }
+                                }}
+                            >
+                                <option value="">Select a tag...</option>
+                                {availableTags.map(tag => (
+                                    <option key={tag.tagId} value={tag.name}>{tag.name}</option>
+                                ))}
+                            </select>
+
+                            {/* Input for new tags */}
+                            <div className="new-tag-container">
+                                <input
+                                    type="text"
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    onKeyDown={handleTagKeyDown}
+                                    placeholder="Or create a new tag..."
+                                    className="form-input new-tag-input"
+                                />
+                                <button
+                                    onClick={() => addTag(tagInput)}
+                                    className="btn-secondary add-tag-btn"
+                                >
+                                    Add
+                                </button>
+                            </div>
+
+                            <div className="tags-list">
+                                {selectedTags.map((tag, index) => (
+                                    <span key={index} className="tag-chip">
+                                        {tag}
+                                        <button onClick={() => removeTag(tag)} className="remove-tag-btn">×</button>
+                                    </span>
+                                ))}
+                            </div>
+                            <p className="upload-subtext tag-help-text">
+                                Select from existing tags or create your own to help others discover your artwork
                             </p>
                         </div>
                     </div>
@@ -181,7 +254,7 @@ function UploadArtwork({ artistData, onNavigate }) {
                         <button onClick={handleCancel} className="btn-cancel">
                             Cancel
                         </button>
-                        <button onClick={handleSubmit} className="btn-submit">
+                        <button onClick={handleSubmit} className="button-hexagon btn-submit">
                             Upload Artwork
                         </button>
                     </div>

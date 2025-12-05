@@ -28,8 +28,12 @@ public class ArtistController {
     ArtistService aservice;
 
     @PostMapping("/insertArtist")
-    public ArtistEntity insertArtist(@RequestBody ArtistEntity artist) {
-        return aservice.insertArtist(artist);
+    public ResponseEntity<?> insertArtist(@RequestBody ArtistEntity artist) {
+        try {
+            return ResponseEntity.ok(aservice.insertArtist(artist));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     @GetMapping("/getAllArtists")
@@ -63,7 +67,11 @@ public class ArtistController {
     }
 
     @PostMapping("/register")
-    public ArtistEntity register(@RequestBody ArtistEntity artist) {
-        return aservice.insertArtist(artist);
+    public ResponseEntity<?> register(@RequestBody ArtistEntity artist) {
+        try {
+            return ResponseEntity.ok(aservice.insertArtist(artist));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 }

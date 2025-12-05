@@ -57,7 +57,8 @@ function Register({ onRegisterSuccess, initialData, onClearPendingData }) {
                 onRegisterSuccess(newArtist, formData);
             }
         } catch (err) {
-            setError("Registration failed. Please try again.");
+            // Display specific error message from backend if available
+            setError(err.message || "Registration failed. Please try again.");
         }
     };
 
@@ -155,7 +156,7 @@ function Register({ onRegisterSuccess, initialData, onClearPendingData }) {
 
                     <button
                         type="submit"
-                        className="auth-btn"
+                        className="button-hexagon auth-btn"
                     >
                         Create Account
                     </button>

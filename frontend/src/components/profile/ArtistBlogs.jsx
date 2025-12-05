@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { usePopup } from '../../context/PopupContext';
 import { likeBlog, deleteBlog } from '../../api/blogApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
 import { getAllUserComments } from '../../api/userCommentApi';
 import { getAllArtists } from '../../api/artistApi';
-import { FaHeart, FaRegHeart, FaRegComment, FaShare, FaRegFileAlt, FaSortAmountDown, FaTrash } from 'react-icons/fa';
-import './ArtistBlogs.css';
+import { Hexagon, MessageCircle, Share2, FileQuestion, Trash2 } from 'lucide-react';
+import FilterSort from '../common/FilterSort';
+import '../../styles/ArtistBlogs.css';
 
 function ArtistBlogs({ blogs, artist, onNavigate }) {
+    const { showAlert, showConfirm } = usePopup();
     // Sort blogs by most recent first
     const [sortOrder, setSortOrder] = useState('newest');
     const sortedBlogs = [...blogs].sort((a, b) => {
@@ -73,12 +76,12 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
     const handleLike = async (blogId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to like");
+            showAlert("Login Required", "Please login to like");
             return;
         }
         try {
             const updatedBlog = await likeBlog(blogId, user.artistId);
-            setLocalBlogs(prev => prev.map(b => b.blogId === blogId ? { ...b, likeCount: updatedBlog.likeCount } : b));
+            setLocalBlogs(prev => prev.map(b => b.blogId === blogId ? { ...b, likeCount: updatedBlog.likeCount, isLiked: updatedBlog.isLiked } : b));
         } catch (error) {
             console.error("Failed to like blog", error);
         }
@@ -104,7 +107,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
         if (!commentText.trim()) return;
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to comment");
+            showAlert("Login Required", "Please login to comment");
             return;
         }
         try {
@@ -123,53 +126,47 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
         }
     };
 
-    const handleDelete = async (blogId) => {
-        if (!window.confirm("Are you sure you want to delete this blog?")) return;
-        try {
-            await deleteBlog(blogId);
-            setLocalBlogs(prev => prev.filter(b => b.blogId !== blogId));
-        } catch (error) {
-            console.error("Failed to delete blog", error);
-            alert("Failed to delete blog");
-        }
+    const handleDelete = (blogId) => {
+        showConfirm(
+            "Delete Blog",
+            "Are you sure you want to delete this blog?",
+            async () => {
+                try {
+                    await deleteBlog(blogId);
+                    setLocalBlogs(prev => prev.filter(b => b.blogId !== blogId));
+                } catch (error) {
+                    console.error("Failed to delete blog", error);
+                    showAlert("Error", "Failed to delete blog");
+                }
+            }
+        );
     };
 
     return (
         <div className="artist-blogs-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ color: 'var(--primary-color)', margin: 0, fontFamily: 'var(--font-family)' }}>Artist's Blogs</h3>
+                <h3 style={{ color: 'var(--primary-color)', margin: 0, fontFamily: 'var(--font-family)', letterSpacing: 'var(--letter-spacing-wide)' }}>Artist's Blogs</h3>
                 {/* Sort Filter */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--primary-color)' }}>
-                    <FaSortAmountDown className="icon" />
-                    <span>Sort by:</span>
-                    <select
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
-                        className="input"
-                        style={{
-                            padding: '4px 8px',
-                            width: 'auto',
-                            backgroundColor: 'transparent',
-                            color: 'var(--primary-color)',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontWeight: '600'
-                        }}
-                    >
-                        <option value="newest" style={{ color: 'black' }}>Newest First</option>
-                        <option value="oldest" style={{ color: 'black' }}>Oldest First</option>
-                    </select>
-                </div>
+                <FilterSort
+                    type="blog"
+                    sortOptions={[
+                        { label: 'Newest First', value: 'newest' },
+                        { label: 'Oldest First', value: 'oldest' }
+                    ]}
+                    activeSort={sortOrder}
+                    onSortChange={setSortOrder}
+                    onClear={() => setSortOrder('newest')}
+                />
             </div>
 
             {localBlogs.length > 0 ? (
                 <div className="blog-list">
                     {localBlogs.map((blog) => (
-                        <div key={blog.blogId} className="card blog-card">
+                        <div key={blog.blogId} className="card-hexagon blog-card">
                             {/* Header: Avatar, Name, Date */}
                             <div className="blog-header">
                                 <img
-                                    src={artist?.profileImage || 'https://via.placeholder.com/32'}
+                                    src={artist?.profileImage || '/images/profile/default_profile.png'}
                                     alt={artist?.name || 'Artist'}
                                     className="blog-avatar"
                                 />
@@ -189,9 +186,9 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                                             padding: '4px'
                                         }}
                                         title="Delete Blog"
-                                        className="icon"
+                                        className="icon-hexagon"
                                     >
-                                        <FaTrash />
+                                        <Trash2 size={18} />
                                     </button>
                                 )}
                             </div>
@@ -209,29 +206,32 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                             {/* Footer: Actions */}
                             <div className="blog-footer">
                                 <button className="blog-action" onClick={() => handleLike(blog.blogId)}>
-                                    <span className="icon">{blog.likeCount > 0 ? <FaHeart color="var(--primary-color)" /> : <FaRegHeart />}</span> Like ({blog.likeCount || 0})
+                                    <span className={`icon-hexagon ${blog.isLiked ? 'active' : ''}`}>
+                                        <Hexagon size={18} color={blog.isLiked ? "var(--primary-color)" : "currentColor"} fill={blog.isLiked ? "var(--primary-color)" : "none"} />
+                                    </span>
+                                    Like ({blog.likeCount || 0})
                                 </button>
                                 <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
-                                    <span className="icon"><FaRegComment /></span> Comments
+                                    <span className="icon-hexagon"><MessageCircle size={18} /></span> Comments
                                 </button>
                                 <button className="blog-action">
-                                    <span className="icon"><FaShare /></span> Share
+                                    <span className="icon-hexagon"><Share2 size={18} /></span> Share
                                 </button>
                             </div>
 
                             {/* Comments Section */}
                             {activeCommentBlogId === blog.blogId && (
-                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
+                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '2px solid var(--border-color)' }}>
                                     <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                                         <input
                                             type="text"
                                             value={commentText}
                                             onChange={(e) => setCommentText(e.target.value)}
                                             placeholder="Write a comment..."
-                                            className="input"
+                                            className="input-hexagon"
                                             style={{ flex: 1 }}
                                         />
-                                        <button onClick={() => handleAddComment(blog.blogId)} className="button" style={{ padding: '8px 16px' }}>Post</button>
+                                        <button onClick={() => handleAddComment(blog.blogId)} className="button-hexagon" style={{ padding: '8px 16px' }}>Post</button>
                                     </div>
                                     <div className="comments-list">
                                         {commentsMap[blog.blogId]?.map(comment => {
@@ -240,7 +240,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                                             return (
                                                 <div key={comment.commentId} style={{ padding: '8px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: '10px' }}>
                                                     <img
-                                                        src={commenter.profileImage || 'https://via.placeholder.com/32'}
+                                                        src={commenter.profileImage || '/images/profile/default_profile.png'}
                                                         alt={commenter.name}
                                                         style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
                                                     />
@@ -262,7 +262,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                 </div>
             ) : (
                 <div className="no-blogs-container">
-                    <span className="no-blogs-icon"><FaRegFileAlt /></span>
+                    <span className="no-blogs-icon"><FileQuestion size={48} /></span>
                     <h3 className="no-blogs-title">
                         No blogs yet
                     </h3>
@@ -271,7 +271,7 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
                     </p>
                     <button
                         onClick={() => onNavigate && onNavigate('upload-blog')}
-                        className="button"
+                        className="button-hexagon"
                     >
                         Upload your blog
                     </button>

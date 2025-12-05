@@ -31,9 +31,14 @@ public class ArtworkController {
         return awservice.insertArtwork(artwork, artistId);
     }
 
+    @PostMapping("/insertArtworkTag")
+    public void insertArtworkTag(@RequestParam int artworkId, @RequestParam int tagId) {
+        awservice.insertArtworkTag(artworkId, tagId);
+    }
+
     @GetMapping("/getAllArtworks")
-    public List<ArtworkEntity> getAllArtworks() {
-        return awservice.getAllArtworks();
+    public List<ArtworkEntity> getAllArtworks(@RequestParam(required = false, defaultValue = "0") int userId) {
+        return awservice.getAllArtworks(userId);
     }
 
     @GetMapping("/getArtworksByArtistId/{artistId}")
@@ -64,6 +69,22 @@ public class ArtworkController {
     @GetMapping("/getFavoriteArtworks/{userId}")
     public List<ArtworkEntity> getFavoriteArtworks(@PathVariable int userId) {
         return awservice.getFavoriteArtworks(userId);
+    }
+
+    @GetMapping("/getArchivedArtworksByArtistId/{artistId}")
+    public List<ArtworkEntity> getArchivedArtworksByArtistId(@PathVariable int artistId) {
+        return awservice.getArchivedArtworksByArtistId(artistId);
+    }
+
+    @PutMapping("/archiveArtwork/{artworkId}")
+    public ArtworkEntity archiveArtwork(@PathVariable int artworkId, @RequestParam boolean isArchived) {
+        return awservice.archiveArtwork(artworkId, isArchived);
+    }
+
+    @GetMapping("/getArtworksByTagId/{tagId}")
+    public List<ArtworkEntity> getArtworksByTagId(@PathVariable int tagId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return awservice.getArtworksByTagId(tagId, userId);
     }
 
 }

@@ -40,11 +40,19 @@ public class BlogService {
         }
     }
 
-    public List<BlogEntity> getAllBlogs() {
-        return brepo.findAll();
+    public List<BlogEntity> getAllBlogs(int userId) {
+        List<BlogEntity> blogs = brepo.findAll();
+        if (userId > 0) {
+            for (BlogEntity blog : blogs) {
+                com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey key = new com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey(
+                        blog.getBlogId(), userId);
+                blog.setIsLiked(blogLikesRepository.existsById(key));
+            }
+        }
+        return blogs;
     }
 
-    public List<BlogEntity> getBlogsByArtistId(int artistId) {
+    public List<BlogEntity> getBlogsByArtistId(int artistId, int userId) {
         try {
             // Find all blog IDs associated with the artist
             List<Integer> blogIds = userBlogRepository.findAll().stream()
@@ -53,7 +61,16 @@ public class BlogService {
                     .collect(java.util.stream.Collectors.toList());
 
             // Fetch blogs by IDs
-            return brepo.findAllById(blogIds);
+            List<BlogEntity> blogs = brepo.findAllById(blogIds);
+
+            if (userId > 0) {
+                for (BlogEntity blog : blogs) {
+                    com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey key = new com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey(
+                            blog.getBlogId(), userId);
+                    blog.setIsLiked(blogLikesRepository.existsById(key));
+                }
+            }
+            return blogs;
         } catch (Exception e) {
             e.printStackTrace();
             return java.util.Collections.emptyList();
@@ -125,6 +142,7 @@ public class BlogService {
             blogLikesRepository.deleteById(key);
             int currentLikes = blog.getLikeCount() == null ? 0 : blog.getLikeCount();
             blog.setLikeCount(Math.max(0, currentLikes - 1));
+            blog.setIsLiked(false);
         } else {
             // Like
             com.appdev.siventin.lugatimang3.entity.BlogLikesEntity like = new com.appdev.siventin.lugatimang3.entity.BlogLikesEntity(
@@ -132,6 +150,7 @@ public class BlogService {
             blogLikesRepository.save(like);
             int currentLikes = blog.getLikeCount() == null ? 0 : blog.getLikeCount();
             blog.setLikeCount(currentLikes + 1);
+            blog.setIsLiked(true);
         }
 
         return brepo.save(blog);

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { usePopup } from '../context/PopupContext';
 import { insertBlog } from '../api/blogApi';
 import '../styles/UploadBlog.css';
 
 function UploadBlog({ artistData }) {
+    const { showAlert } = usePopup();
     const [formData, setFormData] = useState({
         title: '',
         content: ''
@@ -15,7 +17,7 @@ function UploadBlog({ artistData }) {
 
     const handleSubmit = async () => {
         if (!formData.title || !formData.content) {
-            alert('Please fill in all required fields');
+            showAlert("Validation Error", "Please fill in all required fields");
             return;
         }
 
@@ -29,15 +31,15 @@ function UploadBlog({ artistData }) {
             console.log("Artist data:", artistData);
             const artistId = artistData?.artistId || 0;
             if (artistId === 0) {
-                alert('You must be logged in to upload a blog.');
+                showAlert("Login Required", "You must be logged in to upload a blog.");
                 return;
             }
             await insertBlog(blogData, artistId);
-            alert('Blog uploaded successfully!');
+            showAlert("Success", "Blog uploaded successfully!");
             setFormData({ title: '', content: '' });
         } catch (error) {
             console.error('Failed to upload blog:', error);
-            alert('Failed to upload blog. Please try again.');
+            showAlert("Error", "Failed to upload blog. Please try again.");
         }
     };
 
@@ -89,7 +91,7 @@ function UploadBlog({ artistData }) {
                     <button onClick={handleCancel} className="btn-cancel">
                         Cancel
                     </button>
-                    <button onClick={handleSubmit} className="btn-submit">
+                    <button onClick={handleSubmit} className="button-hexagon btn-submit">
                         Upload Blog
                     </button>
                 </div>

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { usePopup } from '../../context/PopupContext';
 import ArtworkCard from '../artworks/ArtworkCard';
 import { likeArtwork, favoriteArtwork, getFavoriteArtworks, deleteArtwork } from '../../api/artworkApi';
+import { Image } from 'lucide-react';
 import '../../styles/ArtistArtworks.css';
 
-function ArtistArtworks({ artworks, onNavigate, isOwner }) {
+function ArtistArtworks({ artworks, onNavigate, isOwner, onArchive, isArchivedView }) {
+    const { showAlert, showConfirm } = usePopup();
     const [localArtworks, setLocalArtworks] = useState(artworks);
     const [favorites, setFavorites] = useState(new Set());
 
@@ -27,12 +30,12 @@ function ArtistArtworks({ artworks, onNavigate, isOwner }) {
     const handleLike = async (artworkId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to like");
+            showAlert("Login Required", "Please login to like");
             return;
         }
         try {
             const updatedArtwork = await likeArtwork(artworkId, user.artistId);
-            setLocalArtworks(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount } : a));
+            setLocalArtworks(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount, isLiked: updatedArtwork.isLiked } : a));
         } catch (error) {
             console.error("Failed to like artwork", error);
         }
@@ -41,7 +44,7 @@ function ArtistArtworks({ artworks, onNavigate, isOwner }) {
     const handleFavorite = async (artworkId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to favorite");
+            showAlert("Login Required", "Please login to favorite");
             return;
         }
         try {
@@ -60,15 +63,20 @@ function ArtistArtworks({ artworks, onNavigate, isOwner }) {
         }
     };
 
-    const handleDelete = async (artworkId) => {
-        if (!window.confirm("Are you sure you want to delete this artwork?")) return;
-        try {
-            await deleteArtwork(artworkId);
-            setLocalArtworks(prev => prev.filter(a => a.artworkId !== artworkId));
-        } catch (error) {
-            console.error("Failed to delete artwork", error);
-            alert("Failed to delete artwork");
-        }
+    const handleDelete = (artworkId) => {
+        showConfirm(
+            "Delete Artwork",
+            "Are you sure you want to delete this artwork?",
+            async () => {
+                try {
+                    await deleteArtwork(artworkId);
+                    setLocalArtworks(prev => prev.filter(a => a.artworkId !== artworkId));
+                } catch (error) {
+                    console.error("Failed to delete artwork", error);
+                    showAlert("Error", "Failed to delete artwork");
+                }
+            }
+        );
     };
 
     // Sort artworks by most recent first
@@ -76,8 +84,8 @@ function ArtistArtworks({ artworks, onNavigate, isOwner }) {
 
     return (
         <div className="artist-artworks-container">
-            <h3 className="section-title">
-                Artworks
+            <h3 className="section-title" style={{ fontFamily: 'var(--font-family)', color: 'var(--primary-color)', letterSpacing: 'var(--letter-spacing-wide)' }}>
+                {isArchivedView ? 'Archived Artworks' : 'Artworks'}
             </h3>
             {sortedArtworks.length > 0 ? (
                 <div className="artworks-masonry">
@@ -91,22 +99,25 @@ function ArtistArtworks({ artworks, onNavigate, isOwner }) {
                             showFavorite={true}
                             onComment={() => console.log("Comment", artwork.artworkId)}
                             onDelete={isOwner ? handleDelete : null}
+                            onArchive={onArchive}
+                            isArchived={isArchivedView}
                         />
                     ))
                     }
                 </div>
             ) : (
-                <div className="empty-state-card">
-                    <span className="empty-icon">🖼️</span>
-                    <h3 className="empty-title">
+                <div className="empty-state-card" style={{ textAlign: 'center', padding: '40px', color: 'var(--secondary-text-color)' }}>
+                    <span className="empty-icon"><Image size={48} color="var(--primary-color)" /></span>
+                    <h3 className="empty-title" style={{ color: 'var(--primary-color)', fontFamily: 'var(--font-family)' }}>
                         No artworks yet
                     </h3>
-                    <p className="empty-text">
+                    <p className="empty-text" style={{ fontFamily: 'var(--font-family)' }}>
                         Start sharing your creative work with the Hiveminds community!
                     </p>
                     <button
                         onClick={() => onNavigate && onNavigate('upload-artwork')}
-                        className="upload-btn"
+                        className="button-hexagon"
+                        style={{ marginTop: '20px' }}
                     >
                         Upload your first Artwork
                     </button>

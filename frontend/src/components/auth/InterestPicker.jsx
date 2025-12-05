@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { usePopup } from "../../context/PopupContext";
 import { updateArtist } from "../../api/artistApi";
+import { getAllTags, likeTag } from "../../api/tagApi";
 import '../../styles/InterestPicker.css';
 
 const INTERESTS = [
@@ -13,7 +15,21 @@ const INTERESTS = [
 ];
 
 function InterestPicker({ artistId, onComplete, onBack }) {
+    const { showAlert } = usePopup();
     const [selectedInterests, setSelectedInterests] = useState([]);
+    const [allTags, setAllTags] = useState([]);
+
+    React.useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const tags = await getAllTags();
+                setAllTags(tags);
+            } catch (error) {
+                console.error("Failed to fetch tags", error);
+            }
+        };
+        fetchTags();
+    }, []);
 
     const toggleInterest = (interest) => {
         if (selectedInterests.includes(interest)) {
@@ -25,19 +41,30 @@ function InterestPicker({ artistId, onComplete, onBack }) {
 
     const handleContinue = async () => {
         if (selectedInterests.length < 3) {
-            alert("Please select at least three categories.");
+            showAlert("Selection Required", "Please select at least three categories.");
             return;
         }
 
         try {
-            // Assuming we update the artist with the selected interests as a comma-separated string
-            // or however the backend expects it. For now, joining with commas.
+            // 1. Update artist profile string (legacy/backup)
             const interestString = selectedInterests.join(", ");
             await updateArtist(artistId, { interest: interestString });
+
+            // 2. Like the corresponding tags
+            const likePromises = selectedInterests.map(interestName => {
+                const tag = allTags.find(t => t.name.toLowerCase() === interestName.toLowerCase());
+                if (tag) {
+                    return likeTag(tag.tagId, artistId);
+                }
+                return Promise.resolve();
+            });
+
+            await Promise.all(likePromises);
+
             onComplete();
         } catch (error) {
             console.error("Failed to update interests", error);
-            alert("Failed to save interests. Please try again.");
+            showAlert("Error", "Failed to save interests. Please try again.");
         }
     };
 

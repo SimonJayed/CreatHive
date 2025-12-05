@@ -3,27 +3,14 @@ import { getFavoriteArtworks, likeArtwork, favoriteArtwork } from '../../api/art
 import ArtworkCard from '../artworks/ArtworkCard';
 import '../../styles/FavoriteArtworks.css';
 
-function FavoriteArtworks() {
-    const [favorites, setFavorites] = useState([]);
-    const [loading, setLoading] = useState(true);
+function FavoriteArtworks({ favorites: initialFavorites }) {
+    const [favorites, setFavorites] = useState(initialFavorites || []);
 
     useEffect(() => {
-        fetchFavorites();
-    }, []);
+        setFavorites(initialFavorites || []);
+    }, [initialFavorites]);
 
-    const fetchFavorites = async () => {
-        const user = JSON.parse(localStorage.getItem('currentArtist'));
-        if (!user) return;
-
-        try {
-            const data = await getFavoriteArtworks(user.artistId);
-            setFavorites(data);
-        } catch (error) {
-            console.error("Failed to fetch favorites", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Removed internal fetch logic since data is passed via props
 
     const handleLike = async (artworkId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
@@ -31,7 +18,7 @@ function FavoriteArtworks() {
 
         try {
             const updatedArtwork = await likeArtwork(artworkId, user.artistId);
-            setFavorites(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount } : a));
+            setFavorites(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount, isLiked: updatedArtwork.isLiked } : a));
         } catch (error) {
             console.error("Failed to like artwork", error);
         }
@@ -50,7 +37,7 @@ function FavoriteArtworks() {
         }
     };
 
-    if (loading) return <div className="loading-text">Loading favorites...</div>;
+    // Removed loading check since data is passed via props
 
     return (
         <div className="favorite-artworks-container">
@@ -70,7 +57,7 @@ function FavoriteArtworks() {
                     ))
                 ) : (
                     <div className="no-favorites">
-                        You haven't favorited any artworks yet.
+                        <p className="no-favorites-text">You haven't favorited any artworks yet.</p>
                     </div>
                 )}
             </div>

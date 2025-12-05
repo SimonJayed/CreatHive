@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { usePopup } from '../../context/PopupContext';
 import { getAllArtworks, likeArtwork, favoriteArtwork, getFavoriteArtworks } from '../../api/artworkApi';
 import { getAllUserArtworks } from '../../api/userArtworkApi';
 import { getAllArtists } from '../../api/artistApi';
 import ArtworkCard from './ArtworkCard';
-import { FaSortAmountDown } from 'react-icons/fa';
+import { ArrowUpDown } from 'lucide-react';
 import '../../styles/ArtworksFeed.css';
 
 function ArtworksFeed({ onNavigate }) {
+    const { showAlert } = usePopup();
     const [artworks, setArtworks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState('newest');
@@ -80,12 +82,12 @@ function ArtworksFeed({ onNavigate }) {
     const handleLike = async (artworkId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to like");
+            showAlert("Login Required", "Please login to like");
             return;
         }
         try {
             const updatedArtwork = await likeArtwork(artworkId, user.artistId);
-            setArtworks(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount } : a));
+            setArtworks(prev => prev.map(a => a.artworkId === artworkId ? { ...a, likeCount: updatedArtwork.likeCount, isLiked: updatedArtwork.isLiked } : a));
         } catch (error) {
             console.error("Failed to like artwork", error);
         }
@@ -94,7 +96,7 @@ function ArtworksFeed({ onNavigate }) {
     const handleFavorite = async (artworkId) => {
         const user = JSON.parse(localStorage.getItem('currentArtist'));
         if (!user) {
-            alert("Please login to favorite");
+            showAlert("Login Required", "Please login to favorite");
             return;
         }
         try {
@@ -113,30 +115,40 @@ function ArtworksFeed({ onNavigate }) {
         }
     };
 
-    if (loading) return <div className="loading-text">Loading artworks...</div>;
+    if (loading) return <div className="loading-text" style={{ color: 'var(--primary-color)', textAlign: 'center', marginTop: '20px' }}>Loading artworks...</div>;
 
     return (
         <div className="artworks-feed-container">
             <div className="feed-header">
                 <div className="feed-title-group">
-                    <h2 className="feed-title">Community Artworks</h2>
-                    <div className="sort-controls">
-                        <FaSortAmountDown />
+                    <h2 className="feed-title" style={{ fontFamily: 'var(--font-family)', color: 'var(--primary-color)', letterSpacing: 'var(--letter-spacing-wide)' }}>Community Artworks</h2>
+                    <div className="sort-controls" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-color)' }}>
+                        <ArrowUpDown className="icon-hexagon" size={16} />
                         <span>Sort by:</span>
                         <select
                             value={sortOrder}
                             onChange={(e) => setSortOrder(e.target.value)}
-                            className="sort-select"
+                            className="input-hexagon"
+                            style={{
+                                padding: '4px 8px',
+                                width: 'auto',
+                                backgroundColor: 'transparent',
+                                color: 'var(--primary-color)',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                clipPath: 'none'
+                            }}
                         >
-                            <option value="newest">Newest First</option>
-                            <option value="oldest">Oldest First</option>
+                            <option value="newest" style={{ color: 'black' }}>Newest First</option>
+                            <option value="oldest" style={{ color: 'black' }}>Oldest First</option>
                         </select>
                     </div>
                 </div>
 
                 <button
                     onClick={() => onNavigate('upload-artwork')}
-                    className="upload-artwork-btn"
+                    className="button-hexagon"
                 >
                     + Upload Artwork
                 </button>
@@ -155,7 +167,7 @@ function ArtworksFeed({ onNavigate }) {
                         />
                     ))
                 ) : (
-                    <div className="no-artworks">
+                    <div className="no-artworks" style={{ color: 'var(--secondary-text-color)', textAlign: 'center', padding: '20px' }}>
                         No artworks found.
                     </div>
                 )}

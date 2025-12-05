@@ -46,9 +46,55 @@ public class ArtworkService {
         }
     }
 
+    public void insertArtworkTag(int artworkId, int tagId) {
+        try {
+            com.appdev.siventin.lugatimang3.entity.ArtworkTagEntity artworkTag = new com.appdev.siventin.lugatimang3.entity.ArtworkTagEntity();
+            com.appdev.siventin.lugatimang3.entity.ArtworkTagEntity.ArtworkTagKey id = new com.appdev.siventin.lugatimang3.entity.ArtworkTagEntity.ArtworkTagKey(
+                    artworkId, tagId);
+            artworkTag.setId(id);
+
+            // Fetch and set relationships
+            ArtworkEntity artwork = awrepo.findById(artworkId).orElseThrow();
+            com.appdev.siventin.lugatimang3.entity.TagEntity tag = com.appdev.siventin.lugatimang3.repository.TagRepository.class
+                    .cast(tagRepository).findById(tagId).orElseThrow();
+
+            artworkTag.setArtwork(artwork);
+            artworkTag.setTag(tag);
+
+            artworkTagRepository.save(artworkTag);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     // Read
-    public List<ArtworkEntity> getAllArtworks() {
-        return awrepo.findAll();
+    public List<ArtworkEntity> getAllArtworks(int userId) {
+        List<ArtworkEntity> artworks = awrepo.findAll().stream()
+                .filter(a -> !Boolean.TRUE.equals(a.isArchived()))
+                .collect(Collectors.toList());
+
+        if (userId > 0) {
+            for (ArtworkEntity artwork : artworks) {
+                com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
+                        artwork.getArtworkId(), userId);
+                artwork.setIsLiked(artworkLikesRepository.existsById(key));
+            }
+        }
+
+        // Populate displayTags for all artworks
+        for (ArtworkEntity artwork : artworks) {
+            if (artwork.getArtworkTags() != null) {
+                List<com.appdev.siventin.lugatimang3.entity.TagEntity> tags = artwork.getArtworkTags().stream()
+                        .map(at -> at.getTag())
+                        .collect(Collectors.toList());
+                artwork.setDisplayTags(tags);
+            } else {
+                artwork.setDisplayTags(java.util.Collections.emptyList());
+            }
+        }
+
+        return artworks;
     }
 
     public List<ArtworkEntity> getArtworksByArtistId(int artistId) {
@@ -59,8 +105,42 @@ public class ArtworkService {
                     .map(ua -> ua.getId().getArtworkId())
                     .collect(Collectors.toList());
 
-            // Fetch artworks by IDs
-            return awrepo.findAllById(artworkIds);
+            // Fetch artworks by IDs and filter out archived ones
+            List<ArtworkEntity> artworks = awrepo.findAllById(artworkIds).stream()
+                    .filter(a -> !Boolean.TRUE.equals(a.isArchived()))
+                    .collect(Collectors.toList());
+
+            // Populate displayTags
+            for (ArtworkEntity artwork : artworks) {
+                if (artwork.getArtworkTags() != null) {
+                    List<com.appdev.siventin.lugatimang3.entity.TagEntity> tags = artwork.getArtworkTags().stream()
+                            .map(at -> at.getTag())
+                            .collect(Collectors.toList());
+                    artwork.setDisplayTags(tags);
+                } else {
+                    artwork.setDisplayTags(java.util.Collections.emptyList());
+                }
+            }
+
+            return artworks;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
+        }
+    }
+
+    public List<ArtworkEntity> getArchivedArtworksByArtistId(int artistId) {
+        try {
+            // Find all artwork IDs associated with the artist
+            List<Integer> artworkIds = userArtworkRepository.findAll().stream()
+                    .filter(ua -> ua.getId().getArtistId() == artistId)
+                    .map(ua -> ua.getId().getArtworkId())
+                    .collect(Collectors.toList());
+
+            // Fetch artworks by IDs and filter ONLY archived ones
+            return awrepo.findAllById(artworkIds).stream()
+                    .filter(a -> Boolean.TRUE.equals(a.isArchived()))
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
             return java.util.Collections.emptyList();
@@ -90,6 +170,13 @@ public class ArtworkService {
         } finally {
             return awrepo.save(Artwork);
         }
+    }
+
+    public ArtworkEntity archiveArtwork(int artworkId, boolean isArchived) {
+        ArtworkEntity artwork = awrepo.findById(artworkId)
+                .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
+        artwork.setArchived(isArchived);
+        return awrepo.save(artwork);
     }
 
     // Delete
@@ -154,6 +241,9 @@ public class ArtworkService {
     @Autowired
     com.appdev.siventin.lugatimang3.repository.CommentOnArtworkRepository commentOnArtworkRepository;
 
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.TagRepository tagRepository;
+
     public ArtworkEntity likeArtwork(int artworkId, int userId) {
         ArtworkEntity artwork = awrepo.findById(artworkId)
                 .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
@@ -166,6 +256,7 @@ public class ArtworkService {
             artworkLikesRepository.deleteById(key);
             int currentLikes = artwork.getLikeCount() == null ? 0 : artwork.getLikeCount();
             artwork.setLikeCount(Math.max(0, currentLikes - 1));
+            artwork.setIsLiked(false);
         } else {
             // Like
             com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity like = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity(
@@ -173,9 +264,12 @@ public class ArtworkService {
             artworkLikesRepository.save(like);
             int currentLikes = artwork.getLikeCount() == null ? 0 : artwork.getLikeCount();
             artwork.setLikeCount(currentLikes + 1);
+            artwork.setIsLiked(true);
         }
 
-        return awrepo.save(artwork);
+        ArtworkEntity savedArtwork = awrepo.save(artwork);
+        savedArtwork.setIsLiked(artwork.getIsLiked());
+        return savedArtwork;
     }
 
     public void favoriteArtwork(int artworkId, int userId) {
@@ -201,6 +295,46 @@ public class ArtworkService {
                 .collect(Collectors.toList());
 
         return awrepo.findAllById(artworkIds);
+    }
+
+    public List<ArtworkEntity> getArtworksByTagId(int tagId, int userId) {
+        try {
+            // Find all artwork IDs associated with the tag
+            List<Integer> artworkIds = artworkTagRepository.findAll().stream()
+                    .filter(at -> at.getId().getTagId() == tagId)
+                    .map(at -> at.getId().getArtworkId())
+                    .collect(Collectors.toList());
+
+            // Fetch artworks by IDs and filter out archived ones
+            List<ArtworkEntity> artworks = awrepo.findAllById(artworkIds).stream()
+                    .filter(a -> !Boolean.TRUE.equals(a.isArchived()))
+                    .collect(Collectors.toList());
+
+            // Populate displayTags
+            for (ArtworkEntity artwork : artworks) {
+                if (artwork.getArtworkTags() != null) {
+                    List<com.appdev.siventin.lugatimang3.entity.TagEntity> tags = artwork.getArtworkTags().stream()
+                            .map(at -> at.getTag())
+                            .collect(Collectors.toList());
+                    artwork.setDisplayTags(tags);
+                } else {
+                    artwork.setDisplayTags(java.util.Collections.emptyList());
+                }
+            }
+
+            if (userId > 0) {
+                for (ArtworkEntity artwork : artworks) {
+                    com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
+                            artwork.getArtworkId(), userId);
+                    artwork.setIsLiked(artworkLikesRepository.existsById(key));
+                }
+            }
+            return artworks;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
+        }
     }
 
 }

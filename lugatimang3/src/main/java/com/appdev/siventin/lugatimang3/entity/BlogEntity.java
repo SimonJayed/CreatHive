@@ -73,4 +73,15 @@ public class BlogEntity {
     public void setLikeCount(Integer likeCount) {
         this.likeCount = likeCount;
     }
+
+    @jakarta.persistence.Transient
+    private boolean isLiked;
+
+    public boolean getIsLiked() {
+        return isLiked;
+    }
+
+    public void setIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
+    }
 }

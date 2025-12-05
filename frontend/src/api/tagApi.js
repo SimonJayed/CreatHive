@@ -1,8 +1,16 @@
 const BASE_URL = "http://localhost:8080/tags";
 
-export async function getAllTags() {
-  const res = await fetch(`${BASE_URL}/getAllTags`);
+export async function getAllTags(userId = 0) {
+  const res = await fetch(`${BASE_URL}/getAllTags?userId=${userId}`);
   return res.json();
+}
+
+export async function likeTag(tagId, userId) {
+  await fetch(`${BASE_URL}/likeTag/${tagId}/${userId}`, { method: "PUT" });
+}
+
+export async function unlikeTag(tagId, userId) {
+  await fetch(`${BASE_URL}/unlikeTag/${tagId}/${userId}`, { method: "PUT" });
 }
 
 export async function insertTag(tag) {

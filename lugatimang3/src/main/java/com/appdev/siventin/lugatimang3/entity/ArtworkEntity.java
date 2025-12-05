@@ -25,8 +25,17 @@ public class ArtworkEntity {
     @Column(name = "like_count")
     private Integer likeCount = 0;
 
+    @Column(name = "is_archived")
+    private Boolean isArchived = false;
+
     @OneToMany(mappedBy = "artwork", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArtworkTagEntity> artworkTags;
+
+    @Transient
+    private boolean isLiked;
+
+    @Transient
+    private List<TagEntity> displayTags;
 
     public ArtworkEntity() {
     }
@@ -41,6 +50,7 @@ public class ArtworkEntity {
         this.creationDate = creationDate;
         this.tags = tags;
         this.likeCount = 0;
+        this.isArchived = false;
     }
 
     public int getArtworkId() {
@@ -71,6 +81,10 @@ public class ArtworkEntity {
         return likeCount;
     }
 
+    public Boolean isArchived() {
+        return isArchived;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -95,11 +109,31 @@ public class ArtworkEntity {
         this.likeCount = likeCount;
     }
 
+    public void setArchived(Boolean isArchived) {
+        this.isArchived = isArchived;
+    }
+
     public List<ArtworkTagEntity> getArtworkTags() {
         return artworkTags;
     }
 
     public void setArtworkTags(List<ArtworkTagEntity> artworkTags) {
         this.artworkTags = artworkTags;
+    }
+
+    public boolean getIsLiked() {
+        return isLiked;
+    }
+
+    public void setIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
+    }
+
+    public List<TagEntity> getDisplayTags() {
+        return displayTags;
+    }
+
+    public void setDisplayTags(List<TagEntity> displayTags) {
+        this.displayTags = displayTags;
     }
 }

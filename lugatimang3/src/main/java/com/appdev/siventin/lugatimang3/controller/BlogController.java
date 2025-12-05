@@ -32,13 +32,14 @@ public class BlogController {
     }
 
     @GetMapping("/getAllBlogs")
-    public List<BlogEntity> getAllBlogs() {
-        return bservice.getAllBlogs();
+    public List<BlogEntity> getAllBlogs(@RequestParam(required = false, defaultValue = "0") int userId) {
+        return bservice.getAllBlogs(userId);
     }
 
     @GetMapping("/getBlogsByArtistId/{artistId}")
-    public List<BlogEntity> getBlogsByArtistId(@PathVariable int artistId) {
-        return bservice.getBlogsByArtistId(artistId);
+    public List<BlogEntity> getBlogsByArtistId(@PathVariable int artistId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return bservice.getBlogsByArtistId(artistId, userId);
     }
 
     @PutMapping("/updateBlog")

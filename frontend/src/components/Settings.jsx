@@ -1,26 +1,24 @@
 import React, { useState } from 'react';
+import { usePopup } from '../context/PopupContext';
 import '../styles/Settings.css';
 
 function Settings() {
+    const { showAlert } = usePopup();
     const [darkMode, setDarkMode] = useState(true);
     const [pushNotifications, setPushNotifications] = useState(true);
     const [emailNotifications, setEmailNotifications] = useState(true);
     const [language, setLanguage] = useState('');
 
     const handlePasswordReset = () => {
-        alert('Password reset link will be sent to your email');
+        showAlert("Password Reset", "Password reset link will be sent to your email");
     };
 
     const ToggleSwitch = ({ checked, onChange }) => (
         <div
             onClick={() => onChange(!checked)}
-            className="toggle-switch"
-            style={{ backgroundColor: checked ? '#FFB800' : '#ddd' }}
+            className={`toggle-switch ${checked ? 'active' : ''}`}
         >
-            <div
-                className="toggle-knob"
-                style={{ left: checked ? '26px' : '2px' }}
-            />
+            <div className="toggle-knob" />
         </div>
     );
 
@@ -71,7 +69,7 @@ function Settings() {
             <div className="settings-section">
                 <h2 className="section-title">Language Preferences</h2>
                 <div>
-                    <h3 className="setting-name" style={{ marginBottom: '8px' }}>Language</h3>
+                    <h3 className="setting-name">Language</h3>
                     <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
@@ -94,7 +92,7 @@ function Settings() {
                 <h2 className="section-title">Security</h2>
                 <div>
                     <h3 className="setting-name">Password Reset</h3>
-                    <p className="setting-description" style={{ marginBottom: '16px' }}>
+                    <p className="setting-description mb-4">
                         Request a password reset link via email
                     </p>
                     <button onClick={handlePasswordReset} className="btn-reset">

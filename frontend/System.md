@@ -77,6 +77,25 @@ When creating a new resource (Artwork/Blog), you must:
 **Routing is essential.**
 To fully integrate the new components, they must be added to the application's routing configuration (typically `App.js` or a dedicated router file). This ensures users can navigate to the new pages (e.g., `/artists`).
 
+## File Organization & Structure
+**Strict adherence to folder structure is mandatory.**
+1.  **CSS/Styles**:
+    *   **Location**: All CSS files MUST be placed in `frontend/src/styles/`.
+    *   **Rule**: Do NOT co-locate CSS files with components in `src/components/`.
+    *   **Importing**: Import styles relative to the component, e.g., `import '../../styles/MyComponent.css';`.
+
+2.  **Components**:
+    *   **Location**: React components MUST be placed in `frontend/src/components/`.
+    *   **Grouping**: Group related components into subfolders (e.g., `components/profile/`, `components/artworks/`).
+    *   **Common Components**: Reusable UI elements (buttons, modals) go in `components/common/`.
+
+3.  **API/Services**:
+    *   **Frontend**: All API connector files go in `frontend/src/api/`.
+    *   **Backend**: Follow standard Spring Boot layers (`entity`, `repository`, `service`, `controller`).
+
+4.  **Assets**:
+    *   **Images**: Static images go in `frontend/public/images/`.
+
 ## Quality Control
 **Double-checking modified files for errors is a MUST.**
     *   Extract common UI patterns into reusable components (e.g., `EditableText`).
@@ -99,10 +118,11 @@ To fully integrate the new components, they must be added to the application's r
     *   **Verification**: Always check if users' artworks and blogs are showing up properly where they should be (Profile, Blogs Feed, and Artwork pages).
 
 ## Iconography
-**Library**: `react-icons`
--   **Standard**: Use FontAwesome (`react-icons/fa`) for consistency.
--   **Usage**: Import specific icons (e.g., `FaHeart`) and use them as components.
--   **Styling**: Icons are SVGs and can be styled with CSS (color, size).
+**Library**: `lucide-react`
+-   **Standard**: Use `lucide-react` for all icons to ensure a consistent, modern line-style aesthetic.
+-   **Usage**: Import specific icons (e.g., `Hexagon`, `MessageCircle`) and use them as components.
+-   **Styling**: Icons are SVGs and can be styled with CSS (color, size, stroke width).
+-   **Theme**: Use `Hexagon` for likes/favorites and logos to match the Hive Theme.
 
 ## Time Formatting
 -   **No Seconds**: When displaying time (e.g., in blogs, comments, or artworks), **never include seconds**. Use a format like `Dec 3, 2025, 06:15 PM`.
@@ -147,9 +167,9 @@ This ensures consistency across documentation.
     -   Transaction 1: Students can upload original characters (OCs) and artworks. **[Implemented]**
     -   Transaction 2: System supports different file formats (e.g., JPG, PNG). **[Implemented]**
     -   Transaction 3: Students can remove/delete a post. **[Implemented]**
-    -   Transaction 4: Students can archive/un-list a post. **[Partially Implemented]** (Visibility field exists, UI pending)
+    -   Transaction 4: Students can archive/un-list a post. **[Implemented]**
 -   **Module 2: Tagging and Categorization**
-    -   Transaction 1: System allows searching and filtering based on tags. **[Partially Implemented]** (Backend ready, Frontend UI pending)
+    -   Transaction 1: System allows searching and filtering based on tags. **[Partially Implemented]** (UI exists in `Explore.jsx`, but logic is static/missing)
     -   Transaction 2: Students can assign tags to their uploads. **[Implemented]**
     -   Transaction 3: Students can search using tags. **[Partially Implemented]**
 
@@ -158,7 +178,7 @@ This ensures consistency across documentation.
 -   **Module 1: Forum & Thread Management**
     -   Transaction 1: Users can view discussion forums categorized by topics. **[Implemented]** (via Blogs)
     -   Transaction 2: Users can create new threads and post replies. **[Implemented]** (Blogs & Comments)
-    -   Transaction 3: Users can edit or delete their own posts within a limited time. **[Partially Implemented]** (Edit/Delete exists, time limit pending)
+    -   Transaction 3: Users can edit or delete their own posts within a limited time. **[Implemented]** (Backend endpoints exist)
 -   **Module 2: Moderation & Reporting**
     -   Transaction 1: Users can report inappropriate content. **[Not Started]**
     -   Transaction 2: Moderators can review reports and take action. **[Not Started]**

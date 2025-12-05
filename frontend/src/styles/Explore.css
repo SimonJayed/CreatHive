@@ -97,6 +97,8 @@
     position: relative;
     background-size: cover;
     background-position: center;
+    background-color: #333;
+    /* Fallback color */
     flex-shrink: 0;
     transition: transform var(--duration-normal) var(--ease-smooth);
     box-shadow: var(--shadow-md);

@@ -20,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
-
-
 @RestController
 @RequestMapping("/tags")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -37,17 +34,27 @@ public class TagController {
     }
 
     @GetMapping("/getAllTags")
-    public List<TagEntity> getAllTags() {
-        return tservice.getAllTags();
+    public List<TagEntity> getAllTags(@RequestParam(required = false, defaultValue = "0") int userId) {
+        return tservice.getAllTags(userId);
     }
-    
+
+    @PutMapping("/likeTag/{tagId}/{userId}")
+    public void likeTag(@PathVariable int tagId, @PathVariable int userId) {
+        tservice.likeTag(tagId, userId);
+    }
+
+    @PutMapping("/unlikeTag/{tagId}/{userId}")
+    public void unlikeTag(@PathVariable int tagId, @PathVariable int userId) {
+        tservice.unlikeTag(tagId, userId);
+    }
+
     @PutMapping("/updateTag")
-    public TagEntity updateTag (@RequestParam int tagId, @RequestBody TagEntity newTagDetails) {
+    public TagEntity updateTag(@RequestParam int tagId, @RequestBody TagEntity newTagDetails) {
         return tservice.updateTag(tagId, newTagDetails);
     }
 
     @DeleteMapping("/deleteTag/{tagId}")
-    public String deleteTag(@PathVariable int tagId){
+    public String deleteTag(@PathVariable int tagId) {
         return tservice.deleteTag(tagId);
     }
 }
