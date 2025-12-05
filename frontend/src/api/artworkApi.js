@@ -27,8 +27,8 @@ export async function insertArtworkTag(artworkId, tagId) {
     if (!res.ok) throw new Error("Failed to link tag to artwork");
 }
 
-export async function deleteArtwork(artworkId) {
-    const res = await fetch(`${BASE_URL}/deleteArtwork/${artworkId}`, {
+export async function deleteArtwork(artworkId, artistId) {
+    const res = await fetch(`${BASE_URL}/deleteArtwork/${artworkId}?artistId=${artistId}`, {
         method: 'DELETE',
     });
     return res.text();
@@ -60,8 +60,8 @@ export async function getArchivedArtworksByArtistId(artistId) {
     return res.json();
 }
 
-export async function archiveArtwork(artworkId, isArchived) {
-    const res = await fetch(`${BASE_URL}/archiveArtwork/${artworkId}?isArchived=${isArchived}`, {
+export async function archiveArtwork(artworkId, isArchived, artistId) {
+    const res = await fetch(`${BASE_URL}/archiveArtwork/${artworkId}?isArchived=${isArchived}&artistId=${artistId}`, {
         method: 'PUT',
     });
     return res.json();

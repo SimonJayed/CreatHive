@@ -1,8 +1,28 @@
 import React from 'react';
 import { Hexagon, MessageCircle, Share2, Star, Trash2, Archive } from 'lucide-react';
+import { usePopup } from '../../context/PopupContext';
 
 function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, showFavorite = true, onDelete, onArchive, isArchived }) {
     const isLiked = artwork.isLiked;
+    const { showAlert } = usePopup();
+
+    const handleShare = () => {
+        const url = `${window.location.origin}/artwork/${artwork.artworkId}`;
+        navigator.clipboard.writeText(url);
+        showAlert(
+            "Share Artwork",
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <p style={{ margin: 0 }}>Link copied to clipboard!</p>
+                <input
+                    type="text"
+                    value={url}
+                    readOnly
+                    className="input-hexagon"
+                    style={{ width: '100%', padding: '8px' }}
+                />
+            </div>
+        );
+    };
 
     return (
         <div className="card-hexagon" style={{
@@ -37,16 +57,17 @@ function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, show
                 </div>
             </div>
 
-            {/* Tags */}
-            <div style={{ padding: '8px 12px 0', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {/* Tags - Moved to minimal padding */}
+            <div style={{ padding: '4px 8px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                 {artwork.displayTags && artwork.displayTags.map(tag => (
                     <span key={tag.tagId} style={{
-                        fontSize: '11px',
-                        backgroundColor: 'var(--primary-color)',
-                        color: 'black',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        fontWeight: '600',
+                        fontSize: '10px',
+                        backgroundColor: 'rgba(255, 184, 0, 0.2)', // Lighter, more subtle
+                        color: 'var(--text-color)',
+                        border: '1px solid var(--primary-color)',
+                        padding: '1px 6px',
+                        borderRadius: '4px', // Less pill-like, more tag-like
+                        fontWeight: '500',
                         fontFamily: 'var(--font-family)'
                     }}>
                         {tag.name}
@@ -54,69 +75,70 @@ function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, show
                 ))}
             </div>
 
-            {/* Footer */}
-            <div style={{ padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px solid var(--border-color)' }}>
+            {/* Footer - Reduced padding and removed border for cleaner look */}
+            <div style={{ padding: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <button
                         onClick={() => onLike(artwork.artworkId)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: 'var(--text-color)', fontFamily: 'var(--font-family)' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-color)', fontFamily: 'var(--font-family)', padding: 0 }}
                         title="Like"
                         className="icon-button"
                     >
-                        <span className={`icon-hexagon ${isLiked ? 'active' : ''}`}>
-                            <Hexagon size={20} color={isLiked ? "var(--primary-color)" : "currentColor"} fill={isLiked ? "var(--primary-color)" : "none"} />
+                        <span className={`icon-hexagon ${isLiked ? 'active' : ''}`} style={{ transform: isLiked ? 'scale(1.1)' : 'scale(1)' }}>
+                            <Hexagon size={18} color={isLiked ? "var(--primary-color)" : "currentColor"} fill={isLiked ? "var(--primary-color)" : "none"} />
                         </span>
                         {artwork.likeCount || 0}
                     </button>
                     <button
                         onClick={() => onComment && onComment(artwork.artworkId)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: 'var(--text-color)', fontFamily: 'var(--font-family)' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-color)', fontFamily: 'var(--font-family)', padding: 0 }}
                         title="Comment"
                         className="icon-button"
                     >
-                        <span className="icon-hexagon"><MessageCircle size={20} /></span> 0
+                        <span className="icon-hexagon"><MessageCircle size={18} /></span> 0
                     </button>
+                </div>
+                <div style={{ display: 'flex', gap: '4px' }}>
                     <button
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: 'var(--text-color)', fontFamily: 'var(--font-family)' }}
+                        onClick={handleShare}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px', color: 'var(--text-color)' }}
                         title="Share"
                         className="icon-button"
                     >
-                        <span className="icon-hexagon"><Share2 size={20} /></span>
+                        <Share2 size={18} />
                     </button>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
                     {showFavorite && (
                         <button
                             onClick={() => onFavorite && onFavorite(artwork.artworkId)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary-color)' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary-color)', padding: '4px' }}
                             title="Favorite"
                             className="icon-button"
                         >
                             <span className={`icon-hexagon ${isFavorited ? 'active' : ''}`}>
-                                <Star size={20} fill={isFavorited ? "currentColor" : "none"} />
+                                <Star size={18} fill={isFavorited ? "currentColor" : "none"} />
                             </span>
                         </button>
                     )}
                     {onArchive && (
                         <button
                             onClick={() => onArchive(artwork.artworkId)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-color)' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-color)', padding: '4px' }}
                             title={isArchived ? "Unarchive" : "Archive"}
                             className="icon-button"
                         >
                             <span className={`icon-hexagon ${isArchived ? 'active' : ''}`}>
-                                <Archive size={20} />
+                                <Archive size={18} />
                             </span>
                         </button>
                     )}
                     {onDelete && (
                         <button
                             onClick={() => onDelete(artwork.artworkId)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger-color)' }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger-color)', padding: '4px' }}
                             title="Delete"
                             className="icon-button"
                         >
-                            <span className="icon-hexagon"><Trash2 size={20} /></span>
+                            <span className="icon-hexagon"><Trash2 size={18} /></span>
                         </button>
                     )}
                 </div>

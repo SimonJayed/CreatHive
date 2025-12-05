@@ -5,10 +5,13 @@ import { likeArtwork, favoriteArtwork, getFavoriteArtworks, deleteArtwork } from
 import { Image } from 'lucide-react';
 import '../../styles/ArtistArtworks.css';
 
+import FilterSort from '../common/FilterSort';
+
 function ArtistArtworks({ artworks, onNavigate, isOwner, onArchive, isArchivedView }) {
     const { showAlert, showConfirm } = usePopup();
     const [localArtworks, setLocalArtworks] = useState(artworks);
     const [favorites, setFavorites] = useState(new Set());
+    const [sortOrder, setSortOrder] = useState('newest');
 
     useEffect(() => {
         setLocalArtworks(artworks);
@@ -69,7 +72,9 @@ function ArtistArtworks({ artworks, onNavigate, isOwner, onArchive, isArchivedVi
             "Are you sure you want to delete this artwork?",
             async () => {
                 try {
-                    await deleteArtwork(artworkId);
+                    const user = JSON.parse(localStorage.getItem('currentArtist'));
+                    if (!user) return;
+                    await deleteArtwork(artworkId, user.artistId);
                     setLocalArtworks(prev => prev.filter(a => a.artworkId !== artworkId));
                 } catch (error) {
                     console.error("Failed to delete artwork", error);
@@ -79,14 +84,44 @@ function ArtistArtworks({ artworks, onNavigate, isOwner, onArchive, isArchivedVi
         );
     };
 
-    // Sort artworks by most recent first
-    const sortedArtworks = [...localArtworks].sort((a, b) => b.artworkId - a.artworkId);
+    // Sort artworks
+    const sortedArtworks = [...localArtworks].sort((a, b) => {
+        if (sortOrder === 'newest') {
+            return b.artworkId - a.artworkId; // Assuming ID correlates with time, or stick to ID for now if date missing
+        } else if (sortOrder === 'oldest') {
+            return a.artworkId - b.artworkId;
+        } else if (sortOrder === 'most_liked') {
+            return (b.likeCount || 0) - (a.likeCount || 0);
+        }
+        return 0;
+    });
 
     return (
         <div className="artist-artworks-container">
-            <h3 className="section-title" style={{ fontFamily: 'var(--font-family)', color: 'var(--primary-color)', letterSpacing: 'var(--letter-spacing-wide)' }}>
-                {isArchivedView ? 'Archived Artworks' : 'Artworks'}
-            </h3>
+            <div className="artist-artworks-header">
+                <FilterSort
+                    type="artwork"
+                    sortOptions={[
+                        { label: 'Newest First', value: 'newest' },
+                        { label: 'Oldest First', value: 'oldest' },
+                        { label: 'Most Liked', value: 'most_liked' }
+                    ]}
+                    activeSort={sortOrder}
+                    onSortChange={setSortOrder}
+                    onClear={() => setSortOrder('newest')}
+                    showFilter={false}
+                />
+
+                {isOwner && !isArchivedView && (
+                    <button
+                        onClick={() => onNavigate && onNavigate('upload-artwork')}
+                        className="button-hexagon upload-artwork-btn"
+                    >
+                        + Upload Artwork
+                    </button>
+                )}
+            </div>
+
             {sortedArtworks.length > 0 ? (
                 <div className="artworks-masonry">
                     {sortedArtworks.map((artwork) => (

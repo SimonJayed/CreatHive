@@ -23,7 +23,7 @@ const Popup = () => {
                     {getIcon()}
                     <h3 className="popup-title">{title}</h3>
                 </div>
-                <p className="popup-message">{message}</p>
+                <div className="popup-message">{message}</div>
                 <div className="popup-actions">
                     {type === 'confirm' && (
                         <button

@@ -1,15 +1,10 @@
-.artist-artworks-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+/* Artist Artworks Styles */
 
-.section-title {
-    color: var(--primary-color);
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    font-weight: 600;
-    font-family: var(--font-family);
+.artist-artworks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
 }
 
 .artworks-masonry {

@@ -173,6 +173,32 @@ Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where use
 *   **Card & Modal Shape**: Removed the hexagonal `clip-path` from `.card-hexagon` and `.modal-content`.
     *   **Reason**: User requested removal of the specific component shape.
     *   **New Style**: Replaced with `border-radius: 12px` for a cleaner, rounded-rectangle look while preserving the "Hive Theme" colors, borders, and hover effects.
+    *   **Profile Tabs**: Refined the "Artworks", "Blogs", and "Favorites" tabs by removing redundant headers inside the content areas. Restored the "Archived" tab and added explicit tab styling rules to `Styles.md`.
+    *   **Favorites Display**: Updated backend `ArtworkEntity` and `ArtworkService` to populate transient `artist` data for favorite artworks, resolving the "by Unknown" display issue.
+    *   **Permission Fixes**: Added strict `isOwner` checks for the "Archive" action in `Profile.jsx` to prevent visitors from seeing or using modification controls on other users' profiles.
+
+    *   **Strict Access Control (Security)**:
+        *   **Frontend**: Restricted "Edit Profile" button visibility in `ProfileHeader.jsx` to strict `!readOnly` check.
+        *   **Backend**: Updated `ArtworkService.java` and `ArtworkController.java` to mandate ownership verification (`artistId`) for **Delete** and **Archive** operations. The server now authenticates the requester against the `UserArtwork` registry before allowing these actions, preventing unauthorized API usage.
+        *   **Blogs**: Extended strict access control to `BlogService.java` and `BlogController.java`, ensuring only owners can delete their blogs. Updated `ArtistBlogs.jsx` to comply.
+        *   **Share Functionality**: Implemented "Share" buttons for Artworks and Blogs.
+            *   **Mechanism**: Copies the resource URL (e.g., `/artwork/{id}`) to the clipboard.
+            *   **UI**: Displays a confirmation Popup containing the copied link in a readonly input field.
+            *   **Component**: Updated `Popup.jsx` to support rendering JSX content (replaced `<p>` with `<div>` for the message container).
+        *   **Tag Search**: Enhanced `Explore.jsx` search logic to include tags. Users can now type a tag name (e.g., "digital") in the search bar, and it will match artworks containing that tag, in addition to matching title, description, and artist name. This completes "Module 2: Tagging and Categorization".
+        *   **Merged Artworks into Explore**: Deprecated the standalone "Artworks" page and merged its functionality (Feed + Upload) into the `Explore.jsx` page using a tabbed interface ("Explore Tags" and "All Artworks").
+            *   **Sidebar**: Removed "Artworks" link.
+            *   **Explore**: Added tabs. "Explore Tags" contains the tag cloud. "All Artworks" contains the artwork grid and the "Upload Artwork" button.
+            *   **Navigation**: Clicking a tag in "Explore Tags" now switches to the "All Artworks" tab and applies the tag filter.
+            *   **UI Polish**: updated tabs to have yellow underline style. Separated search bars for "Tags" and "Artworks" tabs. Applied hexagonal styling to search inputs. **Moved Upload Button** next to search bar.
+            *   **Scroll & Layout**: Implemented Custom Hive Scrollbar globally. Fixed oversized artwork cards by enforcing grid sizing (`minmax(300px, 1fr)`). Fixed scrolling issue in Artworks tab. **Tightened Artwork Card UI** (reduced padding, cleaner look). **Implemented Masonry Layout** for Artworks (CSS Columns).
+            *   **Filtering**: Changed multi-select filter logic to **AND** (inclusive of all selected tags). Updated header to display all active filters **(Deduplicated)**. **Implemented Sticky Filter Header** with glassmorphism.
+            *   **Empty State**: Refined Empty State (removed redundant button, fixed text visibility, centered layout).
+            *   **Profile**: Added **FilterSort (Sort by Newest/Oldest/Most Liked)** to Profile Artworks tab. Added **Upload Button** to Profile Artworks and Blogs tabs (visible only to owner).
+            *   **Cleanup**: Deleted `ArtworksFeed.jsx`.
+
+*   **Documentation**:
+    *   **System.md**: Updated "Server Verification" section to mandate running verification checks for **every prompt** involving code changes.
 
 *   **Button Standardization**:
     *   **Action**: Applied `.button-hexagon` class to primary buttons in `ProfileHeader`, `SignIn`, `Register`, `UploadArtwork`, `BlogUploadModal`, and `UploadBlog`.
@@ -226,3 +252,10 @@ Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where use
     *   **File Sizes**: Noted that `Profile.jsx` and `UploadArtwork.jsx` exceed the recommended 120-line limit. This is marked as technical debt for future refactoring.
     *   **Entity Alignment**: Verified that frontend components (`Profile`, `UploadArtwork`) correctly interact with backend entities (`Artist`, `Artwork`, `Tag`) as per the Data Model.
     *   **Theme Compliance**: Confirmed that the "Hive Theme" (hexagonal buttons, colors, fonts) is consistently applied across the audited components.
+    *   **Security Audit**: Verified `ArtworkController` and `BlogController` enforce `artistId` checks on delete/archive operations.
+    *   **Refactoring**: Moved inline styles from `Profile.jsx` (Interests section) to `Profile.css` in compliance with `System.md`.
+    *   **Refinement**: Removed "Upload Artwork" button from the "Archived" tab in Profile to reduce clutter.
+    *   **Alignment**: Ensured "Upload Artwork" button in the "Artworks" tab is right-aligned.
+    *   **Cleanup**: Fixed lint warnings in `ArtistBlogs.jsx` (added `useMemo` for sorting) and `FavoriteArtworks.jsx` (removed unused import).
+    *   **Consistency**: Refactored `BlogsFeed.jsx` to use `.delete-blog-btn` class and added the missing class definition to `ArtistBlogs.css` with correct "red trash icon" styles.
+    *   **Spacing**: Added `.artist-artworks-header` and `.artist-blogs-header` classes to their respective CSS files with `margin-bottom: 32px` to increase space below the upload buttons as requested.

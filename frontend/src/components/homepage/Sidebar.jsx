@@ -7,7 +7,6 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
         { id: 'home', icon: <Home size={20} />, title: 'Home' },
         { id: 'blogs', icon: <MessageSquare size={20} />, title: 'Blog' },
         { id: 'explore', icon: <Search size={20} />, title: 'Explore' },
-        { id: 'artworks', icon: <Image size={20} />, title: 'Artworks' },
         { id: 'profile', icon: <User size={20} />, title: 'Profile' },
         { id: 'settings', icon: <Settings size={20} />, title: 'Settings' }
     ];

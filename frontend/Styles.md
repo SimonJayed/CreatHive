@@ -248,3 +248,35 @@ z-index: 100;
 - **Borders should be 2px** for emphasis on the hive structure.
 - **Apply honeycomb background pattern** to sidebar and main content areas.
 - **Maintain letter-spacing** on branding elements for premium feel.
+
+## Tab Navigation
+Styles for tabbed interfaces (e.g., Profile page):
+```css
+.tab-button {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--secondaryTextColor);
+  cursor: pointer;
+  position: relative;
+  transition: color 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  font-family: var(--fontFamily);
+}
+
+.tab-button:hover,
+.tab-button.active {
+  color: var(--primaryColor);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--primaryColor);
+}
+```

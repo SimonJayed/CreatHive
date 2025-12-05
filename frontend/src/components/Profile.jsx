@@ -142,7 +142,7 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
 
     const handleArchive = async (artworkId, isArchived) => {
         try {
-            await archiveArtwork(artworkId, !isArchived);
+            await archiveArtwork(artworkId, !isArchived, viewingArtistId);
             fetchUserContent(viewingArtistId);
         } catch (error) {
             console.error("Failed to archive artwork", error);
@@ -173,24 +173,17 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
                 />
 
                 {/* Interests Section */}
-                <div className="profile-interests" style={{ padding: '0 24px 24px', borderTop: '1px solid var(--border-color)' }}>
-                    <h3 style={{ fontSize: '16px', marginBottom: '12px', color: 'var(--text-color)' }}>Interests</h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                <div className="profile-interests">
+                    <h3 className="interests-title">Interests</h3>
+                    <div className="interests-list">
                         {likedTags.length > 0 ? (
                             likedTags.map(tag => (
-                                <span key={tag.tagId} className="tag-chip" style={{
-                                    backgroundColor: 'var(--secondary-color)',
-                                    color: 'var(--primary-color)',
-                                    padding: '6px 12px',
-                                    borderRadius: '20px',
-                                    fontSize: '14px',
-                                    fontWeight: '500'
-                                }}>
+                                <span key={tag.tagId} className="tag-chip">
                                     {tag.name}
                                 </span>
                             ))
                         ) : (
-                            <p style={{ color: '#888', fontSize: '14px' }}>No interests selected yet.</p>
+                            <p className="no-interests">No interests selected yet.</p>
                         )}
                     </div>
                 </div>
@@ -224,6 +217,7 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
                         Archived
                     </button>
                 )}
+
             </div>
 
             {/* Tab Content */}
@@ -234,7 +228,7 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
                             artworks={userArtworks}
                             onNavigate={onNavigate}
                             isOwner={isOwner}
-                            onArchive={(id) => handleArchive(id, false)}
+                            onArchive={isOwner ? (id) => handleArchive(id, false) : null}
                         />
                     </div>
                 )}
@@ -254,11 +248,12 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
                             artworks={archivedArtworks}
                             onNavigate={onNavigate}
                             isOwner={isOwner}
-                            onArchive={(id) => handleArchive(id, true)}
+                            onArchive={isOwner ? (id) => handleArchive(id, true) : null}
                             isArchivedView={true}
                         />
                     </div>
                 )}
+
             </div>
         </div>
     );

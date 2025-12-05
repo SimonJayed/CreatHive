@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFavoriteArtworks, likeArtwork, favoriteArtwork } from '../../api/artworkApi';
+import { likeArtwork, favoriteArtwork } from '../../api/artworkApi';
 import ArtworkCard from '../artworks/ArtworkCard';
 import '../../styles/FavoriteArtworks.css';
 
@@ -41,7 +41,7 @@ function FavoriteArtworks({ favorites: initialFavorites }) {
 
     return (
         <div className="favorite-artworks-container">
-            <h3 className="favorites-title">My Favorites</h3>
+
             <div className="artworks-masonry">
                 {favorites.length > 0 ? (
                     favorites.map((artwork) => (

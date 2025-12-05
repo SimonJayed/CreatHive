@@ -2,6 +2,13 @@
     padding: var(--card-padding, 20px);
 }
 
+.artist-blogs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
 .blog-list {
     display: flex;
     flex-direction: column;
@@ -58,6 +65,24 @@
     font-size: 12px;
     color: var(--secondary-text-color);
     font-family: var(--font-family);
+}
+
+.delete-blog-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.delete-blog-btn:hover {
+    color: var(--danger-hover);
+    transform: scale(1.1);
 }
 
 .blog-title {
@@ -163,20 +188,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.no-blogs-icon {
-    color: var(--primary-color);
-    margin-bottom: 16px;
-    opacity: 0.8;
-}
-
-.no-blogs-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-color);
-    margin: 0 0 8px 0;
-    font-family: var(--font-family);
 }
 
 .no-blogs-text {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BlogsFeed from './blogs/BlogsFeed';
 import UploadBlog from './UploadBlog';
-import ArtworksFeed from './artworks/ArtworksFeed';
 import UploadArtwork from './UploadArtwork';
 import Explore from './Explore';
 import Profile from './Profile';
@@ -17,7 +16,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         const path = window.location.pathname.substring(1);
         const parts = path.split('/');
         const mainTab = parts[0];
-        const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'artworks', 'upload-artwork', 'profile', 'settings'];
+        const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings'];
         return validTabs.includes(mainTab) ? mainTab : 'home';
     });
 
@@ -47,7 +46,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
             const path = window.location.pathname.substring(1);
             const parts = path.split('/');
             const mainTab = parts[0];
-            const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'artworks', 'upload-artwork', 'profile', 'settings'];
+            const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings'];
             if (validTabs.includes(mainTab)) {
                 setActiveTabState(mainTab);
                 if (mainTab === 'profile' && parts[1]) {
@@ -77,9 +76,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
             case 'upload-blog':
                 return <UploadBlog artistData={artistData} />;
             case 'explore':
-                return <Explore currentUser={artistData} />;
-            case 'artworks':
-                return <ArtworksFeed onNavigate={setActiveTab} />;
+                return <Explore currentUser={artistData} onNavigate={setActiveTab} />;
             case 'upload-artwork':
                 return <UploadArtwork artistData={artistData} onNavigate={setActiveTab} />;
             case 'profile':

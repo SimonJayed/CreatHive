@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.appdev.siventin.lugatimang3.entity.ArtworkEntity;
+import com.appdev.siventin.lugatimang3.entity.ArtistEntity;
 import com.appdev.siventin.lugatimang3.repository.ArtworkRepository;
 import com.appdev.siventin.lugatimang3.repository.UserArtworkRepository;
+import com.appdev.siventin.lugatimang3.repository.ArtistRepository;
 import com.appdev.siventin.lugatimang3.entity.UserArtworkEntity;
 
 @Service
@@ -22,6 +24,9 @@ public class ArtworkService {
 
     @Autowired
     UserArtworkRepository userArtworkRepository;
+
+    @Autowired
+    ArtistRepository artistRepository;
 
     public ArtworkService() {
     }
@@ -172,7 +177,16 @@ public class ArtworkService {
         }
     }
 
-    public ArtworkEntity archiveArtwork(int artworkId, boolean isArchived) {
+    public ArtworkEntity archiveArtwork(int artworkId, boolean isArchived, int requestingArtistId) {
+        // Verify ownership
+        com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey key = new com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey(
+                artworkId, requestingArtistId);
+
+        if (!userArtworkRepository.existsById(key)) {
+            throw new IllegalArgumentException(
+                    "Unauthorized: User " + requestingArtistId + " does not own artwork " + artworkId);
+        }
+
         ArtworkEntity artwork = awrepo.findById(artworkId)
                 .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
         artwork.setArchived(isArchived);
@@ -182,8 +196,27 @@ public class ArtworkService {
     // Delete
     @SuppressWarnings("unused")
     // Delete
-    public String deleteArtwork(int artworkId) {
+    // Delete
+    public String deleteArtwork(int artworkId, int requestingArtistId) {
         String msg = "";
+
+        // Verify ownership (Skip if requestingArtistId is -1 for internal/admin calls
+        // if needed, OR force it)
+        // For strictness, if passing 0 or negative, maybe allowing it if called
+        // internally?
+        // But for this user request "checks if the artwork belongs to this user", we
+        // enforce it.
+        // NOTE: ArtistService cascading delete calls this. It might query by ID.
+        // If ArtistService calls this, it knows the artistId.
+
+        if (requestingArtistId > 0) {
+            com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey key = new com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey(
+                    artworkId, requestingArtistId);
+            if (!userArtworkRepository.existsById(key)) {
+                return "Unauthorized: User " + requestingArtistId + " does not own artwork " + artworkId;
+            }
+        }
+
         if (awrepo.existsById(artworkId)) {
             // 1. Delete from UserArtwork (Link to Artist)
             List<UserArtworkEntity> userArtworks = userArtworkRepository.findAll().stream()
@@ -294,7 +327,38 @@ public class ArtworkService {
                 .map(fav -> fav.getId().getArtworkId())
                 .collect(Collectors.toList());
 
-        return awrepo.findAllById(artworkIds);
+        List<ArtworkEntity> artworks = awrepo.findAllById(artworkIds);
+
+        // Populate artist for each artwork
+        for (ArtworkEntity artwork : artworks) {
+            // Find artist ID from UserArtwork
+            userArtworkRepository.findAll().stream()
+                    .filter(ua -> ua.getId().getArtworkId() == artwork.getArtworkId())
+                    .findFirst()
+                    .ifPresent(ua -> {
+                        artistRepository.findById(ua.getId().getArtistId())
+                                .ifPresent(artist -> artwork.setArtist(artist));
+                    });
+
+            // Also populate displayTags as usual
+            if (artwork.getArtworkTags() != null) {
+                List<com.appdev.siventin.lugatimang3.entity.TagEntity> tags = artwork.getArtworkTags().stream()
+                        .map(at -> at.getTag())
+                        .collect(Collectors.toList());
+                artwork.setDisplayTags(tags);
+            } else {
+                artwork.setDisplayTags(java.util.Collections.emptyList());
+            }
+
+            // And isLiked status
+            if (userId > 0) {
+                com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
+                        artwork.getArtworkId(), userId);
+                artwork.setIsLiked(artworkLikesRepository.existsById(key));
+            }
+        }
+
+        return artworks;
     }
 
     public List<ArtworkEntity> getArtworksByTagId(int tagId, int userId) {

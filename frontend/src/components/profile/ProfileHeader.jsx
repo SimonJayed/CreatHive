@@ -6,7 +6,8 @@ function ProfileHeader({
     isEditing,
     onEditToggle,
     onImageUpload,
-    onNameChange
+    onNameChange,
+    readOnly
 }) {
     return (
         <div className="profile-header">
@@ -47,9 +48,12 @@ function ProfileHeader({
             </div>
 
             {/* Edit/Save Button */}
-            <button onClick={onEditToggle} className="button-hexagon edit-button">
-                {isEditing ? 'Save Changes' : 'Edit Profile'}
-            </button>
+            {/* Edit/Save Button */}
+            {!readOnly && (
+                <button onClick={onEditToggle} className="button-hexagon edit-button">
+                    {isEditing ? 'Save Changes' : 'Edit Profile'}
+                </button>
+            )}
         </div>
     );
 }

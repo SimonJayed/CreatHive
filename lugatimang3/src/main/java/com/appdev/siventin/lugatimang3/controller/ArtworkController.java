@@ -52,8 +52,8 @@ public class ArtworkController {
     }
 
     @DeleteMapping("/deleteArtwork/{artworkId}")
-    public String deleteArtwork(@PathVariable int artworkId) {
-        return awservice.deleteArtwork(artworkId);
+    public String deleteArtwork(@PathVariable int artworkId, @RequestParam int artistId) {
+        return awservice.deleteArtwork(artworkId, artistId);
     }
 
     @PutMapping("/likeArtwork/{artworkId}/{userId}")
@@ -77,8 +77,9 @@ public class ArtworkController {
     }
 
     @PutMapping("/archiveArtwork/{artworkId}")
-    public ArtworkEntity archiveArtwork(@PathVariable int artworkId, @RequestParam boolean isArchived) {
-        return awservice.archiveArtwork(artworkId, isArchived);
+    public ArtworkEntity archiveArtwork(@PathVariable int artworkId, @RequestParam boolean isArchived,
+            @RequestParam int artistId) {
+        return awservice.archiveArtwork(artworkId, isArchived, artistId);
     }
 
     @GetMapping("/getArtworksByTagId/{tagId}")

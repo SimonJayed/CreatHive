@@ -91,8 +91,18 @@ public class BlogService {
         }
     }
 
-    public String deleteBlog(int blogId) {
+    public String deleteBlog(int blogId, int requestingArtistId) {
         String msg = "";
+
+        // Verify ownership
+        if (requestingArtistId > 0) {
+            com.appdev.siventin.lugatimang3.entity.UserBlogEntity.UserBlogKey key = new com.appdev.siventin.lugatimang3.entity.UserBlogEntity.UserBlogKey(
+                    blogId, requestingArtistId);
+
+            if (!userBlogRepository.existsById(key)) {
+                return "Unauthorized: User " + requestingArtistId + " does not own blog " + blogId;
+            }
+        }
 
         if (brepo.existsById(blogId)) {
             // 1. Delete from UserBlog (Link to Artist)

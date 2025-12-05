@@ -191,6 +191,24 @@ function BlogsFeed({ onNavigate, currentUser }) {
         );
     };
 
+    const handleShare = (blogId) => {
+        const url = `${window.location.origin}/blog/${blogId}`;
+        navigator.clipboard.writeText(url);
+        showAlert(
+            "Share Blog",
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <p style={{ margin: 0 }}>Link copied to clipboard!</p>
+                <input
+                    type="text"
+                    value={url}
+                    readOnly
+                    className="input-hexagon"
+                    style={{ width: '100%', padding: '8px' }}
+                />
+            </div>
+        );
+    };
+
     if (loading) return <div style={{ color: 'var(--primary-color)', textAlign: 'center', marginTop: '50px' }}>Loading blogs...</div>;
 
     return (
@@ -250,16 +268,8 @@ function BlogsFeed({ onNavigate, currentUser }) {
                                 {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === blog.artist?.artistId && (
                                     <button
                                         onClick={() => handleDelete(blog.blogId)}
-                                        style={{
-                                            marginLeft: 'auto',
-                                            background: 'none',
-                                            border: 'none',
-                                            color: 'var(--danger-color)',
-                                            cursor: 'pointer',
-                                            padding: '4px'
-                                        }}
+                                        className="delete-blog-btn icon-hexagon"
                                         title="Delete Blog"
-                                        className="icon-hexagon"
                                     >
                                         <Trash2 size={18} />
                                     </button>
@@ -283,7 +293,7 @@ function BlogsFeed({ onNavigate, currentUser }) {
                                 <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
                                     <span className="icon-hexagon"><MessageCircle size={18} /></span> Comments
                                 </button>
-                                <button className="blog-action"><span className="icon-hexagon"><Share2 size={18} /></span> Share</button>
+                                <button className="blog-action" onClick={() => handleShare(blog.blogId)}><span className="icon-hexagon"><Share2 size={18} /></span> Share</button>
                             </div>
 
                             {/* Comments Section */}

@@ -139,6 +139,18 @@ To fully integrate the new components, they must be added to the application's r
 
 This ensures consistency across documentation.
 
+## Security & Verification Protocols
+
+### 1. Server Verification (Agent Capability)
+- **Capability**: The AI agent provides verification by determining if code works through running the backend (`mvnw clean compile`, `mvnw spring-boot:run`) and frontend (`npm start`) servers.
+- **Protocol**: **MANDATORY**: For **EVERY PROMPT** involving code changes, the agent must run the servers (or at least `mvnw clean compile`) to verify the code works and check for compilation errors.
+- **Debugging**: If errors are found, investigate the terminal output and fix them immediately. Do not mark tasks as complete until verification passes.
+
+### 2. Strict Access Control
+- **Strict Ownership**: All modification actions (Delete, Update, Archive) on User Generated Content (Artworks, Blogs) MUST verify that the requesting user (`artistId`) is the owner of the resource.
+- **Backend Verification**: The backend services (`ArtworkService`, `BlogService`) must explicitly query the ownership relation (e.g., `UserArtworkRepository`, `UserBlogRepository`) before executing these actions. Do not rely solely on frontend logic.
+- **Frontend Prevention**: Modification UI elements (Edit/Delete buttons) must be hidden from non-owners (`isOwner` or `!readOnly` checks).
+
 ## Authentication & Session Management
 **Token-based authentication is required for secure user sessions.**
 -   **Tokens/Sessions**: The application uses token-based authentication (e.g., JWT) to manage user sessions. Tokens should be stored securely (e.g., in `localStorage` or `sessionStorage`).
@@ -169,9 +181,9 @@ This ensures consistency across documentation.
     -   Transaction 3: Students can remove/delete a post. **[Implemented]**
     -   Transaction 4: Students can archive/un-list a post. **[Implemented]**
 -   **Module 2: Tagging and Categorization**
-    -   Transaction 1: System allows searching and filtering based on tags. **[Partially Implemented]** (UI exists in `Explore.jsx`, but logic is static/missing)
+    -   Transaction 1: System allows searching and filtering based on tags. **[Implemented]**
     -   Transaction 2: Students can assign tags to their uploads. **[Implemented]**
-    -   Transaction 3: Students can search using tags. **[Partially Implemented]**
+    -   Transaction 3: Students can search using tags. **[Implemented]**
 
 ### Objective 3: Forums & Discussions
 **Goal**: Allow users to participate and engage in forums.

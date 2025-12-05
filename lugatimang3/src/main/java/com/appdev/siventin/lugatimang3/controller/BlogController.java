@@ -48,8 +48,8 @@ public class BlogController {
     }
 
     @DeleteMapping("/deleteBlog/{blogId}")
-    public String deleteBlog(@PathVariable int blogId) {
-        return bservice.deleteBlog(blogId);
+    public String deleteBlog(@PathVariable int blogId, @RequestParam int artistId) {
+        return bservice.deleteBlog(blogId, artistId);
     }
 
     @PutMapping("/likeBlog/{blogId}/{userId}")

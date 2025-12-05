@@ -10,7 +10,8 @@ const FilterSort = ({
     filterOptions = [], // Array of { id, name } for tags
     activeFilters = [],
     onFilterChange,
-    onClear
+    onClear,
+    showFilter = true
 }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const filterRef = useRef(null);
@@ -59,7 +60,7 @@ const FilterSort = ({
             </div>
 
             {/* Filter Section (Artworks only) */}
-            {type === 'artwork' && (
+            {type === 'artwork' && showFilter && (
                 <div className="filter-section" ref={filterRef}>
                     <button
                         className={`filter-toggle-btn ${activeFilters.length > 0 ? 'active' : ''}`}
