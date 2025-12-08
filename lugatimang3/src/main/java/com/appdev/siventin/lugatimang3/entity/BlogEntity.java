@@ -63,6 +63,28 @@ public class BlogEntity {
         this.datePosted = datePosted;
     }
 
+    @Column(name = "is_edited")
+    private Boolean isEdited = false;
+
+    @Column(name = "date_edited")
+    private java.sql.Timestamp dateEdited;
+
+    public Boolean getIsEdited() {
+        return isEdited;
+    }
+
+    public void setIsEdited(Boolean isEdited) {
+        this.isEdited = isEdited;
+    }
+
+    public java.sql.Timestamp getDateEdited() {
+        return dateEdited;
+    }
+
+    public void setDateEdited(java.sql.Timestamp dateEdited) {
+        this.dateEdited = dateEdited;
+    }
+
     @Column(name = "like_count")
     private Integer likeCount = 0;
 
@@ -83,5 +105,16 @@ public class BlogEntity {
 
     public void setIsLiked(boolean isLiked) {
         this.isLiked = isLiked;
+    }
+
+    @jakarta.persistence.OneToMany(mappedBy = "blog", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<BlogTagEntity> blogTags;
+
+    public java.util.List<BlogTagEntity> getBlogTags() {
+        return blogTags;
+    }
+
+    public void setBlogTags(java.util.List<BlogTagEntity> blogTags) {
+        this.blogTags = blogTags;
     }
 }

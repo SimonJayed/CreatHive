@@ -1,3 +1,4 @@
+
 const BASE_URL = "http://localhost:8080/blogs";
 
 export async function getAllBlogs(userId = 0) {
@@ -52,4 +53,30 @@ export async function likeBlog(blogId, userId) {
     method: "PUT",
   });
   return res.json();
+}
+
+export async function insertBlogTag(blogId, tagId) {
+  const res = await fetch(`${BASE_URL}/insertBlogTag?blogId=${blogId}&tagId=${tagId}`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error("Failed to link tag to blog");
+}
+
+export async function getBlogsByTagId(tagId, userId = 0) {
+  const res = await fetch(`${BASE_URL}/getBlogsByTagId/${tagId}?userId=${userId}`);
+  return res.json();
+}
+
+export async function getTagsByBlogId(blogId) {
+  const res = await fetch(`${BASE_URL}/getTagsByBlogId/${blogId}`);
+  return res.json();
+}
+
+export async function updateBlogTags(blogId, tagIds) {
+  const res = await fetch(`${BASE_URL}/updateBlogTags?blogId=${blogId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(tagIds),
+  });
+  if (!res.ok) throw new Error("Failed to update blog tags");
 }

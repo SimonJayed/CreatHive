@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, MessageSquare, Search, Image, User, Settings, LogOut, Hexagon } from 'lucide-react';
+import { Home, MessageSquare, Search, Image, User, Settings, LogOut, Hexagon, Bot, BookOpen } from 'lucide-react';
 import './Sidebar.css';
 
 function Sidebar({ activeTab, setActiveTab, onLogout }) {
@@ -7,6 +7,8 @@ function Sidebar({ activeTab, setActiveTab, onLogout }) {
         { id: 'home', icon: <Home size={20} />, title: 'Home' },
         { id: 'blogs', icon: <MessageSquare size={20} />, title: 'Blog' },
         { id: 'explore', icon: <Search size={20} />, title: 'Explore' },
+        { id: 'ai-studio', icon: <Bot size={20} />, title: 'AI Studio' },
+        { id: 'learning', icon: <BookOpen size={20} />, title: 'Learning' },
         { id: 'profile', icon: <User size={20} />, title: 'Profile' },
         { id: 'settings', icon: <Settings size={20} />, title: 'Settings' }
     ];

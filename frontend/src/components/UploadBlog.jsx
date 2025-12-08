@@ -1,14 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePopup } from '../context/PopupContext';
-import { insertBlog } from '../api/blogApi';
+import { insertBlog, updateBlog, insertBlogTag, getTagsByBlogId, updateBlogTags } from '../api/blogApi';
+import { getAllTags } from '../api/tagApi';
+import TagSelector from './common/TagSelector';
 import '../styles/UploadBlog.css';
 
-function UploadBlog({ artistData }) {
+function UploadBlog({ artistData, onNavigate, blogToEdit = null }) {
     const { showAlert } = usePopup();
     const [formData, setFormData] = useState({
         title: '',
         content: ''
     });
+    const [allTags, setAllTags] = useState([]);
+    const [selectedTagNames, setSelectedTagNames] = useState([]);
+    const [isEditMode, setIsEditMode] = useState(false);
+
+    useEffect(() => {
+        // Fetch all available tags for ID lookup
+        getAllTags().then(tags => setAllTags(tags || []));
+
+        if (blogToEdit) {
+            setIsEditMode(true);
+            setFormData({
+                title: blogToEdit.title,
+                content: blogToEdit.content
+            });
+            // Fetch existing tags for this blog
+            getTagsByBlogId(blogToEdit.blogId).then(tags => {
+                setSelectedTagNames(tags.map(t => t.name));
+            });
+        }
+    }, [blogToEdit]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,37 +44,66 @@ function UploadBlog({ artistData }) {
         }
 
         try {
-            // Include artistId in the blog data
-            const blogData = {
-                ...formData,
-                artistId: artistData?.artistId || 0
-            };
-            console.log("Uploading blog with data:", blogData);
-            console.log("Artist data:", artistData);
             const artistId = artistData?.artistId || 0;
             if (artistId === 0) {
                 showAlert("Login Required", "You must be logged in to upload a blog.");
                 return;
             }
-            await insertBlog(blogData, artistId);
-            showAlert("Success", "Blog uploaded successfully!");
+
+            // Resolve Tag IDs
+            const tagIdsToSubmit = [];
+            for (const tagName of selectedTagNames) {
+                const existingTag = allTags.find(t => t.name.toLowerCase() === tagName.toLowerCase());
+                if (existingTag) {
+                    tagIdsToSubmit.push(existingTag.tagId);
+                } else {
+                    // Tag creation not supported in Blog for now, or could iterate loop to create.
+                    // Ignoring new tags for now as per previous logic decision to keep it simple unless requested.
+                }
+            }
+
+            if (isEditMode) {
+                await updateBlog(blogToEdit.blogId, formData);
+
+                // Update Tags
+                await updateBlogTags(blogToEdit.blogId, tagIdsToSubmit);
+
+                showAlert("Success", "Blog updated successfully!");
+            } else {
+                const blogData = {
+                    ...formData,
+                    artistId: artistId
+                };
+                const newBlog = await insertBlog(blogData, artistId);
+
+                // Insert Tags
+                if (tagIdsToSubmit.length > 0) {
+                    await Promise.all(tagIdsToSubmit.map(tagId => insertBlogTag(newBlog.blogId, tagId)));
+                }
+
+                showAlert("Success", "Blog uploaded successfully!");
+            }
+
             setFormData({ title: '', content: '' });
+            setSelectedTagNames([]);
+            if (onNavigate) onNavigate('blogs');
         } catch (error) {
-            console.error('Failed to upload blog:', error);
-            showAlert("Error", "Failed to upload blog. Please try again.");
+            console.error('Failed to save blog:', error);
+            showAlert("Error", "Failed to save blog. Please try again.");
         }
     };
 
     const handleCancel = () => {
         setFormData({ title: '', content: '' });
+        if (onNavigate) onNavigate('blogs');
     };
 
     return (
         <div className="upload-blog-container">
             <div className="upload-header">
-                <h1 className="upload-title">Upload Blog</h1>
+                <h1 className="upload-title">{isEditMode ? 'Edit Blog' : 'Upload Blog'}</h1>
                 <p className="upload-subtitle">
-                    Share your creative work with the Hiveminds community!
+                    {isEditMode ? 'Update your thoughts...' : 'Share your creative work with the Hiveminds community!'}
                 </p>
             </div>
 
@@ -84,6 +135,16 @@ function UploadBlog({ artistData }) {
                         />
                     </div>
 
+                    {/* Tags Selection */}
+                    <div className="form-group">
+                        <label className="form-label">Tags</label>
+                        <TagSelector
+                            selectedTags={selectedTagNames}
+                            onTagSelect={setSelectedTagNames}
+                            allowCreation={false}
+                        />
+                    </div>
+
                 </div>
 
                 {/* Buttons */}
@@ -92,7 +153,7 @@ function UploadBlog({ artistData }) {
                         Cancel
                     </button>
                     <button onClick={handleSubmit} className="button-hexagon btn-submit">
-                        Upload Blog
+                        {isEditMode ? 'Update Blog' : 'Upload Blog'}
                     </button>
                 </div>
             </div>

@@ -1,6 +1,11 @@
 # System Documentation
 
+
 **IMPORTANT**: All code changes must follow both `System.md` AND `Styles.md` guidelines.
+
+**Rule: Scan Before Creation**
+Before creating any new component or code, you MUST use `list_dir` and `grep_search` to scan for existing similar components to avoid duplication.
+
 
 ## Data Model
 **Artists are the Users in this application.**
@@ -116,6 +121,7 @@ To fully integrate the new components, they must be added to the application's r
     *   Replace inline styles with `className`.
     *   Verify functionality remains identical.
     *   **Verification**: Always check if users' artworks and blogs are showing up properly where they should be (Profile, Blogs Feed, and Artwork pages).
+    *   **Profile Page Reuse**: The Profile page MUST reuse the existing `ArtworkCard` (from Explore) and `BlogCard` (from Blogs Feed) components. Do not duplicate card markup. The Profile should only pass a filter (e.g., `artistId`) to show the specific user's work, but the UI component itself must be identical.
 
 ## Iconography
 **Library**: `lucide-react`
@@ -188,9 +194,9 @@ This ensures consistency across documentation.
 ### Objective 3: Forums & Discussions
 **Goal**: Allow users to participate and engage in forums.
 -   **Module 1: Forum & Thread Management**
-    -   Transaction 1: Users can view discussion forums categorized by topics. **[Implemented]** (via Blogs)
-    -   Transaction 2: Users can create new threads and post replies. **[Implemented]** (Blogs & Comments)
-    -   Transaction 3: Users can edit or delete their own posts within a limited time. **[Implemented]** (Backend endpoints exist)
+    -   Transaction 1: Users can view discussion forums categorized by topics. **[Implemented]**
+    -   Transaction 2: Users can create new threads and post replies. **[Implemented]**
+    -   Transaction 3: Users can edit or delete their own posts within a limited time. **[Implemented]**
 -   **Module 2: Moderation & Reporting**
     -   Transaction 1: Users can report inappropriate content. **[Not Started]**
     -   Transaction 2: Moderators can review reports and take action. **[Not Started]**
@@ -212,7 +218,7 @@ This ensures consistency across documentation.
     -   Transaction 2: Students can access tutorials and resources. **[Not Started]**
 -   **Module 2: Community Gallery**
     -   Transaction 1: Students can post to public gallery. **[Implemented]**
-    -   Transaction 2: Students can browse, like, comment, and share. **[Partially Implemented]** (Browse/Like/Comment done, Share pending)
+    -   Transaction 2: Students can browse, like, comment, and share. **[Implemented]**
 
 ### Objective 6: Resources & Learning
 **Goal**: Provide access to art resources and learning materials.

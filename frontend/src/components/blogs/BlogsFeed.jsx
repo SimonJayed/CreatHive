@@ -1,33 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { usePopup } from '../../context/PopupContext';
-import { getAllBlogs, likeBlog, deleteBlog } from '../../api/blogApi';
+import { getAllBlogs, likeBlog, deleteBlog, getBlogsByTagId } from '../../api/blogApi';
+import { getAllTags } from '../../api/tagApi';
 import { getAllUserBlogs } from '../../api/userBlogApi';
 import { getAllArtists } from '../../api/artistApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
 import { getAllUserComments } from '../../api/userCommentApi';
-import { Hexagon, MessageCircle, Share2, FileQuestion, ArrowUpDown, Trash2 } from 'lucide-react';
-import '../../styles/ArtistBlogs.css'; // Reuse styles
+import { Hexagon, MessageCircle, Share2, FileQuestion, ArrowUpDown, Trash2, Edit2 } from 'lucide-react';
+import '../../styles/ArtistBlogs.css'; // Reuse basic card styles
+import '../../styles/BlogsFeed.css'; // New dedicated styles
+import '../../styles/TagSelector.css'; // Shared tag styles
+
+import SearchBar from '../common/SearchBar'; // Import generic SearchBar
+import FilterSort from '../common/FilterSort';
+import TagList from '../common/TagList';
+import BlogCard from './BlogCard';
 
 function BlogsFeed({ onNavigate, currentUser }) {
     const { showAlert, showConfirm } = usePopup();
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
+    const [searchQuery, setSearchQuery] = useState(''); // New State for Search
     const [activeCommentBlogId, setActiveCommentBlogId] = useState(null);
     const [commentText, setCommentText] = useState('');
     const [commentsMap, setCommentsMap] = useState({}); // blogId -> comments[]
     const [artistsMap, setArtistsMap] = useState({}); // artistId -> Artist
     const [commentUserMap, setCommentUserMap] = useState({}); // commentId -> artistId
 
+    // Tag Filtering State
+    const [allTags, setAllTags] = useState([]);
+    const [selectedTagIds, setSelectedTagIds] = useState([]); // Changed to Array
+
+    useEffect(() => {
+        // Fetch Tags
+        getAllTags().then(tags => setAllTags(tags || []));
+    }, []);
+
     useEffect(() => {
         fetchData();
-    }, [currentUser]);
+    }, [currentUser]); // Removed selectedTagIds dependency as we filter client side for multi-select
 
     const fetchData = async () => {
+        setLoading(true);
         try {
             const userId = currentUser?.artistId || 0;
+
+            // Always fetch ALL blogs to enable client-side multi-filtering
+            // This is acceptable for the expected scale of "Community Blogs"
+            const blogsPromise = getAllBlogs(userId);
+
             const [blogsData, userBlogsData, artistsData, userCommentsData] = await Promise.all([
-                getAllBlogs(userId),
+                blogsPromise,
                 getAllUserBlogs(),
                 getAllArtists(),
                 getAllUserComments()
@@ -63,7 +87,6 @@ function BlogsFeed({ onNavigate, currentUser }) {
                 };
             });
 
-            console.log("Fetched blogs:", enrichedBlogs);
             setBlogs(enrichedBlogs);
         } catch (error) {
             console.error("Failed to fetch blogs feed", error);
@@ -82,6 +105,38 @@ function BlogsFeed({ onNavigate, currentUser }) {
             return dateA - dateB;
         }
     });
+
+    const filteredAndSortedBlogs = sortedBlogs
+        .filter(blog => {
+            // 1. Search Query
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                if (!(
+                    blog.title?.toLowerCase().includes(query) ||
+                    blog.content?.toLowerCase().includes(query) ||
+                    blog.artist?.name?.toLowerCase().includes(query)
+                )) {
+                    return false;
+                }
+            }
+
+            // 2. Tag Filter (Multi-select) - AND Logic (must have ALL selected tags)
+            if (selectedTagIds.length > 0) {
+                if (!blog.blogTags || blog.blogTags.length === 0) return false;
+
+                // Get tag names from blogTags (BlogTagEntity -> tag -> name)
+                const blogTagNames = blog.blogTags.map(bt => bt.tag?.name);
+
+                // Get selected tag names
+                const selectedTagNames = selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name);
+
+                // Check if blog has all selected tags
+                const hasAllTags = selectedTagNames.every(name => blogTagNames.includes(name));
+                if (!hasAllTags) return false;
+            }
+
+            return true;
+        });
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Unknown Date';
@@ -122,16 +177,14 @@ function BlogsFeed({ onNavigate, currentUser }) {
                 if (b.blogId === blogId) {
                     return {
                         ...b,
-                        // Ensure we keep the enriched artist data
                         likeCount: updatedBlog.likeCount,
-                        isLiked: updatedBlog.isLiked // Backend now returns this
+                        isLiked: updatedBlog.isLiked
                     };
                 }
                 return b;
             }));
         } catch (error) {
             console.error("Failed to like blog", error);
-            // Revert on error
             fetchData();
         }
     };
@@ -191,6 +244,14 @@ function BlogsFeed({ onNavigate, currentUser }) {
         );
     };
 
+    const handleEdit = (blog) => {
+        // Assuming onNavigate allows passing data, otherwise this needs App.js support.
+        // Calling onNavigate with data object if supported, or assuming some other state management.
+        // If onNavigate only accepts string, this might fail to pass data.
+        // Logic for now:
+        if (onNavigate) onNavigate('upload-blog', { blogToEdit: blog });
+    };
+
     const handleShare = (blogId) => {
         const url = `${window.location.origin}/blog/${blogId}`;
         navigator.clipboard.writeText(url);
@@ -212,139 +273,93 @@ function BlogsFeed({ onNavigate, currentUser }) {
     if (loading) return <div style={{ color: 'var(--primary-color)', textAlign: 'center', marginTop: '50px' }}>Loading blogs...</div>;
 
     return (
-        <div className="blogs-feed-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <h2 style={{ color: 'var(--primary-color)', margin: 0, fontFamily: 'var(--font-family)', letterSpacing: 'var(--letter-spacing-wide)' }}>Community Blogs</h2>
-
-                    {/* Sort Filter */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--primary-color)' }}>
-                        <ArrowUpDown className="icon-hexagon" size={16} />
-                        <span>Sort by:</span>
-                        <select
-                            value={sortOrder}
-                            onChange={(e) => setSortOrder(e.target.value)}
-                            className="input-hexagon"
-                            style={{
-                                padding: '4px 8px',
-                                width: 'auto',
-                                backgroundColor: 'transparent',
-                                color: 'var(--primary-color)',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontWeight: '600',
-                                clipPath: 'none' // Override clip-path for select to avoid cutting off text
-                            }}
-                        >
-                            <option value="newest" style={{ color: 'black' }}>Newest First</option>
-                            <option value="oldest" style={{ color: 'black' }}>Oldest First</option>
-                        </select>
-                    </div>
+        <div className="blogs-feed-container">
+            {/* Search & Create Header (Top Row) */}
+            <div className="search-bar-container" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{ flex: 1 }}>
+                    <SearchBar
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search discussions..."
+                    />
                 </div>
-
                 <button
                     onClick={() => onNavigate('upload-blog')}
                     className="button-hexagon"
+                    style={{ whiteSpace: 'nowrap', height: '48px', display: 'flex', alignItems: 'center' }}
                 >
                     + Create Blog
                 </button>
             </div>
 
+            {/* Filter Sort Bar (Dark Bar) */}
+            <div className="blogs-filter-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+                    <FilterSort
+                        type="blog"
+                        sortOptions={[
+                            { label: 'Newest First', value: 'newest' },
+                            { label: 'Oldest First', value: 'oldest' },
+                        ]}
+                        activeSort={sortOrder}
+                        onSortChange={setSortOrder}
+                        showFilter={true}
+                        filterOptions={allTags}
+                        activeFilters={selectedTagIds}
+                        onFilterChange={setSelectedTagIds}
+                        onClear={() => {
+                            setSortOrder('newest');
+                            setSelectedTagIds([]);
+                            setSearchQuery('');
+                        }}
+                    />
+
+                    {selectedTagIds.length > 0 && (
+                        <span style={{ color: 'var(--primary-color)', fontSize: '14px' }}>
+                            Filtering by: <b>
+                                {selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name).join(', ')}
+                            </b>
+                        </span>
+                    )}
+                </div>
+            </div>
+
             <div className="blog-list">
-                {sortedBlogs.length > 0 ? (
-                    sortedBlogs.map((blog) => (
-                        <div key={blog.blogId} className="card-hexagon blog-card">
-                            {/* Header */}
-                            <div className="blog-header">
-                                <img
-                                    src={blog.artist?.profileImage || 'https://via.placeholder.com/32'}
-                                    alt={blog.artist?.name}
-                                    className="blog-avatar"
-                                />
-                                <div className="blog-meta">
-                                    <span className="blog-author">{blog.artist?.name}</span>
-                                    <span className="blog-date">Posted {formatDate(blog.datePosted)}</span>
-                                </div>
-                                {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === blog.artist?.artistId && (
-                                    <button
-                                        onClick={() => handleDelete(blog.blogId)}
-                                        className="delete-blog-btn icon-hexagon"
-                                        title="Delete Blog"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Title */}
-                            <h4 className="blog-title">{blog.title}</h4>
-
-                            {/* Content */}
-                            <p className="blog-content">{blog.content}</p>
-
-                            {/* Footer */}
-                            <div className="blog-footer">
-                                <button className="blog-action" onClick={() => handleLike(blog.blogId)}>
-                                    <span className={`icon-hexagon ${blog.isLiked ? 'active' : ''}`}>
-                                        <Hexagon size={18} color={blog.isLiked ? "var(--primary-color)" : "currentColor"} fill={blog.isLiked ? "var(--primary-color)" : "none"} />
-                                    </span>
-                                    Like ({blog.likeCount || 0})
-                                </button>
-                                <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
-                                    <span className="icon-hexagon"><MessageCircle size={18} /></span> Comments
-                                </button>
-                                <button className="blog-action" onClick={() => handleShare(blog.blogId)}><span className="icon-hexagon"><Share2 size={18} /></span> Share</button>
-                            </div>
-
-                            {/* Comments Section */}
-                            {activeCommentBlogId === blog.blogId && (
-                                <div className="comments-section" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '2px solid var(--border-color)' }}>
-                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                                        <input
-                                            type="text"
-                                            value={commentText}
-                                            onChange={(e) => setCommentText(e.target.value)}
-                                            placeholder="Write a comment..."
-                                            className="input-hexagon"
-                                            style={{ flex: 1 }}
-                                        />
-                                        <button onClick={() => handleAddComment(blog.blogId)} className="button-hexagon" style={{ padding: '8px 16px' }}>Post</button>
-                                    </div>
-                                    <div className="comments-list">
-                                        {commentsMap[blog.blogId]?.map(comment => {
-                                            const commenterId = commentUserMap[comment.commentId];
-                                            const commenter = artistsMap[commenterId] || { name: 'Unknown', profileImage: null };
-                                            return (
-                                                <div key={comment.commentId} style={{ padding: '8px', borderBottom: '1px solid #f0f0f0', display: 'flex', gap: '10px' }}>
-                                                    <img
-                                                        src={commenter.profileImage || '/images/profile/default_profile.png'}
-                                                        alt={commenter.name}
-                                                        style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
-                                                    />
-                                                    <div>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                            <span style={{ fontWeight: '600', fontSize: '13px', fontFamily: 'var(--font-family)' }}>{commenter.name}</span>
-                                                            <span style={{ fontSize: '10px', color: '#999', fontFamily: 'var(--font-family)' }}>{formatDate(comment.datePosted)}</span>
-                                                        </div>
-                                                        <p style={{ margin: '4px 0 0', fontSize: '14px', fontFamily: 'var(--font-family)' }}>{comment.content}</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                {filteredAndSortedBlogs.length > 0 ? (
+                    filteredAndSortedBlogs.map((blog) => (
+                        <BlogCard
+                            key={blog.blogId}
+                            blog={blog}
+                            currentUser={currentUser}
+                            isOpen={activeCommentBlogId === blog.blogId}
+                            onToggle={(id) => toggleComments(id)}
+                            comments={commentsMap[blog.blogId]}
+                            onLike={handleLike}
+                            onShare={handleShare}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            onAddComment={handleAddComment}
+                            commentText={commentText}
+                            setCommentText={setCommentText}
+                            commentUserMap={commentUserMap}
+                            artistsMap={artistsMap}
+                            onTagClick={(tag) => {
+                                if (!selectedTagIds.includes(tag.tagId)) {
+                                    setSelectedTagIds([...selectedTagIds, tag.tagId]);
+                                }
+                            }}
+                            selectedTagIds={selectedTagIds}
+                        />
                     ))
                 ) : (
                     <div className="no-blogs-container">
                         <span className="no-blogs-icon"><FileQuestion size={48} /></span>
-                        <h3 className="no-blogs-title">No blogs yet</h3>
-                        <p className="no-blogs-text">Be the first to share your thoughts!</p>
+                        <h3 className="no-blogs-title">No blogs found</h3>
+                        <p className="no-blogs-text">Try adjusting your filters or search.</p>
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }
 

@@ -6,9 +6,10 @@ import { getAllUserComments } from '../../api/userCommentApi';
 import { getAllArtists } from '../../api/artistApi';
 import { Hexagon, MessageCircle, Share2, FileQuestion, Trash2 } from 'lucide-react';
 import FilterSort from '../common/FilterSort';
+import BlogCard from '../blogs/BlogCard';
 import '../../styles/ArtistBlogs.css';
 
-function ArtistBlogs({ blogs, artist, onNavigate }) {
+function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
     const { showAlert, showConfirm } = usePopup();
     // Sort blogs by most recent first
     const [sortOrder, setSortOrder] = useState('newest');
@@ -165,6 +166,10 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
         );
     };
 
+    const handleEdit = (blog) => {
+        if (onNavigate) onNavigate('upload-blog', { blogToEdit: blog });
+    };
+
     return (
         <div className="artist-blogs-container">
             <div className="artist-blogs-header">
@@ -194,93 +199,23 @@ function ArtistBlogs({ blogs, artist, onNavigate }) {
             {localBlogs.length > 0 ? (
                 <div className="blog-list">
                     {localBlogs.map((blog) => (
-                        <div key={blog.blogId} className="card-hexagon blog-card">
-                            {/* Header: Avatar, Name, Date */}
-                            <div className="blog-header">
-                                <img
-                                    src={artist?.profileImage || '/images/profile/default_profile.png'}
-                                    alt={artist?.name || 'Artist'}
-                                    className="blog-avatar"
-                                />
-                                <div className="blog-meta">
-                                    <span className="blog-author">{artist?.name || 'Artist'}</span>
-                                    <span className="blog-date">Posted {formatDate(blog.datePosted)}</span>
-                                </div>
-                                {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === artist?.artistId && (
-                                    <button
-                                        onClick={() => handleDelete(blog.blogId)}
-                                        className="delete-blog-btn icon-hexagon"
-                                        title="Delete Blog"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Title */}
-                            <h4 className="blog-title">
-                                {blog.title}
-                            </h4>
-
-                            {/* Content */}
-                            <p className="blog-content">
-                                {blog.content}
-                            </p>
-
-                            {/* Footer: Actions */}
-                            <div className="blog-footer">
-                                <button className="blog-action" onClick={() => handleLike(blog.blogId)}>
-                                    <span className={`icon-hexagon ${blog.isLiked ? 'active' : ''}`}>
-                                        <Hexagon size={18} color={blog.isLiked ? "var(--primary-color)" : "currentColor"} fill={blog.isLiked ? "var(--primary-color)" : "none"} />
-                                    </span>
-                                    Like ({blog.likeCount || 0})
-                                </button>
-                                <button className="blog-action" onClick={() => toggleComments(blog.blogId)}>
-                                    <span className="icon-hexagon"><MessageCircle size={18} /></span> Comments
-                                </button>
-                                <button className="blog-action" onClick={() => handleShare(blog.blogId)}>
-                                    <span className="icon-hexagon"><Share2 size={18} /></span> Share
-                                </button>
-                            </div>
-
-                            {/* Comments Section */}
-                            {activeCommentBlogId === blog.blogId && (
-                                <div className="comments-section">
-                                    <div className="comments-input-area">
-                                        <input
-                                            type="text"
-                                            value={commentText}
-                                            onChange={(e) => setCommentText(e.target.value)}
-                                            placeholder="Write a comment..."
-                                            className="input-hexagon comment-input-field"
-                                        />
-                                        <button onClick={() => handleAddComment(blog.blogId)} className="button-hexagon post-comment-btn">Post</button>
-                                    </div>
-                                    <div className="comments-list">
-                                        {commentsMap[blog.blogId]?.map(comment => {
-                                            const commenterId = commentUserMap[comment.commentId];
-                                            const commenter = artistsMap[commenterId] || { name: 'Unknown', profileImage: null };
-                                            return (
-                                                <div key={comment.commentId} className="comment-item">
-                                                    <img
-                                                        src={commenter.profileImage || '/images/profile/default_profile.png'}
-                                                        alt={commenter.name}
-                                                        className="comment-avatar"
-                                                    />
-                                                    <div>
-                                                        <div className="comment-meta">
-                                                            <span className="comment-author">{commenter.name}</span>
-                                                            <span className="comment-date">{formatDate(comment.datePosted)}</span>
-                                                        </div>
-                                                        <p className="comment-content">{comment.content}</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <BlogCard
+                            key={blog.blogId}
+                            blog={blog}
+                            currentUser={currentUser || JSON.parse(localStorage.getItem('currentArtist'))}
+                            isOpen={activeCommentBlogId === blog.blogId}
+                            onToggle={(id) => toggleComments(id)}
+                            comments={commentsMap[blog.blogId]}
+                            onLike={handleLike}
+                            onShare={handleShare}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            onAddComment={handleAddComment}
+                            commentText={commentText}
+                            setCommentText={setCommentText}
+                            commentUserMap={commentUserMap}
+                            artistsMap={artistsMap}
+                        />
                     ))}
                 </div>
             ) : (

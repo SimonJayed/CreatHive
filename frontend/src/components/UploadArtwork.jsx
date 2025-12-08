@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePopup } from '../context/PopupContext';
 import { insertArtwork } from '../api/artworkApi';
 import { getAllTags, insertTag, insertArtworkTag } from '../api/tagApi';
+import TagSelector from './common/TagSelector';
 import '../styles/UploadArtwork.css';
 
 function UploadArtwork({ artistData, onNavigate }) {
@@ -11,22 +12,12 @@ function UploadArtwork({ artistData, onNavigate }) {
         description: ''
     });
     const [imageFile, setImageFile] = useState(null);
-    const [tagInput, setTagInput] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
     const [availableTags, setAvailableTags] = useState([]);
 
     useEffect(() => {
-        loadTags();
+        getAllTags().then(tags => setAvailableTags(tags || []));
     }, []);
-
-    const loadTags = async () => {
-        try {
-            const tags = await getAllTags();
-            setAvailableTags(tags);
-        } catch (error) {
-            console.error("Failed to load tags", error);
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,25 +29,6 @@ function UploadArtwork({ artistData, onNavigate }) {
         if (file) {
             setImageFile(file);
         }
-    };
-
-    const handleTagKeyDown = (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            addTag(tagInput);
-        }
-    };
-
-    const addTag = (tagName) => {
-        const trimmedTag = tagName.trim();
-        if (trimmedTag && !selectedTags.includes(trimmedTag)) {
-            setSelectedTags([...selectedTags, trimmedTag]);
-            setTagInput('');
-        }
-    };
-
-    const removeTag = (tagToRemove) => {
-        setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
     };
 
     const handleSubmit = async () => {
@@ -184,52 +156,11 @@ function UploadArtwork({ artistData, onNavigate }) {
                         {/* Tags */}
                         <div className="form-group">
                             <label className="form-label">Tags</label>
-
-                            {/* Dropdown for existing tags */}
-                            <select
-                                className="form-input tag-select"
-                                onChange={(e) => {
-                                    if (e.target.value) {
-                                        addTag(e.target.value);
-                                        e.target.value = ""; // Reset select
-                                    }
-                                }}
-                            >
-                                <option value="">Select a tag...</option>
-                                {availableTags.map(tag => (
-                                    <option key={tag.tagId} value={tag.name}>{tag.name}</option>
-                                ))}
-                            </select>
-
-                            {/* Input for new tags */}
-                            <div className="new-tag-container">
-                                <input
-                                    type="text"
-                                    value={tagInput}
-                                    onChange={(e) => setTagInput(e.target.value)}
-                                    onKeyDown={handleTagKeyDown}
-                                    placeholder="Or create a new tag..."
-                                    className="form-input new-tag-input"
-                                />
-                                <button
-                                    onClick={() => addTag(tagInput)}
-                                    className="btn-secondary add-tag-btn"
-                                >
-                                    Add
-                                </button>
-                            </div>
-
-                            <div className="tags-list">
-                                {selectedTags.map((tag, index) => (
-                                    <span key={index} className="tag-chip">
-                                        {tag}
-                                        <button onClick={() => removeTag(tag)} className="remove-tag-btn">×</button>
-                                    </span>
-                                ))}
-                            </div>
-                            <p className="upload-subtext tag-help-text">
-                                Select from existing tags or create your own to help others discover your artwork
-                            </p>
+                            <TagSelector
+                                selectedTags={selectedTags}
+                                onTagSelect={setSelectedTags}
+                                allowCreation={true}
+                            />
                         </div>
                     </div>
 

@@ -18,6 +18,15 @@ public class BlogService {
     @Autowired
     com.appdev.siventin.lugatimang3.repository.UserBlogRepository userBlogRepository;
 
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.BlogLikesRepository blogLikesRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.CommentOnBlogRepository commentOnBlogRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.BlogTagRepository blogTagRepository;
+
     public BlogEntity insertBlog(BlogEntity blog, int artistId) {
         try {
             // 1. Save the Blog
@@ -84,6 +93,8 @@ public class BlogService {
             blog = brepo.findById(blogId).get();
             blog.setTitle(newBlogDetails.getTitle());
             blog.setContent(newBlogDetails.getContent());
+            blog.setIsEdited(true);
+            blog.setDateEdited(new java.sql.Timestamp(System.currentTimeMillis()));
         } catch (NoSuchElementException ex) {
             throw new NoSuchElementException("Blog " + blogId + " does not exist.");
         } finally {
@@ -125,6 +136,13 @@ public class BlogService {
                     .collect(java.util.stream.Collectors.toList());
             commentOnBlogRepository.deleteAll(commentLinks);
 
+            // 4. Delete from BlogTags (Link to Tags)
+            java.util.List<com.appdev.siventin.lugatimang3.entity.BlogTagEntity> blogTags = blogTagRepository.findAll()
+                    .stream()
+                    .filter(bt -> bt.getId().getBlogId() == blogId)
+                    .collect(java.util.stream.Collectors.toList());
+            blogTagRepository.deleteAll(blogTags);
+
             // 4. Delete the Blog itself
             brepo.deleteById(blogId);
             msg = "Blog " + blogId + " is successfully deleted!";
@@ -133,12 +151,6 @@ public class BlogService {
         }
         return msg;
     }
-
-    @Autowired
-    com.appdev.siventin.lugatimang3.repository.BlogLikesRepository blogLikesRepository;
-
-    @Autowired
-    com.appdev.siventin.lugatimang3.repository.CommentOnBlogRepository commentOnBlogRepository;
 
     public BlogEntity likeBlog(int blogId, int userId) {
         BlogEntity blog = brepo.findById(blogId)
@@ -164,5 +176,80 @@ public class BlogService {
         }
 
         return brepo.save(blog);
+    }
+
+    public List<BlogEntity> getBlogsByTagId(int tagId, int userId) {
+        // 1. Get BlogTags for this tag
+        java.util.List<com.appdev.siventin.lugatimang3.entity.BlogTagEntity> blogTags = blogTagRepository.findAll()
+                .stream()
+                .filter(bt -> bt.getId().getTagId() == tagId)
+                .collect(java.util.stream.Collectors.toList());
+
+        // 2. Extract Blog IDs
+        List<Integer> blogIds = blogTags.stream().map(bt -> bt.getId().getBlogId())
+                .collect(java.util.stream.Collectors.toList());
+
+        // 3. Fetch Blogs
+        List<BlogEntity> blogs = brepo.findAllById(blogIds);
+
+        // 4. Set Likes
+        if (userId > 0) {
+            for (BlogEntity blog : blogs) {
+                com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey key = new com.appdev.siventin.lugatimang3.entity.BlogLikesEntity.BlogLikesKey(
+                        blog.getBlogId(), userId);
+                blog.setIsLiked(blogLikesRepository.existsById(key));
+            }
+        }
+        return blogs;
+    }
+
+    public List<com.appdev.siventin.lugatimang3.entity.TagEntity> getTagsByBlogId(int blogId) {
+        return blogTagRepository.findAll().stream()
+                .filter(bt -> bt.getId().getBlogId() == blogId)
+                .map(bt -> bt.getTag())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.TagRepository tagRepository;
+
+    public void insertBlogTag(int blogId, int tagId) {
+        com.appdev.siventin.lugatimang3.entity.BlogTagEntity blogTag = new com.appdev.siventin.lugatimang3.entity.BlogTagEntity(
+                blogId, tagId);
+
+        // Fetch and set relationships (Required for @MapsId)
+        BlogEntity blog = brepo.findById(blogId).orElseThrow();
+        com.appdev.siventin.lugatimang3.entity.TagEntity tag = tagRepository.findById(tagId).orElseThrow();
+
+        blogTag.setBlog(blog);
+        blogTag.setTag(tag);
+
+        blogTagRepository.save(blogTag);
+    }
+
+    public void updateBlogTags(int blogId, List<Integer> tagIds) {
+        // 1. Get existing tags
+        List<com.appdev.siventin.lugatimang3.entity.BlogTagEntity> existingTags = blogTagRepository.findAll()
+                .stream()
+                .filter(bt -> bt.getId().getBlogId() == blogId)
+                .collect(java.util.stream.Collectors.toList());
+
+        // 2. Remove tags not in the new list
+        for (com.appdev.siventin.lugatimang3.entity.BlogTagEntity existing : existingTags) {
+            if (!tagIds.contains(existing.getId().getTagId())) {
+                blogTagRepository.delete(existing);
+            }
+        }
+
+        // 3. Add new tags
+        List<Integer> existingTagIds = existingTags.stream()
+                .map(bt -> bt.getId().getTagId())
+                .collect(java.util.stream.Collectors.toList());
+
+        for (Integer newTagId : tagIds) {
+            if (!existingTagIds.contains(newTagId)) {
+                insertBlogTag(blogId, newTagId);
+            }
+        }
     }
 }

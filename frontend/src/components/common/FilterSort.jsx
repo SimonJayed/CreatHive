@@ -59,8 +59,8 @@ const FilterSort = ({
                 </div>
             </div>
 
-            {/* Filter Section (Artworks only) */}
-            {type === 'artwork' && showFilter && (
+            {/* Filter Section */}
+            {showFilter && (
                 <div className="filter-section" ref={filterRef}>
                     <button
                         className={`filter-toggle-btn ${activeFilters.length > 0 ? 'active' : ''}`}

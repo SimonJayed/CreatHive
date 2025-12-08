@@ -1,0 +1,156 @@
+/* BlogsFeed.css */
+
+.blogs-feed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.blogs-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.blogs-title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.blogs-feed-title {
+    color: var(--primary-color);
+    margin: 0;
+    font-family: var(--font-family);
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.blogs-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.blogs-search-wrapper {
+    flex: 1;
+    min-width: 200px;
+}
+
+.blogs-sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+.blogs-sort-select {
+    padding: 4px 8px;
+    width: auto;
+    background-color: transparent;
+    color: var(--primary-color);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    clip-path: none !important;
+    /* Override hexagon clip path */
+}
+
+.blogs-sort-select option {
+    color: black;
+}
+
+.create-blog-btn {
+    white-space: nowrap;
+}
+
+/* Reusing card styles, but defining comment styles specifically */
+.comments-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px solid var(--border-color);
+}
+
+.comment-input-wrapper {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.comment-input {
+    flex: 1;
+}
+
+.post-comment-btn {
+    padding: 8px 16px;
+}
+
+.comments-list {
+    /* container for comments */
+}
+
+.comment-item {
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Adjusted for dark theme */
+    display: flex;
+    gap: 10px;
+}
+
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-author {
+    font-weight: 600;
+    font-size: 13px;
+    font-family: var(--font-family);
+    color: var(--text-color);
+}
+
+.comment-date {
+    font-size: 10px;
+    color: #999;
+    font-family: var(--font-family);
+}
+
+.comment-content {
+    margin: 4px 0 0;
+    font-size: 14px;
+    font-family: var(--font-family);
+    color: var(--secondary-text-color);
+}
+
+/* Dark Bar Filter Header reused from Explore.css */
+.blogs-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 15px 20px;
+    /* Dark Glassmorphism Effect */
+    background: rgba(18, 18, 18, 0.85);
+    /* Slightly opaquer for readability */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-left: -20px;
+    margin-right: -20px;
+}

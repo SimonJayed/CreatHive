@@ -1,0 +1,44 @@
+/* SearchBar.css */
+.hive-search-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.hive-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.hive-search-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    /* Space for icon */
+    border: 2px solid var(--border-color);
+    /* Hexagon clip path from Explore.css */
+    clip-path: polygon(2% 0%, 98% 0%, 100% 50%, 98% 100%, 2% 100%, 0% 50%);
+    font-size: 16px;
+    outline: none;
+    background: white;
+    font-family: var(--font-family);
+    transition: all 250ms ease;
+    height: 48px;
+    box-sizing: border-box;
+    color: black;
+}
+
+.hive-search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.2);
+}
+
+.hive-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--secondary-text-color);
+    pointer-events: none;
+    z-index: 1;
+}

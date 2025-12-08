@@ -5,6 +5,7 @@ import UploadArtwork from './UploadArtwork';
 import Explore from './Explore';
 import Profile from './Profile';
 import Settings from './Settings';
+import PlaceholderPage from './common/PlaceholderPage'; // Import Placeholder
 import Sidebar from './homepage/Sidebar';
 import HeroSection from './homepage/HeroSection';
 import FeaturesSection from './homepage/FeaturesSection';
@@ -16,7 +17,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         const path = window.location.pathname.substring(1);
         const parts = path.split('/');
         const mainTab = parts[0];
-        const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings'];
+        const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings', 'ai-studio', 'learning']; // Added new tabs
         return validTabs.includes(mainTab) ? mainTab : 'home';
     });
 
@@ -28,12 +29,25 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         return null;
     });
 
+    // Navigation Data State
+    const [navData, setNavData] = useState(null);
+
     // Wrapper to update state and URL
-    const setActiveTab = (tab, id = null) => {
+    const setActiveTab = (tab, data = null) => {
         setActiveTabState(tab);
-        if (tab === 'profile' && id) {
-            setProfileId(id);
-            window.history.pushState({}, "", `/profile/${id}`);
+        if (typeof data === 'object') {
+            setNavData(data);
+        } else {
+            setNavData(null);
+        }
+
+        if (tab === 'profile' && typeof data === 'string') {
+            // Support legacy ID passing for profile: setActiveTab('profile', '123')
+            setProfileId(data);
+            window.history.pushState({}, "", `/profile/${data}`);
+        } else if (tab === 'profile' && data?.id) {
+            setProfileId(data.id);
+            window.history.pushState({}, "", `/profile/${data.id}`);
         } else {
             setProfileId(null);
             window.history.pushState({}, "", `/${tab}`);
@@ -46,7 +60,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
             const path = window.location.pathname.substring(1);
             const parts = path.split('/');
             const mainTab = parts[0];
-            const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings'];
+            const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'settings', 'ai-studio', 'learning'];
             if (validTabs.includes(mainTab)) {
                 setActiveTabState(mainTab);
                 if (mainTab === 'profile' && parts[1]) {
@@ -74,7 +88,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
             case 'blogs':
                 return <BlogsFeed onNavigate={setActiveTab} currentUser={artistData} />;
             case 'upload-blog':
-                return <UploadBlog artistData={artistData} />;
+                return <UploadBlog artistData={artistData} onNavigate={setActiveTab} blogToEdit={navData?.blogToEdit} />;
             case 'explore':
                 return <Explore currentUser={artistData} onNavigate={setActiveTab} />;
             case 'upload-artwork':
@@ -83,6 +97,20 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
                 return <Profile userData={artistData} onNavigate={setActiveTab} onProfileUpdate={onProfileUpdate} viewingArtistId={profileId} />;
             case 'settings':
                 return <Settings />;
+            case 'ai-studio':
+                return (
+                    <PlaceholderPage
+                        title="AI Studio"
+                        message="AI-Assisted Discovery and Personalized Recommendations are coming soon!"
+                    />
+                );
+            case 'learning':
+                return (
+                    <PlaceholderPage
+                        title="Learning Resources"
+                        message="Interactive lessons, tutorials, and progress tracking are under development."
+                    />
+                );
             default:
                 return null;
         }

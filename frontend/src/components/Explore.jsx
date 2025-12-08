@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import SearchBar from './common/SearchBar';
+
 import { getAllTags, likeTag, unlikeTag } from '../api/tagApi';
 import { getAllArtworks, getArtworksByTagId, likeArtwork, favoriteArtwork, getFavoriteArtworks } from '../api/artworkApi';
 import { getAllUserArtworks } from '../api/userArtworkApi';
 import { getAllArtists } from '../api/artistApi';
 import ArtworkCard from './artworks/ArtworkCard';
 import FilterSort from './common/FilterSort';
-import { Hexagon, Search } from 'lucide-react';
+import { Hexagon } from 'lucide-react';
 import { usePopup } from '../context/PopupContext';
 import '../styles/Explore.css';
 
@@ -240,18 +242,16 @@ function Explore({ currentUser, onNavigate }) {
             {activeTab === 'tags' && (
                 <div className="explore-content fade-in">
                     {/* Tag Search Bar */}
-                    <div className="search-bar-container">
-                        <div className="search-input-wrapper">
-                            <Search className="search-icon-inside" size={20} />
-                            <input
-                                type="text"
+                    <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'center' }}>
+                        <div style={{ width: '100%', maxWidth: '600px' }}>
+                            <SearchBar
                                 value={tagSearchQuery}
                                 onChange={(e) => setTagSearchQuery(e.target.value)}
                                 placeholder="Search tags..."
-                                className="search-input"
                             />
                         </div>
                     </div>
+
 
                     <div className="featured-header">
                         <h2 className="featured-title">Explore Tags</h2>
@@ -310,14 +310,11 @@ function Explore({ currentUser, onNavigate }) {
                 <div className="artworks-section fade-in">
                     {/* Artwork Search Bar + Upload Button */}
                     <div className="search-bar-container" style={{ display: 'flex', gap: '16px', alignItems: 'center', background: 'transparent', padding: 0, boxShadow: 'none' }}>
-                        <div className="search-input-wrapper" style={{ flex: 1 }}>
-                            <Search className="search-icon-inside" size={20} />
-                            <input
-                                type="text"
+                        <div style={{ flex: 1 }}>
+                            <SearchBar
                                 value={artworkSearchQuery}
                                 onChange={(e) => setArtworkSearchQuery(e.target.value)}
                                 placeholder="Search artworks, artists..."
-                                className="search-input"
                             />
                         </div>
                         <button
@@ -328,6 +325,7 @@ function Explore({ currentUser, onNavigate }) {
                             + Upload Artwork
                         </button>
                     </div>
+
 
                     <div className="artworks-filter-header">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>

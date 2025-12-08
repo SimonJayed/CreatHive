@@ -11,6 +11,7 @@ import FavoriteArtworks from './profile/FavoriteArtworks';
 import ProfileHeader from './profile/ProfileHeader';
 import ProfileBio from './profile/ProfileBio';
 import '../styles/Profile.css';
+import '../styles/TagSelector.css'; // Import tag styles for interests
 
 function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingArtistId: propViewingId }) {
     const { showAlert } = usePopup();
@@ -81,7 +82,14 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
                 setProfileData(prev => ({ ...prev, artworks: artworks.length }));
             }
 
-            if (Array.isArray(blogs)) setUserBlogs(blogs);
+            if (Array.isArray(blogs)) {
+                const currentArtistInfo = artistObj || profileData || { artistId, name: 'Artist' };
+                const blogsWithArtist = blogs.map(b => ({
+                    ...b,
+                    artist: b.artist || currentArtistInfo
+                }));
+                setUserBlogs(blogsWithArtist);
+            }
             if (Array.isArray(favorites)) setFavoriteArtworks(favorites);
 
             if (isOwner) {
@@ -234,7 +242,7 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
                 )}
                 {activeTab === 'blogs' && (
                     <div className="tab-content-wrapper">
-                        <ArtistBlogs blogs={userBlogs} artist={profileData} onNavigate={onNavigate} isOwner={isOwner} />
+                        <ArtistBlogs blogs={userBlogs} artist={profileData} onNavigate={onNavigate} isOwner={isOwner} currentUser={currentUser} />
                     </div>
                 )}
                 {activeTab === 'favorites' && (

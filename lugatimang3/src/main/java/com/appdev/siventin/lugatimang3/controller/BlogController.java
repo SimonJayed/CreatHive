@@ -56,4 +56,25 @@ public class BlogController {
     public BlogEntity likeBlog(@PathVariable int blogId, @PathVariable int userId) {
         return bservice.likeBlog(blogId, userId);
     }
+
+    @PostMapping("/insertBlogTag")
+    public void insertBlogTag(@RequestParam int blogId, @RequestParam int tagId) {
+        bservice.insertBlogTag(blogId, tagId);
+    }
+
+    @GetMapping("/getBlogsByTagId/{tagId}")
+    public List<BlogEntity> getBlogsByTagId(@PathVariable int tagId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return bservice.getBlogsByTagId(tagId, userId);
+    }
+
+    @GetMapping("/getTagsByBlogId/{blogId}")
+    public List<com.appdev.siventin.lugatimang3.entity.TagEntity> getTagsByBlogId(@PathVariable int blogId) {
+        return bservice.getTagsByBlogId(blogId);
+    }
+
+    @PutMapping("/updateBlogTags")
+    public void updateBlogTags(@RequestParam int blogId, @RequestBody List<Integer> tagIds) {
+        bservice.updateBlogTags(blogId, tagIds);
+    }
 }

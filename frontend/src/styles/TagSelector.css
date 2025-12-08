@@ -1,0 +1,135 @@
+/* TagSelector.css */
+.tag-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tag-select-wrapper {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.tag-select {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
+    /* Assuming standardized radius */
+    border: 1px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 14px;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+.tag-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 184, 0, 0.2);
+}
+
+.new-tag-wrapper {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+}
+
+.new-tag-input {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    font-family: var(--font-family);
+    font-size: 14px;
+}
+
+.add-tag-btn {
+    padding: 8px 16px;
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.add-tag-btn:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.add-tag-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+}
+
+.selected-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    /* Standardized sizing */
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: 1px solid #FFB800;
+    /* Yellow Border */
+    background-color: rgba(255, 184, 0, 0.15);
+    /* Light Yellow BG */
+    color: #000000;
+    /* Black text */
+    font-family: var(--font-family);
+    cursor: default;
+}
+
+.tag-chip.selected {
+    background-color: rgba(255, 184, 0, 0.3);
+    /* Slightly darker yellow on selection */
+    color: #000000;
+    /* Keep black text */
+}
+
+.remove-tag-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.remove-tag-btn:hover {
+    opacity: 1;
+}
+
+/* Small tags override for blog cards */
+.blog-card-tags .tag-chip {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    height: auto;
+    font-weight: 500;
+}
