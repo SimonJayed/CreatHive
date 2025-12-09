@@ -1,10 +1,12 @@
-import React from 'react';
-import { Hexagon, MessageCircle, Share2, Star, Trash2, Archive } from 'lucide-react';
+import React, { useState } from 'react';
+import { Hexagon, MessageCircle, Share2, Star, Trash2, Archive, Flag } from 'lucide-react';
 import { usePopup } from '../../context/PopupContext';
+import ReportModal from '../common/ReportModal';
 
-function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, showFavorite = true, onDelete, onArchive, isArchived }) {
+function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, showFavorite = true, onDelete, onArchive, isArchived, currentUser, onNavigate }) {
     const isLiked = artwork.isLiked;
     const { showAlert } = usePopup();
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     const handleShare = () => {
         const url = `${window.location.origin}/artwork/${artwork.artworkId}`;
@@ -24,26 +26,70 @@ function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, show
         );
     };
 
+    const handleNavigate = () => {
+        if (onNavigate) {
+            onNavigate('artwork', { id: artwork.artworkId });
+        } else {
+            // Fallback for direct link if onNavigate not present (though it should be)
+            window.location.href = `/artwork/${artwork.artworkId}`;
+        }
+    };
+
     return (
         <div className="card-hexagon" style={{
             padding: 0,
-            marginBottom: '20px',
+            marginBottom: '0', /* Remove margin, grid handles gap */
             breakInside: 'avoid',
             backgroundColor: 'white',
             overflow: 'hidden',
-            border: '2px solid transparent' // Reset border for hover effect
+            border: '2px solid transparent',
+            display: 'flex', /* Enable Flexbox */
+            flexDirection: 'column', /* Stack children vertically */
+            height: '100%', /* Fill grid cell height */
         }}>
-            {/* Image */}
-            <div style={{ width: '100%', position: 'relative' }}>
+            {/* Image Container - Grows to fill space */}
+            <div
+                style={{
+                    position: 'relative',
+                    cursor: 'pointer',
+                    flex: '1', /* Grow to fill available space */
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: '0' /* Allow shrinking if needed */
+                }}
+                onClick={handleNavigate}
+            >
                 <img
                     src={artwork.image}
                     alt={artwork.title}
-                    style={{ width: '100%', display: 'block', height: 'auto' }}
+                    style={{
+                        width: '100%',
+                        height: '100%', /* Fill container */
+                        objectFit: 'cover', /* Crop to fit */
+                        display: 'block'
+                    }}
                 />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px', background: 'linear-gradient(transparent, rgba(0,0,0,0.8))', color: 'white' }}>
+                <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: '10px',
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+                    color: 'white',
+                    zIndex: 1
+                }}>
                     <h3 style={{ margin: 0, fontSize: '18px', fontFamily: 'var(--font-family)', letterSpacing: 'var(--letter-spacing-wide)' }}>{artwork.title}</h3>
                     <p style={{ margin: '4px 0 0', fontSize: '14px', opacity: 0.9, fontFamily: 'var(--font-family)' }}>
-                        by <a href={`/profile/${artwork.artist?.artistId}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{artwork.artist?.name || 'Unknown'}</a>
+                        by <span
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (onNavigate) onNavigate('profile', artwork.artist?.artistId);
+                            }}
+                            style={{ color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
+                        >
+                            {artwork.artist?.name || 'Unknown'}
+                        </span>
                     </p>
                     <p style={{ margin: '2px 0 0', fontSize: '10px', opacity: 0.7, fontFamily: 'var(--font-family)' }}>
                         {new Date(artwork.creationDate).toLocaleString(undefined, {
@@ -57,26 +103,34 @@ function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, show
                 </div>
             </div>
 
-            {/* Tags - Moved to minimal padding */}
-            <div style={{ padding: '4px 8px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {/* Tags */}
+            <div style={{ padding: '8px 8px 4px 8px', display: 'flex', flexWrap: 'wrap', gap: '4px', flexShrink: 0 }}>
                 {artwork.displayTags && artwork.displayTags.map(tag => (
-                    <span key={tag.tagId} style={{
-                        fontSize: '10px',
-                        backgroundColor: 'rgba(255, 184, 0, 0.2)', // Lighter, more subtle
-                        color: 'var(--text-color)',
-                        border: '1px solid var(--primary-color)',
-                        padding: '1px 6px',
-                        borderRadius: '4px', // Less pill-like, more tag-like
-                        fontWeight: '500',
-                        fontFamily: 'var(--font-family)'
-                    }}>
+                    <span
+                        key={tag.tagId}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (onNavigate) onNavigate('explore', { tagId: tag.tagId });
+                        }}
+                        style={{
+                            fontSize: '10px',
+                            backgroundColor: 'rgba(255, 184, 0, 0.1)',
+                            color: 'var(--text-color)',
+                            border: '1px solid var(--primary-color)',
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            fontWeight: '500',
+                            fontFamily: 'var(--font-family)',
+                            cursor: 'pointer'
+                        }}
+                    >
                         {tag.name}
                     </span>
                 ))}
             </div>
 
-            {/* Footer - Reduced padding and removed border for cleaner look */}
-            <div style={{ padding: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Footer */}
+            <div style={{ padding: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: '12px' }}>
                     <button
                         onClick={() => onLike(artwork.artworkId)}
@@ -90,12 +144,12 @@ function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, show
                         {artwork.likeCount || 0}
                     </button>
                     <button
-                        onClick={() => onComment && onComment(artwork.artworkId)}
+                        onClick={handleNavigate}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: 'var(--text-color)', fontFamily: 'var(--font-family)', padding: 0 }}
                         title="Comment"
                         className="icon-button"
                     >
-                        <span className="icon-hexagon"><MessageCircle size={18} /></span> 0
+                        <span className="icon-hexagon"><MessageCircle size={18} /></span>
                     </button>
                 </div>
                 <div style={{ display: 'flex', gap: '4px' }}>
@@ -141,8 +195,23 @@ function ArtworkCard({ artwork, onLike, onFavorite, isFavorited, onComment, show
                             <span className="icon-hexagon"><Trash2 size={18} /></span>
                         </button>
                     )}
+                    <button
+                        onClick={() => setIsReportModalOpen(true)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-color)', padding: '4px' }}
+                        title="Report"
+                        className="icon-button"
+                    >
+                        <Flag size={18} />
+                    </button>
                 </div>
             </div>
+            <ReportModal
+                isOpen={isReportModalOpen}
+                onClose={() => setIsReportModalOpen(false)}
+                reporterId={currentUser?.artistId || 0}
+                reportedItemId={artwork.artworkId}
+                itemType="ARTWORK"
+            />
         </div>
     );
 }

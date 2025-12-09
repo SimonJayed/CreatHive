@@ -16,7 +16,7 @@ import FilterSort from '../common/FilterSort';
 import TagList from '../common/TagList';
 import BlogCard from './BlogCard';
 
-function BlogsFeed({ onNavigate, currentUser }) {
+function BlogsFeed({ onNavigate, currentUser, initialData }) {
     const { showAlert, showConfirm } = usePopup();
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -36,6 +36,13 @@ function BlogsFeed({ onNavigate, currentUser }) {
         // Fetch Tags
         getAllTags().then(tags => setAllTags(tags || []));
     }, []);
+
+    useEffect(() => {
+        if (initialData?.tagId) {
+            setSelectedTagIds([initialData.tagId]);
+            setSearchQuery('');
+        }
+    }, [initialData]);
 
     useEffect(() => {
         fetchData();
@@ -274,6 +281,7 @@ function BlogsFeed({ onNavigate, currentUser }) {
 
     return (
         <div className="blogs-feed-container">
+            <h1 style={{ marginBottom: '20px', color: 'var(--primary-color)', fontFamily: 'var(--font-family)' }}>Community Blogs</h1>
             {/* Search & Create Header (Top Row) */}
             <div className="search-bar-container" style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '10px' }}>
                 <div style={{ flex: 1 }}>
@@ -349,6 +357,7 @@ function BlogsFeed({ onNavigate, currentUser }) {
                                 }
                             }}
                             selectedTagIds={selectedTagIds}
+                            onNavigate={onNavigate}
                         />
                     ))
                 ) : (

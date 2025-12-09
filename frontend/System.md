@@ -142,19 +142,6 @@ To fully integrate the new components, they must be added to the application's r
 
 **Overhaul Log:**
 *   **ALWAYS** update `frontend/Overhaul.md`. This is the primary log for the project. Do not update the one in the root directory.
-
-This ensures consistency across documentation.
-
-## Security & Verification Protocols
-
-### 1. Server Verification (Agent Capability)
-- **Capability**: The AI agent provides verification by determining if code works through running the backend (`mvnw clean compile`, `mvnw spring-boot:run`) and frontend (`npm start`) servers.
-- **Protocol**: **MANDATORY**: For **EVERY PROMPT** involving code changes, the agent must run the servers (or at least `mvnw clean compile`) to verify the code works and check for compilation errors.
-- **Debugging**: If errors are found, investigate the terminal output and fix them immediately. Do not mark tasks as complete until verification passes.
-
-### 2. Strict Access Control
-- **Strict Ownership**: All modification actions (Delete, Update, Archive) on User Generated Content (Artworks, Blogs) MUST verify that the requesting user (`artistId`) is the owner of the resource.
-- **Backend Verification**: The backend services (`ArtworkService`, `BlogService`) must explicitly query the ownership relation (e.g., `UserArtworkRepository`, `UserBlogRepository`) before executing these actions. Do not rely solely on frontend logic.
 - **Frontend Prevention**: Modification UI elements (Edit/Delete buttons) must be hidden from non-owners (`isOwner` or `!readOnly` checks).
 
 ## Authentication & Session Management
@@ -198,9 +185,9 @@ This ensures consistency across documentation.
     -   Transaction 2: Users can create new threads and post replies. **[Implemented]**
     -   Transaction 3: Users can edit or delete their own posts within a limited time. **[Implemented]**
 -   **Module 2: Moderation & Reporting**
-    -   Transaction 1: Users can report inappropriate content. **[Not Started]**
-    -   Transaction 2: Moderators can review reports and take action. **[Not Started]**
-    -   Transaction 3: Admins can assign moderator roles. **[Not Started]**
+    -   Transaction 1: Users can report inappropriate content. **[Implemented]**
+    -   Transaction 2: Moderators can review reports and take action. **[Implemented]**
+    -   Transaction 3: Admins can assign moderator roles. **[Implemented]**
 
 ### Objective 4: AI-Assisted Discovery
 **Goal**: Provide AI-assisted discovery and personalized assistance.
@@ -214,7 +201,7 @@ This ensures consistency across documentation.
 ### Objective 5: Creative Development
 **Goal**: Support student creatives in developing and sharing art.
 -   **Module 1: Creative Challenges**
-    -   Transaction 1: Students can participate in challenges (streaks). **[Not Started]**
+    -   Transaction 1: Students can participate in challenges (streaks). **[Implemented]**
     -   Transaction 2: Students can access tutorials and resources. **[Not Started]**
 -   **Module 2: Community Gallery**
     -   Transaction 1: Students can post to public gallery. **[Implemented]**

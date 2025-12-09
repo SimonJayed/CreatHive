@@ -5,7 +5,7 @@ import { getAllTags, insertTag, insertArtworkTag } from '../api/tagApi';
 import TagSelector from './common/TagSelector';
 import '../styles/UploadArtwork.css';
 
-function UploadArtwork({ artistData, onNavigate }) {
+function UploadArtwork({ artistData, onNavigate, challengeId, challengeTheme, requiredTag }) {
     const { showAlert } = usePopup();
     const [formData, setFormData] = useState({
         title: '',
@@ -18,6 +18,16 @@ function UploadArtwork({ artistData, onNavigate }) {
     useEffect(() => {
         getAllTags().then(tags => setAvailableTags(tags || []));
     }, []);
+
+    // Auto-select required tag if provided
+    useEffect(() => {
+        if (requiredTag) {
+            setSelectedTags(prev => {
+                const exists = prev.some(t => t.toLowerCase() === requiredTag.toLowerCase());
+                return exists ? prev : [...prev, requiredTag];
+            });
+        }
+    }, [requiredTag]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -42,6 +52,12 @@ function UploadArtwork({ artistData, onNavigate }) {
             return;
         }
 
+        // Validate required tag
+        if (requiredTag && !selectedTags.some(t => t.toLowerCase() === requiredTag.toLowerCase())) {
+            showAlert("Challenge Requirement", `You must include the tag "${requiredTag}" to submit to this challenge.`);
+            return;
+        }
+
         try {
             // Convert image to Base64
             const reader = new FileReader();
@@ -54,7 +70,8 @@ function UploadArtwork({ artistData, onNavigate }) {
                     description: formData.description,
                     image: base64Image,
                     artistId: artistData.artistId,
-                    creationDate: new Date().toISOString().slice(0, 19)
+                    creationDate: new Date().toISOString().slice(0, 19),
+                    challenge: challengeId ? { challengeId: challengeId } : null
                 };
 
                 // 1. Insert Artwork
@@ -84,7 +101,11 @@ function UploadArtwork({ artistData, onNavigate }) {
                 }
 
                 showAlert("Success", "Artwork uploaded successfully!", () => {
-                    if (onNavigate) onNavigate('profile');
+                    if (challengeId) {
+                        onNavigate('challenges'); // Return to challenge page
+                    } else {
+                        onNavigate('profile');
+                    }
                 });
                 setFormData({ title: '', description: '' });
                 setSelectedTags([]);
@@ -100,15 +121,42 @@ function UploadArtwork({ artistData, onNavigate }) {
         setFormData({ title: '', description: '' });
         setSelectedTags([]);
         setImageFile(null);
+        if (challengeId) {
+            onNavigate('challenges');
+        } else {
+            onNavigate('explore');
+        }
     };
 
     return (
         <div className="upload-artwork-container">
             <div className="upload-header">
-                <h1 className="upload-title">Upload Artwork</h1>
+                <h1 className="upload-title">
+                    {challengeId ? `Challenge Submission: ${challengeTheme}` : 'Upload Artwork'}
+                </h1>
                 <p className="upload-subtitle">
-                    Share your creative work with the Hiveminds community!
+                    {challengeId
+                        ? 'Show off your skills and participate in the weekly challenge!'
+                        : 'Share your creative work with the Hiveminds community!'
+                    }
                 </p>
+                {challengeId && (
+                    <div style={{
+                        backgroundColor: '#FFF4E5',
+                        color: '#663C00',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        marginTop: '10px',
+                        border: '1px solid #FFCC80',
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px'
+                    }}>
+                        <span>🏆 You are submitting to the weekly challenge!</span>
+                        {requiredTag && <span style={{ fontSize: '0.9em' }}>ℹ️ Required Tag: <strong>{requiredTag}</strong> (Auto-selected)</span>}
+                    </div>
+                )}
             </div>
 
             <div className="upload-form-card">
@@ -161,6 +209,11 @@ function UploadArtwork({ artistData, onNavigate }) {
                                 onTagSelect={setSelectedTags}
                                 allowCreation={true}
                             />
+                            {requiredTag && (
+                                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                                    Tag <strong>{requiredTag}</strong> is required for this challenge.
+                                </p>
+                            )}
                         </div>
                     </div>
 

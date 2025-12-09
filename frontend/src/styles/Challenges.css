@@ -1,0 +1,143 @@
+.challenges-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: var(--font-family);
+    color: var(--text-color);
+    min-height: 100vh;
+}
+
+/* Hero Section */
+.challenge-hero {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.challenge-hero-content {
+    flex: 1;
+    z-index: 2;
+}
+
+.challenge-title {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 10px;
+}
+
+.challenge-theme-box {
+    margin-bottom: 15px;
+}
+
+.theme-text {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    color: black;
+    line-height: 1.2;
+}
+
+.challenge-tag-requirement {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.highlight-tag {
+    color: var(--button-text);
+    text-decoration: underline;
+}
+
+.challenge-description {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.btn-join-challenge {
+    background-color: black;
+    color: var(--primary-color);
+    border: none;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: var(--font-family);
+}
+
+.btn-join-challenge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Streak Badge */
+.streak-badge {
+    background: white;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    /* Circle */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 4px solid var(--accent);
+    transform: rotate(15deg);
+}
+
+.streak-count {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+}
+
+.streak-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #666;
+}
+
+/* Submissions Grid */
+.submissions-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding-left: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.submissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.no-entries {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    color: #888;
+    font-size: 1.2rem;
+    font-style: italic;
+    border: 2px dashed #ddd;
+}

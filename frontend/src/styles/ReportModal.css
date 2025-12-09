@@ -1,0 +1,105 @@
+.report-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    animation: modalFadeIn var(--duration-normal) ease-out;
+}
+
+.report-modal-content {
+    background: var(--secondary-color);
+    padding: var(--modal-padding);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    font-family: var(--font-family);
+    border: 2px solid var(--border-color);
+    animation: modalSlideIn var(--duration-slow) var(--ease-elastic);
+}
+
+.report-modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--danger-color);
+    font-family: var(--font-family);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-modal-content p {
+    color: var(--secondary-text-color);
+    margin-bottom: 20px;
+}
+
+.report-reason-input {
+    width: 100%;
+    padding: var(--input-padding);
+    margin: 16px 0;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    outline: none;
+    transition: all var(--duration-normal);
+    background-color: #fafafa;
+    min-height: 100px;
+    box-sizing: border-box;
+}
+
+.report-reason-input:focus {
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 184, 0, 0.1);
+}
+
+.report-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 2px solid transparent;
+    color: var(--secondary-text-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: var(--font-family);
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+}
+
+.btn-submit-report {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: var(--font-family);
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(255, 68, 68, 0.3);
+}
+
+.btn-submit-report:hover {
+    background-color: var(--danger-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(255, 68, 68, 0.4);
+}

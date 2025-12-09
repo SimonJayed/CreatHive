@@ -13,3 +13,17 @@ export const getCommentsByBlogId = async (blogId) => {
     if (!response.ok) throw new Error('Failed to fetch comments');
     return response.json();
 };
+
+export const addCommentToArtwork = async (artworkId, artistId, content) => {
+    const response = await fetch(`${BASE_URL}/addCommentToArtwork?artworkId=${artworkId}&artistId=${artistId}&content=${encodeURIComponent(content)}`, {
+        method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to add comment to artwork');
+    return response.json();
+};
+
+export const getCommentsByArtworkId = async (artworkId) => {
+    const response = await fetch(`${BASE_URL}/getCommentsByArtworkId/${artworkId}`);
+    if (!response.ok) throw new Error('Failed to fetch artwork comments');
+    return response.json();
+};

@@ -132,10 +132,10 @@ function ArtistArtworks({ artworks, onNavigate, isOwner, onArchive, isArchivedVi
                             onFavorite={handleFavorite}
                             isFavorited={favorites.has(artwork.artworkId)}
                             showFavorite={true}
-                            onComment={() => console.log("Comment", artwork.artworkId)}
                             onDelete={isOwner ? handleDelete : null}
                             onArchive={onArchive}
                             isArchived={isArchivedView}
+                            onNavigate={onNavigate}
                         />
                     ))
                     }

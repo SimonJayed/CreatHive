@@ -55,4 +55,45 @@ This guide documents the process of ensuring the application handles both "zoomi
 ## 5. Troubleshooting & Fixes
 ### Common Issues
 -   **Variable Redeclaration**: Be careful when copy-pasting code blocks (e.g., `likeArtwork` logic). Ensure variables like `updatedArtwork` are not declared twice in the same scope.
-    *   *Fix*: Remove the duplicate `const` declaration.
+
+## 6. Manual Management: Challenges & Streaks
+Since there is no Admin UI for managing challenges or streaks yet, you must use SQL commands directly on the MySQL database (`crea_db`).
+
+### A. How to Reset/Force a New Challenge
+The system automatically creates a new challenge if the current one has expired. To force a new challenge, you can manually expire the current one.
+
+**Step 1: Expire the Current active challenge**
+Run this SQL command to set the `end_date` of the active challenge to yesterday:
+```sql
+UPDATE challenge 
+SET end_date = NOW() - INTERVAL 1 DAY 
+WHERE is_active = true;
+```
+
+**Step 2: Trigger New Challenge Generation**
+Simply visit the Challenges page or call the API endpoint:
+*   **URL**: `http://localhost:3000/challenges` (Frontend)
+*   **API**: `GET http://localhost:8080/challenges/current`
+
+The backend (`ChallengeService.getCurrentChallenge()`) will see no active challenge exists and automatically create a new one with a random theme.
+
+### B. How to Manually Set a User's Streak
+If you need to fix or set a user's streak manually (e.g., for testing or support).
+
+**Step 1: Find the User's Username**
+```sql
+SELECT artist_id, username, streak FROM artist;
+```
+
+**Step 2: Update the Streak**
+Run this command, replacing `[NEW_STREAK]` and `[USERNAME]` with your desired values:
+```sql
+UPDATE artist 
+SET streak = [NEW_STREAK] 
+WHERE username = '[USERNAME]';
+```
+
+**Example**: Set 'SimonJayed' streak to 50.
+```sql
+UPDATE artist SET streak = 50 WHERE username = 'SimonJayed';
+```

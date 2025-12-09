@@ -21,6 +21,10 @@
 .content-scroll-container {
     height: 100%;
     overflow-y: auto;
+    background-color: var(--background-color);
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='honeycomb' x='0' y='0' width='56' height='100' patternUnits='userSpaceOnUse'%3E%3Cpolygon points='28,0 56,17 56,50 28,67 0,50 0,17' fill='none' stroke='rgba(255,184,0,0.05)' stroke-width='1'/%3E%3Cpolygon points='28,33 56,50 56,83 28,100 0,83 0,50' fill='none' stroke='rgba(255,184,0,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23honeycomb)'/%3E%3C/svg%3E");
+    background-size: 100px 100px;
+    background-attachment: fixed;
 }
 
 /* Home Tab Specific Styles */
@@ -54,7 +58,10 @@
     /* Center content on large screens */
     padding: 80px 80px;
     gap: 60px;
-    background-color: black;
+    background-color: var(--background-color);
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='honeycomb' x='0' y='0' width='56' height='100' patternUnits='userSpaceOnUse'%3E%3Cpolygon points='28,0 56,17 56,50 28,67 0,50 0,17' fill='none' stroke='rgba(255,184,0,0.05)' stroke-width='1'/%3E%3Cpolygon points='28,33 56,50 56,83 28,100 0,83 0,50' fill='none' stroke='rgba(255,184,0,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23honeycomb)'/%3E%3C/svg%3E");
+    background-size: 100px 100px;
+    background-attachment: fixed;
     box-sizing: border-box;
     flex-wrap: wrap;
 }
@@ -113,7 +120,10 @@
     justify-content: center;
     align-items: center;
     /* Center content */
-    background-color: black;
+    background-color: var(--background-color);
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='honeycomb' x='0' y='0' width='56' height='100' patternUnits='userSpaceOnUse'%3E%3Cpolygon points='28,0 56,17 56,50 28,67 0,50 0,17' fill='none' stroke='rgba(255,184,0,0.05)' stroke-width='1'/%3E%3Cpolygon points='28,33 56,50 56,83 28,100 0,83 0,50' fill='none' stroke='rgba(255,184,0,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23honeycomb)'/%3E%3C/svg%3E");
+    background-size: 100px 100px;
+    background-attachment: fixed;
     box-sizing: border-box;
 }
 

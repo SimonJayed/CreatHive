@@ -4,21 +4,6 @@ This document tracks significant changes, refactoring efforts, and architectural
 
 ### Refactoring & UI Fixes
 1.  **Reusable `TagSelector`**:
-    *   Created `TagSelector.jsx` and `TagSelector.css` for consistent tag management.
-    *   Refactored `UploadArtwork.jsx` and `UploadBlog.jsx` to use this new component.
-2.  **UI Improvements**:
-    *   Fixed "Create Blog" button alignment in `BlogsFeed.css`.
-    *   Standardized tag input styling compliant with `Styles.md`.
-
-### Backend Improvements
-1.  **Relationship Audit**:
-    *   Updated `BlogEntity` to include `@OneToMany` relationship for `blogTags` with `CascadeType.ALL`.
-    *   This ensures proper lifecycle management and orphan removal for blog tags.
-2.  **Bug Fixes**:
-    *   Resolved `availableTags` reference error in `UploadArtwork.jsx` by restoring state management for tag ID resolution.
-3.  **Visual Overhaul (Design Match)**:
-    *   **Tag Readability**: Updated `TagSelector.css` to enforce **black text on yellow background**, resolving low-contrast issues on Upload and Profile pages.
-    *   **Explore Bar Reuse**: Refactored `BlogsFeed.jsx` to implementation the **Dark Filter Bar** from the Explore page, using the shared `FilterSort` component for consistent filtering and sorting UX.
     *   **Generalized Tag Display**: Created `TagList.jsx` as a reusable component for displaying tags (used in `TagSelector`, `BlogsFeed`, etc.) to ensure consistency.
     *   **Multi-Tag Filtering**: Upgraded `BlogsFeed` to support **multi-tag filtering** (AND logic) and displaying tags directly on blog cards.
     *   **Refined Tag Styling**: Applied specific `.blog-card-tags` styling to tags within blog cards to make them **smaller** (10px) than the title, as per user request.

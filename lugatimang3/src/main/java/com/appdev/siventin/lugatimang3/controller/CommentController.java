@@ -32,4 +32,15 @@ public class CommentController {
     public List<CommentEntity> getCommentsByBlogId(@PathVariable int blogId) {
         return commentService.getCommentsByBlogId(blogId);
     }
+
+    @PostMapping("/addCommentToArtwork")
+    public CommentEntity addCommentToArtwork(@RequestParam int artworkId, @RequestParam int artistId,
+            @RequestParam String content) {
+        return commentService.addCommentToArtwork(artworkId, artistId, content);
+    }
+
+    @GetMapping("/getCommentsByArtworkId/{artworkId}")
+    public List<CommentEntity> getCommentsByArtworkId(@PathVariable int artworkId) {
+        return commentService.getCommentsByArtworkId(artworkId);
+    }
 }

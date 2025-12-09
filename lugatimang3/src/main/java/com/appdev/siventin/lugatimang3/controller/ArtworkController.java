@@ -41,9 +41,16 @@ public class ArtworkController {
         return awservice.getAllArtworks(userId);
     }
 
+    @GetMapping("/getArtworkById/{artworkId}")
+    public ArtworkEntity getArtworkById(@PathVariable int artworkId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return awservice.getArtworkById(artworkId, userId);
+    }
+
     @GetMapping("/getArtworksByArtistId/{artistId}")
-    public List<ArtworkEntity> getArtworksByArtistId(@PathVariable int artistId) {
-        return awservice.getArtworksByArtistId(artistId);
+    public List<ArtworkEntity> getArtworksByArtistId(@PathVariable int artistId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return awservice.getArtworksByArtistId(artistId, userId);
     }
 
     @PutMapping("/updateArtwork")

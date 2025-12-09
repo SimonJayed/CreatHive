@@ -10,10 +10,11 @@ import FilterSort from './common/FilterSort';
 import { Hexagon } from 'lucide-react';
 import { usePopup } from '../context/PopupContext';
 import '../styles/Explore.css';
+import LoadingSpinner from './common/LoadingSpinner';
 
-function Explore({ currentUser, onNavigate }) {
+function Explore({ currentUser, onNavigate, initialData }) {
     const { showAlert } = usePopup();
-    const [activeTab, setActiveTab] = useState('artworks'); // Default to Artworks as per user request flow
+    const [activeTab, setActiveTab] = useState('artworks'); // Default to Artworks
     // Independent Search States
     const [tagSearchQuery, setTagSearchQuery] = useState('');
     const [artworkSearchQuery, setArtworkSearchQuery] = useState('');
@@ -38,6 +39,17 @@ function Explore({ currentUser, onNavigate }) {
         loadTags(currentUser?.artistId || 0);
         loadArtworks();
     }, [currentUser]);
+
+    // Handle Init Data from Navigation (e.g. tag click from other pages)
+    useEffect(() => {
+        if (initialData?.tagId) {
+            setActiveTab('artworks');
+            setActiveFilters([initialData.tagId]);
+            // Find tag object for verification/display if needed, but activeFilters is enough for logic
+            // Optionally clear conflicts
+            setArtworkSearchQuery('');
+        }
+    }, [initialData]);
 
     // Handle Tag Click for Filter
     useEffect(() => {
@@ -222,6 +234,7 @@ function Explore({ currentUser, onNavigate }) {
 
     return (
         <div className="explore-container">
+            <h1 style={{ marginBottom: '20px', color: 'var(--primary-color)', fontFamily: 'var(--font-family)' }}>Explore Artworks</h1>
             {/* Tabs */}
             <div className="explore-tabs">
                 <button
@@ -354,7 +367,7 @@ function Explore({ currentUser, onNavigate }) {
                     </div>
 
                     {loading ? (
-                        <div className="loading-spinner">Loading...</div>
+                        <LoadingSpinner />
                     ) : (
                         <>
                             {filteredArtworks.length > 0 ? (
@@ -366,6 +379,7 @@ function Explore({ currentUser, onNavigate }) {
                                             onLike={handleLikeArtwork}
                                             onFavorite={handleFavorite}
                                             isFavorited={favorites.has(artwork.artworkId)}
+                                            onNavigate={onNavigate}
                                         />
                                     ))}
                                 </div>

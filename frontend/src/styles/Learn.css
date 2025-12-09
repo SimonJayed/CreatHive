@@ -1,0 +1,126 @@
+.learn-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: var(--font-family);
+    min-height: 100vh;
+}
+
+.learn-title {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.learn-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.section-icon {
+    color: var(--primary-color);
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+.resource-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+    border: 1px solid #eee;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Video Card specific */
+.video-thumbnail {
+    height: 180px;
+    background: #333;
+    display: flex;
+    /**/
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.video-thumbnail:hover {
+    background: #444;
+}
+
+.resource-info {
+    padding: 16px;
+}
+
+.resource-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+}
+
+.resource-info p {
+    font-size: 0.9rem;
+    color: #777;
+    margin: 0 0 12px 0;
+}
+
+.duration {
+    font-size: 0.8rem;
+    background: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #555;
+    font-weight: 500;
+}
+
+/* Download Card specific */
+.download-card {
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+.download-icon-area {
+    width: 80px;
+    height: 100%;
+    background: var(--secondary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--button-text);
+    min-height: 100px;
+}
+
+.btn-download {
+    background: var(--text-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.btn-download:hover {
+    background: black;
+}

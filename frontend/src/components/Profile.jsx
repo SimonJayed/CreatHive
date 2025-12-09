@@ -13,6 +13,8 @@ import ProfileBio from './profile/ProfileBio';
 import '../styles/Profile.css';
 import '../styles/TagSelector.css'; // Import tag styles for interests
 
+import LoadingSpinner from './common/LoadingSpinner';
+
 function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingArtistId: propViewingId }) {
     const { showAlert } = usePopup();
     const [isEditing, setIsEditing] = useState(false);
@@ -66,8 +68,8 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
     const fetchUserContent = async (artistId, artistObj) => {
         try {
             const [artworks, blogs, favorites] = await Promise.all([
-                getArtworksByArtistId(artistId),
-                getBlogsByArtistId(artistId),
+                getArtworksByArtistId(artistId, currentUser ? currentUser.artistId : 0),
+                getBlogsByArtistId(artistId, currentUser ? currentUser.artistId : 0),
                 getFavoriteArtworks(artistId)
             ]);
 
@@ -159,7 +161,7 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
 
     const updateField = (field) => (e) => setProfileData(prev => ({ ...prev, [field]: e.target.value }));
 
-    if (!profileData) return <div className="loading">Loading Profile...</div>;
+    if (!profileData) return <LoadingSpinner />;
 
     return (
         <div className="profile-container">

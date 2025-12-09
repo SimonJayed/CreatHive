@@ -1,17 +1,30 @@
 import React from 'react';
-import { Home, MessageSquare, Search, Image, User, Settings, LogOut, Hexagon, Bot, BookOpen } from 'lucide-react';
+import { Home, MessageSquare, Search, Image, User, LogOut, Hexagon, BookOpen, Trophy, Shield } from 'lucide-react';
 import './Sidebar.css';
 
-function Sidebar({ activeTab, setActiveTab, onLogout }) {
-    const navItems = [
-        { id: 'home', icon: <Home size={20} />, title: 'Home' },
-        { id: 'blogs', icon: <MessageSquare size={20} />, title: 'Blog' },
-        { id: 'explore', icon: <Search size={20} />, title: 'Explore' },
-        { id: 'ai-studio', icon: <Bot size={20} />, title: 'AI Studio' },
-        { id: 'learning', icon: <BookOpen size={20} />, title: 'Learning' },
-        { id: 'profile', icon: <User size={20} />, title: 'Profile' },
-        { id: 'settings', icon: <Settings size={20} />, title: 'Settings' }
-    ];
+const baseNavItems = [
+    { id: 'home', icon: <Home size={20} />, title: 'Home' },
+    { id: 'challenges', icon: <Trophy size={20} />, title: 'Challenges' },
+    { id: 'blogs', icon: <MessageSquare size={20} />, title: 'Blog' },
+    { id: 'explore', icon: <Search size={20} />, title: 'Explore' },
+    { id: 'learning', icon: <BookOpen size={20} />, title: 'Learning' },
+    { id: 'profile', icon: <User size={20} />, title: 'Profile' }
+];
+
+// Assuming currentUser/userRole is not passed directly, but maybe we can infer it or we need to pass it.
+// Ideally Sidebar should receive the full user object or role.
+// The previous prompt said "Update App.js / Sidebar.jsx". Sidebar receives onLogout.
+// I will check if Sidebar receives artistData... wait, Step 1076 shows: function Sidebar({ activeTab, setActiveTab, onLogout })
+// It does NOT receive artistData. I need to update it to receive artistData or role.
+// For now, I will modify the component to accept `role`.
+
+function Sidebar({ activeTab, setActiveTab, onLogout, role }) {
+    const navItems = [...baseNavItems];
+
+    if (role === 'MODERATOR' || role === 'ADMIN') {
+        // Insert Moderation before Settings
+        navItems.splice(navItems.length - 1, 0, { id: 'moderation', icon: <Shield size={20} />, title: 'Moderation' });
+    }
 
     return (
         <div className="sidebar">

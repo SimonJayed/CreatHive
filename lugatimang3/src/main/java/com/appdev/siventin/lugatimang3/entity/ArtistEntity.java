@@ -42,9 +42,34 @@ public class ArtistEntity {
     @Column(name = "date_created")
     private java.time.LocalDateTime dateCreated;
 
+    @Column(name = "role", nullable = false)
+    private String role = "USER";
+
+    @Column(name = "streak")
+    private Integer streak = 0;
+
+    @Column(name = "last_challenge_participation")
+    private java.time.LocalDateTime lastChallengeParticipation;
+
     public ArtistEntity() {
         super();
         this.dateCreated = java.time.LocalDateTime.now();
+    }
+
+    public Integer getStreak() {
+        return streak != null ? streak : 0;
+    }
+
+    public void setStreak(Integer streak) {
+        this.streak = streak;
+    }
+
+    public java.time.LocalDateTime getLastChallengeParticipation() {
+        return lastChallengeParticipation;
+    }
+
+    public void setLastChallengeParticipation(java.time.LocalDateTime lastChallengeParticipation) {
+        this.lastChallengeParticipation = lastChallengeParticipation;
     }
 
     public ArtistEntity(int artistId, String name, String bio, String interest, String username, String password,
@@ -139,5 +164,13 @@ public class ArtistEntity {
 
     public void setDateCreated(java.time.LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

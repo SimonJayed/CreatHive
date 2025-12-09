@@ -144,7 +144,31 @@ public class ArtworkEntity {
         return artist;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "challenge_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("artworks")
+    private ChallengeEntity challenge;
+
+    public ChallengeEntity getChallenge() {
+        return challenge;
+    }
+
+    public void setChallenge(ChallengeEntity challenge) {
+        this.challenge = challenge;
+    }
+
+    @Transient
+    private boolean isFavorited;
+
     public void setArtist(ArtistEntity artist) {
         this.artist = artist;
+    }
+
+    public boolean getIsFavorited() {
+        return isFavorited;
+    }
+
+    public void setIsFavorited(boolean isFavorited) {
+        this.isFavorited = isFavorited;
     }
 }

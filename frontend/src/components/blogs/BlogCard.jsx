@@ -1,6 +1,7 @@
-import React from 'react';
-import { Hexagon, MessageCircle, Share2, FileQuestion, ArrowUpDown, Trash2, Edit2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Hexagon, MessageCircle, Share2, FileQuestion, ArrowUpDown, Trash2, Edit2, Flag } from 'lucide-react';
 import TagList from '../common/TagList';
+import ReportModal from '../common/ReportModal';
 
 const formatDate = (dateString) => {
     if (!dateString) return 'Unknown Date';
@@ -30,9 +31,11 @@ const BlogCard = ({
     commentUserMap,
     artistsMap,
     onTagClick,
-    selectedTagIds = []
+    selectedTagIds = [],
+    onNavigate
 }) => {
     const isOwner = currentUser?.artistId === blog.artist?.artistId;
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     return (
         <div className="card-hexagon blog-card">
@@ -43,9 +46,17 @@ const BlogCard = ({
                     alt={blog.artist?.name}
                     className="blog-avatar"
                     onError={(e) => { e.target.src = '/images/profile/default_profile.png'; }}
+                    onClick={() => onNavigate && onNavigate('profile', blog.artist?.artistId)}
+                    style={{ cursor: 'pointer' }}
                 />
                 <div className="blog-meta">
-                    <span className="blog-author">{blog.artist?.name}</span>
+                    <span
+                        className="blog-author"
+                        onClick={() => onNavigate && onNavigate('profile', blog.artist?.artistId)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {blog.artist?.name}
+                    </span>
                     <span className="blog-date">
                         Posted {formatDate(blog.datePosted)}
                         {blog.isEdited && blog.dateEdited && (
@@ -89,7 +100,7 @@ const BlogCard = ({
                         tags={blog.blogTags.map(bt => bt.tag)}
                         readOnly={true}
                         className="blog-card-tags"
-                        onTagClick={onTagClick ? (tag) => onTagClick(tag) : undefined}
+                        onTagClick={(tag) => onNavigate && onNavigate('blogs', { tagId: tag.tagId })}
                     />
                 </div>
             )}
@@ -109,7 +120,18 @@ const BlogCard = ({
                     <span className="icon-hexagon"><MessageCircle size={18} /></span> Comments
                 </button>
                 <button className="blog-action" onClick={() => onShare(blog.blogId)}><span className="icon-hexagon"><Share2 size={18} /></span> Share</button>
+                <button className="blog-action" onClick={() => setIsReportModalOpen(true)} title="Report Content">
+                    <span className="icon-hexagon"><Flag size={18} /></span> Report
+                </button>
             </div>
+
+            <ReportModal
+                isOpen={isReportModalOpen}
+                onClose={() => setIsReportModalOpen(false)}
+                reporterId={currentUser?.artistId || 0}
+                reportedItemId={blog.blogId}
+                itemType="BLOG"
+            />
 
             {/* Comments Section */}
             {isOpen && (
@@ -126,9 +148,9 @@ const BlogCard = ({
                     </div>
                     <div className="comments-list">
                         {comments?.map(comment => {
-                            // Resolve commenter
-                            const commenterId = commentUserMap[comment.commentId];
-                            const commenter = artistsMap[commenterId] || { name: 'Unknown', profileImage: null };
+                            // Resolve commenter: Prefer direct artist object, fallback to map lookups
+                            const commenterId = comment.artist?.artistId || commentUserMap[comment.commentId];
+                            const commenter = comment.artist || artistsMap[commenterId] || { name: 'Unknown', profileImage: null };
 
                             return (
                                 <div key={comment.commentId} className="comment-item">

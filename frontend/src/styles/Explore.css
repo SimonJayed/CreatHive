@@ -1,11 +1,7 @@
 .explore-container {
-    height: 100%;
+    min-height: 100vh;
     padding: 60px 80px;
-    background-color: black;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=1600");
-    background-size: cover;
-    background-position: center;
-    overflow: hidden;
+    /* overflow properties removed to let parent scroll */
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -184,33 +180,21 @@
     justify-content: center;
 }
 
-/* Pinterest-style Masonry Layout for Artworks */
+/* Standard CSS Grid Layout (Replaces Masonry) */
 .artworks-grid {
-    column-count: 4;
-    column-gap: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Responsive columns */
+    gap: 24px;
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
     padding: 0 20px;
+    box-sizing: border-box;
+    /* Prevent padding from adding to width */
 }
 
-@media (max-width: 1400px) {
-    .artworks-grid {
-        column-count: 3;
-    }
-}
-
-@media (max-width: 1000px) {
-    .artworks-grid {
-        column-count: 2;
-    }
-}
-
-@media (max-width: 600px) {
-    .artworks-grid {
-        column-count: 1;
-    }
-}
+/* Removed Pinterest-style media queries as grid auto-adjusts */
 
 /* Tab Navigation */
 .explore-tabs {
@@ -257,6 +241,11 @@
 /* Hexagonal Search Input Override */
 .search-bar-container {
     margin-bottom: 30px;
+    width: 100%;
+    max-width: 800px;
+    /* Constrain width */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
@@ -270,13 +259,18 @@
     top: 0;
     z-index: 100;
     padding: 15px 20px;
+    width: 100%;
+    max-width: 1200px;
+    /* Match grid max-width */
+    margin-left: auto;
+    margin-right: auto;
+
     /* Glassmorphism Effect */
-    background: rgba(18, 18, 18, 0.65);
+    background: rgba(18, 18, 18, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    /* Negative margin to counteract container padding if needed, 
-       but here we just ensure it spans nicely */
-    margin-left: -20px;
-    margin-right: -20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    /* Ensure padding doesn't add to width */
 }

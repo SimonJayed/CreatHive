@@ -5,9 +5,15 @@ export async function getAllArtworks(userId = 0) {
     return res.json();
 }
 
-export async function getArtworksByArtistId(artistId) {
-    const res = await fetch(`${BASE_URL}/getArtworksByArtistId/${artistId}`);
+export async function getArtworksByArtistId(artistId, userId = 0) {
+    const res = await fetch(`${BASE_URL}/getArtworksByArtistId/${artistId}?userId=${userId}`);
     if (!res.ok) return [];
+    return res.json();
+}
+
+export async function getArtworkById(artworkId, userId = 0) {
+    const res = await fetch(`${BASE_URL}/getArtworkById/${artworkId}?userId=${userId}`);
+    if (!res.ok) throw new Error("Artwork not found");
     return res.json();
 }
 

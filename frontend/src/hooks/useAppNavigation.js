@@ -8,7 +8,7 @@ export const useAppNavigation = () => {
         const savedArtist = localStorage.getItem("currentArtist");
         if (savedArtist && savedArtist !== "undefined") {
             const path = window.location.pathname;
-            const validHomeRoutes = ["/home", "/blogs", "/upload-blog", "/upload-artwork", "/explore", "/profile", "/settings"];
+            const validHomeRoutes = ["/home", "/blogs", "/upload-blog", "/upload-artwork", "/explore", "/profile", "/settings", "/artwork"];
             if (validHomeRoutes.some(route => path.startsWith(route))) {
                 return "home";
             }

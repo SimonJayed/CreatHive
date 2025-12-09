@@ -1,0 +1,182 @@
+.mod-dashboard {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: var(--font-family);
+    min-height: 100vh;
+}
+
+.mod-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.mod-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-color);
+}
+
+.mod-stats {
+    font-weight: bold;
+    color: var(--danger-color);
+    background: #ffecec;
+    /* Keep as specific UI element color or add var */
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.mod-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.mod-filters button {
+    padding: 8px 16px;
+    border: 2px solid var(--border-color);
+    /* Thicker border per theme */
+    background: var(--secondary-color);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: var(--font-family);
+    transition: all 0.2s ease;
+}
+
+.mod-filters button:hover {
+    border-color: var(--primary-color);
+}
+
+.mod-filters button.active {
+    background: var(--primary-color);
+    color: white;
+    /* Rule: Primary bg -> White text */
+    border-color: var(--primary-color);
+}
+
+.mod-table-container {
+    background: var(--secondary-color);
+    border-radius: 8px;
+    /* Theme says 0 radius for hex, but tables often need slight rounding. keeping 8px or making 0 */
+    box-shadow: var(--shadow-color);
+    overflow-x: auto;
+    border: 2px solid var(--border-color);
+}
+
+.mod-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mod-table th,
+.mod-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mod-table th {
+    background: #f8f9fa;
+    /* Light gray for header */
+    font-weight: 600;
+    color: var(--secondary-text-color);
+}
+
+.badge-type {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Status Colors - Can remain hex if not global tokens */
+.type-artwork {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.type-blog {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.type-user {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.status-resolved {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-dismissed {
+    background: #eceff1;
+    color: #546e7a;
+}
+
+.reason-cell {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-buttons button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: var(--font-family);
+    transition: transform 0.2s ease;
+}
+
+.action-buttons button:hover {
+    transform: scale(1.05);
+}
+
+.btn-resolve {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-dismiss {
+    background: #78909c;
+    color: white;
+}
+
+.mod-dashboard-denied {
+    padding: 40px;
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--danger-color);
+    font-family: var(--font-family);
+}
