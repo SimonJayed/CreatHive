@@ -618,3 +618,11 @@ Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where use
 *   **Browser Title**: Updated to "CreatHive" (was "React App").
 *   **Favicon**: Replaced default React favicon with the CreatHive hexagonal logo (SVG) to match the sidebar icon.
 *   **Manifest**: Updated App Name and Short Name to "CreatHive" in `manifest.json`.
+
+### Visual Style Alignment (2025-12-10)
+*   **Hero Section**: Updated the Homepage `HeroSection` background gradient and text color to match the "Weekly Challenge" card style (Gold Gradient with Black Text), providing a cohesive visual experience.
+
+### Documentation (2025-12-10)
+*   **Admin Guide**: Created `Admin.md` detailing:
+    *   **Tag Naming Convention**: `frontend/public/images/tags/[tagname].jpg` (lowercase).
+    *   **Moderator Access**: Tutorial on promoting users to `MODERATOR`/`ADMIN` role via SQL to access the Moderation Dashboard.
