@@ -85,16 +85,18 @@ function ArtistArtworks({ artworks, onNavigate, isOwner, onArchive, isArchivedVi
     };
 
     // Sort artworks
-    const sortedArtworks = [...localArtworks].sort((a, b) => {
-        if (sortOrder === 'newest') {
-            return b.artworkId - a.artworkId; // Assuming ID correlates with time, or stick to ID for now if date missing
-        } else if (sortOrder === 'oldest') {
-            return a.artworkId - b.artworkId;
-        } else if (sortOrder === 'most_liked') {
-            return (b.likeCount || 0) - (a.likeCount || 0);
-        }
-        return 0;
-    });
+    const sortedArtworks = React.useMemo(() => {
+        return [...localArtworks].sort((a, b) => {
+            if (sortOrder === 'newest') {
+                return b.artworkId - a.artworkId; // Assuming ID correlates with time, or stick to ID for now if date missing
+            } else if (sortOrder === 'oldest') {
+                return a.artworkId - b.artworkId;
+            } else if (sortOrder === 'most_liked') {
+                return (b.likeCount || 0) - (a.likeCount || 0);
+            }
+            return 0;
+        });
+    }, [localArtworks, sortOrder]);
 
     return (
         <div className="artist-artworks-container">

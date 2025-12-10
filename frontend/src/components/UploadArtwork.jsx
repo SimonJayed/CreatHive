@@ -141,20 +141,9 @@ function UploadArtwork({ artistData, onNavigate, challengeId, challengeTheme, re
                     }
                 </p>
                 {challengeId && (
-                    <div style={{
-                        backgroundColor: '#FFF4E5',
-                        color: '#663C00',
-                        padding: '10px 15px',
-                        borderRadius: '8px',
-                        marginTop: '10px',
-                        border: '1px solid #FFCC80',
-                        fontWeight: 'bold',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px'
-                    }}>
+                    <div className="challenge-alert-box">
                         <span>🏆 You are submitting to the weekly challenge!</span>
-                        {requiredTag && <span style={{ fontSize: '0.9em' }}>ℹ️ Required Tag: <strong>{requiredTag}</strong> (Auto-selected)</span>}
+                        {requiredTag && <span className="challenge-tag-info">ℹ️ Required Tag: <strong>{requiredTag}</strong> (Auto-selected)</span>}
                     </div>
                 )}
             </div>
@@ -210,7 +199,7 @@ function UploadArtwork({ artistData, onNavigate, challengeId, challengeTheme, re
                                 allowCreation={true}
                             />
                             {requiredTag && (
-                                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                                <p className="tag-requirement-note">
                                     Tag <strong>{requiredTag}</strong> is required for this challenge.
                                 </p>
                             )}

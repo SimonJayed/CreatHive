@@ -19,6 +19,44 @@ public class CommentEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name = "artist_id")
+    private ArtistEntity author;
+
+    public ArtistEntity getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(ArtistEntity author) {
+        this.author = author;
+    }
+
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name = "blog_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("comments")
+    private BlogEntity blog;
+
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name = "artwork_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("comments")
+    private ArtworkEntity artwork;
+
+    public BlogEntity getBlog() {
+        return blog;
+    }
+
+    public void setBlog(BlogEntity blog) {
+        this.blog = blog;
+    }
+
+    public ArtworkEntity getArtwork() {
+        return artwork;
+    }
+
+    public void setArtwork(ArtworkEntity artwork) {
+        this.artwork = artwork;
+    }
+
     @Column(name = "date_posted")
     private LocalDateTime datePosted;
 

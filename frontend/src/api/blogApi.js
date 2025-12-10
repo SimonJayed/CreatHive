@@ -23,6 +23,17 @@ export async function getBlogsByArtistId(artistId, userId = 0) {
   }
 }
 
+export async function getBlogById(blogId, userId = 0) {
+  try {
+    const res = await fetch(`${BASE_URL}/getBlogById/${blogId}?userId=${userId}`);
+    if (!res.ok) throw new Error("Failed to fetch blog");
+    return await res.json();
+  } catch (error) {
+    console.error(`Error fetching blog ${blogId}:`, error);
+    return null;
+  }
+}
+
 export async function insertBlog(blog, artistId) {
   const res = await fetch(`${BASE_URL}/insertBlog?artistId=${artistId}`, {
     method: "POST",
@@ -41,8 +52,8 @@ export async function updateBlog(blogId, blog) {
   return res.json();
 }
 
-export async function deleteBlog(blogId) {
-  const res = await fetch(`${BASE_URL}/deleteBlog/${blogId}`, {
+export async function deleteBlog(blogId, artistId) {
+  const res = await fetch(`${BASE_URL}/deleteBlog/${blogId}?artistId=${artistId}`, {
     method: "DELETE",
   });
   return res.text();

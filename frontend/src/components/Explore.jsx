@@ -3,7 +3,6 @@ import SearchBar from './common/SearchBar';
 
 import { getAllTags, likeTag, unlikeTag } from '../api/tagApi';
 import { getAllArtworks, getArtworksByTagId, likeArtwork, favoriteArtwork, getFavoriteArtworks } from '../api/artworkApi';
-import { getAllUserArtworks } from '../api/userArtworkApi';
 import { getAllArtists } from '../api/artistApi';
 import ArtworkCard from './artworks/ArtworkCard';
 import FilterSort from './common/FilterSort';
@@ -86,7 +85,6 @@ function Explore({ currentUser, onNavigate, initialData }) {
             const user = currentUser || JSON.parse(localStorage.getItem('currentArtist'));
             const requests = [
                 getAllArtworks(user ? user.artistId : 0),
-                getAllUserArtworks(),
                 getAllArtists()
             ];
 
@@ -96,9 +94,8 @@ function Explore({ currentUser, onNavigate, initialData }) {
 
             const results = await Promise.all(requests);
             const artworksData = results[0];
-            const userArtworksData = results[1];
-            const artistsData = results[2];
-            const favoritesData = user && results.length > 3 ? results[3] : [];
+            const artistsData = results[1];
+            const favoritesData = user && results.length > 2 ? results[2] : [];
 
             // Map artists by ID
             const artistsMap = {};
@@ -106,18 +103,18 @@ function Explore({ currentUser, onNavigate, initialData }) {
                 artistsMap[artist.artistId] = artist;
             });
 
-            // Map artworkId to userId
-            const artworkUserMap = {};
-            userArtworksData.forEach(link => {
-                artworkUserMap[link.id.artworkId] = link.id.artistId;
-            });
-
             const favSet = new Set(favoritesData.map(f => f.artworkId));
             setFavorites(favSet);
 
             const enrichedArtworks = artworksData.map(artwork => {
-                const artistId = artworkUserMap[artwork.artworkId];
-                const artist = artistsMap[artistId];
+                // Use new direct Artist relationship
+                let artist = artwork.artist;
+
+                // Fallback (defensive)
+                if (!artist && artwork.artistId) {
+                    artist = artistsMap[artwork.artistId];
+                }
+
                 return {
                     ...artwork,
                     artist: artist || { name: 'Unknown Artist', profileImage: null }

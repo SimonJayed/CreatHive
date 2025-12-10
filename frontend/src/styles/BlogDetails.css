@@ -1,0 +1,171 @@
+/* Main Container */
+.blog-details-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    color: var(--text-color);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: auto;
+    overflow-y: visible;
+}
+
+/* Back Button */
+.blog-back-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    /* Aligned with margin in ArtworkDetails */
+    font-size: 16px;
+    font-family: var(--font-family);
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.blog-back-btn:hover {
+    opacity: 1;
+    color: var(--primary-color);
+}
+
+/* Card Container */
+.blog-card-details {
+    /* Renamed to avoid confusion with feed cards, but styles mirror artwork-card */
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 40px;
+    /* More padding for blog readability */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: #333;
+    position: relative;
+    /* Hexagon clip-path logic handled by parent or specific classes if needed, 
+       but for the main content card, a rounded rect is usually better for reading. 
+       ArtworkDetails uses rounded rect (.artwork-card). We follow suit. */
+}
+
+/* Header */
+.blog-header-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.blog-avatar-large {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.blog-meta-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.blog-author-name {
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.blog-author-name:hover {
+    text-decoration: underline;
+}
+
+.blog-timestamp {
+    font-size: 13px;
+    color: var(--secondary-text-color);
+}
+
+.blog-admin-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+/* Content */
+.blog-title-large {
+    font-size: 32px;
+    font-weight: bold;
+    font-family: var(--font-family-heading);
+    margin: 10px 0 20px 0;
+    color: #000;
+    line-height: 1.2;
+}
+
+.blog-content-body {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #333;
+    white-space: pre-wrap;
+    /* Preserve formatting */
+    margin-bottom: 30px;
+    font-family: 'Times New Roman', Times, serif;
+    /* Or keep sans-serif if preferred, but blogs often look good in serif. keeping var(--font-family) for consistency though */
+    font-family: var(--font-family);
+}
+
+/* Tags */
+.blog-tags-section {
+    margin-bottom: 20px;
+}
+
+/* Actions Footer */
+.blog-actions-footer {
+    display: flex;
+    justify-content: flex-start;
+    /* Or space-around to match Artwork? Artwork uses space-around. */
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.blog-action-btn {
+    background: none;
+    border: none;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-family: var(--font-family);
+}
+
+.blog-action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+}
+
+.blog-action-btn.active {
+    color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .blog-card-details {
+        padding: 20px;
+    }
+
+    .blog-title-large {
+        font-size: 24px;
+    }
+}

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { usePopup } from '../../context/PopupContext';
 import { likeBlog, deleteBlog } from '../../api/blogApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
-import { getAllUserComments } from '../../api/userCommentApi';
 import { getAllArtists } from '../../api/artistApi';
 import { Hexagon, MessageCircle, Share2, FileQuestion, Trash2 } from 'lucide-react';
 import FilterSort from '../common/FilterSort';
@@ -44,24 +43,14 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
 
     const fetchUserData = async () => {
         try {
-            const [artistsData, userCommentsData] = await Promise.all([
-                getAllArtists(),
-                getAllUserComments()
-            ]);
-
+            const artistsData = await getAllArtists();
             const aMap = {};
             artistsData.forEach(artist => {
                 aMap[artist.artistId] = artist;
             });
             setArtistsMap(aMap);
-
-            const cUserMap = {};
-            userCommentsData.forEach(link => {
-                cUserMap[link.id.commentId] = link.id.artistId;
-            });
-            setCommentUserMap(cUserMap);
         } catch (error) {
-            console.error("Failed to fetch user data for comments", error);
+            console.error("Failed to fetch artist data", error);
         }
     };
 
@@ -118,7 +107,7 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
             const newComment = await addComment(blogId, user.artistId, commentText);
 
             // Update local maps
-            setCommentUserMap(prev => ({ ...prev, [newComment.commentId]: user.artistId }));
+            // setCommentUserMap(prev => ({ ...prev, [newComment.commentId]: user.artistId })); // Removed legacy map
 
             setCommentsMap(prev => ({
                 ...prev,
@@ -213,7 +202,6 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
                             onAddComment={handleAddComment}
                             commentText={commentText}
                             setCommentText={setCommentText}
-                            commentUserMap={commentUserMap}
                             artistsMap={artistsMap}
                         />
                     ))}

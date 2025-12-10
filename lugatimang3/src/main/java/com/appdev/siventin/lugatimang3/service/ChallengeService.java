@@ -3,7 +3,7 @@ package com.appdev.siventin.lugatimang3.service;
 import com.appdev.siventin.lugatimang3.entity.ArtworkEntity;
 import com.appdev.siventin.lugatimang3.entity.ChallengeEntity;
 import com.appdev.siventin.lugatimang3.entity.ArtistEntity;
-import com.appdev.siventin.lugatimang3.repository.ArtworkRepository;
+
 import com.appdev.siventin.lugatimang3.repository.ChallengeRepository;
 import com.appdev.siventin.lugatimang3.repository.ArtistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,6 @@ public class ChallengeService {
 
     @Autowired
     private ArtistRepository artistRepository;
-
-    @Autowired
-    private com.appdev.siventin.lugatimang3.repository.UserArtworkRepository userArtworkRepository;
 
     @Autowired
     private com.appdev.siventin.lugatimang3.repository.ArtworkLikesRepository artworkLikesRepository;
@@ -133,19 +130,13 @@ public class ChallengeService {
 
         List<ArtworkEntity> artworks = challenge.getArtworks();
 
-        // Populate artist info for each artwork
+        // Populate artist info for each artwork (Managed by JPA)
+        // No manual lookup needed.
         for (ArtworkEntity artwork : artworks) {
-            // Find artist ID from UserArtwork
-            // Note: This is an N+1 query issue, but acceptable for MVP scale.
-            // Optimization would involve fetching all UserArtworks for these artwork IDs in
-            // one go.
-            userArtworkRepository.findAll().stream()
-                    .filter(ua -> ua.getId().getArtworkId() == artwork.getArtworkId())
-                    .findFirst()
-                    .ifPresent(ua -> {
-                        artistRepository.findById(ua.getId().getArtistId())
-                                .ifPresent(artist -> artwork.setArtist(artist));
-                    });
+            // Ensure artist loaded if needed
+            if (artwork.getArtist() == null) {
+                // logging
+            }
         }
 
         // Populate Like/Favorite status if userId is provided

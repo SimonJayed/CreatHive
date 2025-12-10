@@ -7,4 +7,8 @@ import com.appdev.siventin.lugatimang3.entity.BlogLikesEntity;
 
 @Repository
 public interface BlogLikesRepository extends JpaRepository<BlogLikesEntity, BlogLikesEntity.BlogLikesKey> {
+
+    @org.springframework.data.jpa.repository.Query("SELECT b.id.blogId FROM BlogLikesEntity b WHERE b.id.userId = :userId")
+    java.util.List<Integer> findLikedBlogIdsByUserId(
+            @org.springframework.data.repository.query.Param("userId") int userId);
 }

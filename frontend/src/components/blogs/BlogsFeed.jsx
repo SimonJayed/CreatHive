@@ -57,11 +57,9 @@ function BlogsFeed({ onNavigate, currentUser, initialData }) {
             // This is acceptable for the expected scale of "Community Blogs"
             const blogsPromise = getAllBlogs(userId);
 
-            const [blogsData, userBlogsData, artistsData, userCommentsData] = await Promise.all([
+            const [blogsData, artistsData] = await Promise.all([
                 blogsPromise,
-                getAllUserBlogs(),
                 getAllArtists(),
-                getAllUserComments()
             ]);
 
             // Map artists by ID for quick lookup
@@ -71,23 +69,16 @@ function BlogsFeed({ onNavigate, currentUser, initialData }) {
             });
             setArtistsMap(aMap);
 
-            // Map blogId to userId
-            const blogUserMap = {};
-            userBlogsData.forEach(link => {
-                blogUserMap[link.id.blogId] = link.id.userId;
-            });
-
-            // Map commentId to userId
-            const cUserMap = {};
-            userCommentsData.forEach(link => {
-                cUserMap[link.id.commentId] = link.id.artistId;
-            });
-            setCommentUserMap(cUserMap);
-
             // Combine data
             const enrichedBlogs = blogsData.map(blog => {
-                const userId = blogUserMap[blog.blogId];
-                const artist = aMap[userId];
+                // Use new direct Author relationship
+                let artist = blog.author;
+
+                // Fallback to finding by ID if author object is incomplete but has ID (defensive)
+                if (!artist && blog.authorId) {
+                    artist = aMap[blog.authorId];
+                }
+
                 return {
                     ...blog,
                     artist: artist || { name: 'Unknown Artist', profileImage: null }
@@ -103,47 +94,51 @@ function BlogsFeed({ onNavigate, currentUser, initialData }) {
     };
 
     // Sort blogs based on sortOrder
-    const sortedBlogs = [...blogs].sort((a, b) => {
-        const dateA = new Date(a.datePosted || 0).getTime();
-        const dateB = new Date(b.datePosted || 0).getTime();
-        if (sortOrder === 'newest') {
-            return dateB - dateA;
-        } else {
-            return dateA - dateB;
-        }
-    });
-
-    const filteredAndSortedBlogs = sortedBlogs
-        .filter(blog => {
-            // 1. Search Query
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                if (!(
-                    blog.title?.toLowerCase().includes(query) ||
-                    blog.content?.toLowerCase().includes(query) ||
-                    blog.artist?.name?.toLowerCase().includes(query)
-                )) {
-                    return false;
-                }
+    const sortedBlogs = React.useMemo(() => {
+        return [...blogs].sort((a, b) => {
+            const dateA = new Date(a.datePosted || 0).getTime();
+            const dateB = new Date(b.datePosted || 0).getTime();
+            if (sortOrder === 'newest') {
+                return dateB - dateA;
+            } else {
+                return dateA - dateB;
             }
-
-            // 2. Tag Filter (Multi-select) - AND Logic (must have ALL selected tags)
-            if (selectedTagIds.length > 0) {
-                if (!blog.blogTags || blog.blogTags.length === 0) return false;
-
-                // Get tag names from blogTags (BlogTagEntity -> tag -> name)
-                const blogTagNames = blog.blogTags.map(bt => bt.tag?.name);
-
-                // Get selected tag names
-                const selectedTagNames = selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name);
-
-                // Check if blog has all selected tags
-                const hasAllTags = selectedTagNames.every(name => blogTagNames.includes(name));
-                if (!hasAllTags) return false;
-            }
-
-            return true;
         });
+    }, [blogs, sortOrder]);
+
+    const filteredAndSortedBlogs = React.useMemo(() => {
+        return sortedBlogs
+            .filter(blog => {
+                // 1. Search Query
+                if (searchQuery) {
+                    const query = searchQuery.toLowerCase();
+                    if (!(
+                        blog.title?.toLowerCase().includes(query) ||
+                        blog.content?.toLowerCase().includes(query) ||
+                        blog.artist?.name?.toLowerCase().includes(query)
+                    )) {
+                        return false;
+                    }
+                }
+
+                // 2. Tag Filter (Multi-select) - AND Logic (must have ALL selected tags)
+                if (selectedTagIds.length > 0) {
+                    if (!blog.blogTags || blog.blogTags.length === 0) return false;
+
+                    // Get tag names from blogTags (BlogTagEntity -> tag -> name)
+                    const blogTagNames = blog.blogTags.map(bt => bt.tag?.name);
+
+                    // Get selected tag names
+                    const selectedTagNames = selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name);
+
+                    // Check if blog has all selected tags
+                    const hasAllTags = selectedTagNames.every(name => blogTagNames.includes(name));
+                    if (!hasAllTags) return false;
+                }
+
+                return true;
+            });
+    }, [sortedBlogs, searchQuery, selectedTagIds, allTags]);
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Unknown Date';
@@ -241,7 +236,8 @@ function BlogsFeed({ onNavigate, currentUser, initialData }) {
             "Are you sure you want to delete this blog?",
             async () => {
                 try {
-                    await deleteBlog(blogId);
+                    const user = currentUser || JSON.parse(localStorage.getItem('currentArtist'));
+                    await deleteBlog(blogId, user.artistId);
                     setBlogs(prev => prev.filter(b => b.blogId !== blogId));
                 } catch (error) {
                     console.error("Failed to delete blog", error);

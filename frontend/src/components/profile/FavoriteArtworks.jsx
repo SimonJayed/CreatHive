@@ -52,7 +52,7 @@ function FavoriteArtworks({ favorites: initialFavorites }) {
                             onFavorite={handleFavorite}
                             isFavorited={true}
                             showFavorite={true}
-                            onComment={() => console.log("Comment", artwork.artworkId)}
+                            onComment={() => { }}
                         />
                     ))
                 ) : (

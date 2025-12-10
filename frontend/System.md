@@ -26,18 +26,19 @@ The application uses a **Many-to-Many** relationship model implemented via **Ass
 -   **Tag**: Represents a category/tag.
 
 ### Associative Entities (The "Link" Tables)
-Instead of direct Foreign Keys (e.g., `artist_id` in `Artwork` table), we use separate tables to link entities.
+*Note: As of Dec 2025, ownership relationships (Artist->Artwork, Artist->Blog, Artist->Comment) have been refactored to use direct `@ManyToOne` relationships for efficiency. The following associative entities are retained for legacy support or specific many-to-many features, but are no longer the primary source of ownership.*
 
-1.  **UserArtwork (`user_artwork`)**: Links **Artist** and **Artwork**.
-    -   **Purpose**: Indicates ownership (Who uploaded this artwork?).
-    -   **Key**: Composite Key (`artworkId`, `artistId`).
-    -   **Usage**: To find an artist's artworks, query `UserArtworkRepository` for all records with the given `artistId`, then fetch the corresponding `Artwork` records.
+1.  **UserArtwork (`user_artwork`)**: *Deprecated for ownership*. Retained for potential many-to-many features or legacy data.
+2.  **UserBlog (`user_blog`)**: *Deprecated for ownership*. Retained for legacy data.
+3.  **UserComment (`user_comment`)**: *Deprecated for ownership*. Retained for legacy data.
+4.  **ArtworkTags (`artwork_tags`)**: Links **Artwork** and **Tag**.
+5.  **BlogTags (`blog_tags`)**: Links **Blog** and **Tag**.
+6.  **BlogLikes** & **ArtworkLikes**: Tracks likes.
+7.  **Favorites**: Tracks user favorites.
 
-2.  **UserBlog (`user_blog`)**: Links **Artist** and **Blog**.
-    -   **Purpose**: Indicates ownership (Who wrote this blog?).
-    -   **Key**: Composite Key (`blogId`, `userId` [which is artistId]).
-
-3.  **Favorites (`favorites`)**: Links **Artist** and **Artwork**.
+*Deprecated/Legacy:*
+- `UserArtwork`, `UserBlog`, `UserComment`: Replaced by direct `artist` field.
+- `CommentOnBlog`, `CommentOnArtwork`: Replaced by direct `blog` and `artwork` fields in `CommentEntity`.
 ### API Usage for Uploads
 When creating a new resource (Artwork/Blog), you must:
 1.  **Insert the Resource**: POST to `/insert...` with the entity body.

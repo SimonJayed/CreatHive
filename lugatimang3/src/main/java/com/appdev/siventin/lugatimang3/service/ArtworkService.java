@@ -11,24 +11,22 @@ import org.springframework.stereotype.Service;
 
 import com.appdev.siventin.lugatimang3.entity.ArtworkEntity;
 
-import com.appdev.siventin.lugatimang3.entity.UserArtworkEntity;
 import com.appdev.siventin.lugatimang3.repository.ArtworkRepository;
-import com.appdev.siventin.lugatimang3.repository.UserArtworkRepository;
 import com.appdev.siventin.lugatimang3.repository.ArtistRepository;
 import com.appdev.siventin.lugatimang3.repository.TagRepository;
 import com.appdev.siventin.lugatimang3.repository.ArtworkTagRepository;
 import com.appdev.siventin.lugatimang3.repository.ArtworkLikesRepository;
 import com.appdev.siventin.lugatimang3.repository.FavoritesRepository;
-import com.appdev.siventin.lugatimang3.repository.CommentOnArtworkRepository;
+import com.appdev.siventin.lugatimang3.repository.CommentRepository;
+
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ArtworkService {
 
     @Autowired
     ArtworkRepository awrepo;
-
-    @Autowired
-    UserArtworkRepository userArtworkRepository;
 
     @Autowired
     ArtistRepository artistRepository;
@@ -46,12 +44,44 @@ public class ArtworkService {
     FavoritesRepository favoritesRepository;
 
     @Autowired
-    CommentOnArtworkRepository commentOnArtworkRepository;
+    CommentRepository commentRepository;
+
+    @Autowired
+    com.appdev.siventin.lugatimang3.repository.ReportRepository reportRepository;
 
     @Autowired
     ChallengeService challengeService;
 
     public ArtworkService() {
+    }
+
+    // Migration method (Restored)
+    @jakarta.annotation.PostConstruct
+    public void migrateLegacyData() {
+        List<ArtworkEntity> allArtworks = awrepo.findAll();
+        int migratedCount = 0;
+        for (ArtworkEntity artwork : allArtworks) {
+            if (artwork.getArtist() == null) {
+                Integer artistId = awrepo.getLegacyArtistId(artwork.getArtworkId());
+                if (artistId != null) {
+                    try {
+                        com.appdev.siventin.lugatimang3.entity.ArtistEntity artist = artistRepository
+                                .findById(artistId).orElse(null);
+                        if (artist != null) {
+                            artwork.setArtist(artist);
+                            awrepo.save(artwork);
+                            migratedCount++;
+                        }
+                    } catch (Exception e) {
+                        System.err
+                                .println("Failed to migrate artwork " + artwork.getArtworkId() + ": " + e.getMessage());
+                    }
+                }
+            }
+        }
+        if (migratedCount > 0) {
+            System.out.println("Successfully migrated " + migratedCount + " artworks to direct relationships.");
+        }
     }
 
     // Create
@@ -64,17 +94,13 @@ public class ArtworkService {
                 challengeService.submitChallengeEntry(challengeId, artistId, artwork);
             }
 
-            // 1. Save the Artwork
-            ArtworkEntity savedArtwork = awrepo.save(artwork);
+            // 1. Fetch Artist and Set Author
+            com.appdev.siventin.lugatimang3.entity.ArtistEntity artist = artistRepository.findById(artistId)
+                    .orElseThrow(() -> new NoSuchElementException("Artist " + artistId + " not found"));
+            artwork.setArtist(artist);
 
-            // 2. Create the Association
-            UserArtworkEntity userArtwork = new UserArtworkEntity();
-            UserArtworkEntity.UserArtworkKey id = new UserArtworkEntity.UserArtworkKey(savedArtwork.getArtworkId(),
-                    artistId);
-            userArtwork.setId(id);
-            userArtworkRepository.save(userArtwork);
-
-            return savedArtwork;
+            // 2. Save the Artwork
+            return awrepo.save(artwork);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -110,14 +136,14 @@ public class ArtworkService {
                 .collect(Collectors.toList());
 
         if (userId > 0) {
-            for (ArtworkEntity artwork : artworks) {
-                com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
-                        artwork.getArtworkId(), userId);
-                artwork.setIsLiked(artworkLikesRepository.existsById(key));
+            java.util.Set<Integer> likedArtworkIds = new java.util.HashSet<>(
+                    artworkLikesRepository.findLikedArtworkIdsByUserId(userId));
+            java.util.Set<Integer> favoriteArtworkIds = new java.util.HashSet<>(
+                    favoritesRepository.findFavoriteArtworkIdsByUserId(userId));
 
-                com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey favKey = new com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey(
-                        artwork.getArtworkId(), userId);
-                artwork.setIsFavorited(favoritesRepository.existsById(favKey));
+            for (ArtworkEntity artwork : artworks) {
+                artwork.setIsLiked(likedArtworkIds.contains(artwork.getArtworkId()));
+                artwork.setIsFavorited(favoriteArtworkIds.contains(artwork.getArtworkId()));
             }
         }
 
@@ -141,11 +167,15 @@ public class ArtworkService {
                 .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
 
         // Populate artist
-        userArtworkRepository.findAll().stream().filter(ua -> ua.getId().getArtworkId() == artwork.getArtworkId())
-                .findFirst().ifPresent(ua -> {
-                    artistRepository.findById(ua.getId().getArtistId())
-                            .ifPresent(artist -> artwork.setArtist(artist));
-                });
+        // No need for manual population if lazy loading / EAGER fetch works, but
+        // ensuring strictly via getter if needed.
+        // JPA handles it via getArtist()
+        // Fallback or explicit check if needed for legacy compatibility during
+        // migration phase:
+        if (artwork.getArtist() == null) {
+            // Fallback logic removed.
+            // Ensure data integrity via direct relationships.
+        }
 
         // Populate displayTags
         if (artwork.getArtworkTags() != null) {
@@ -172,14 +202,8 @@ public class ArtworkService {
 
     public List<ArtworkEntity> getArtworksByArtistId(int artistId, int userId) {
         try {
-            // Find all artwork IDs associated with the artist
-            List<Integer> artworkIds = userArtworkRepository.findAll().stream()
-                    .filter(ua -> ua.getId().getArtistId() == artistId)
-                    .map(ua -> ua.getId().getArtworkId())
-                    .collect(Collectors.toList());
-
-            // Fetch artworks by IDs and filter out archived ones
-            List<ArtworkEntity> artworks = awrepo.findAllById(artworkIds).stream()
+            // Direct fetch by Artist
+            List<ArtworkEntity> artworks = awrepo.findByArtist_ArtistId(artistId).stream()
                     .filter(a -> !Boolean.TRUE.equals(a.isArchived()))
                     .collect(Collectors.toList());
 
@@ -196,14 +220,14 @@ public class ArtworkService {
             }
 
             if (userId > 0) {
-                for (ArtworkEntity artwork : artworks) {
-                    com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
-                            artwork.getArtworkId(), userId);
-                    artwork.setIsLiked(artworkLikesRepository.existsById(key));
+                java.util.Set<Integer> likedArtworkIds = new java.util.HashSet<>(
+                        artworkLikesRepository.findLikedArtworkIdsByUserId(userId));
+                java.util.Set<Integer> favoriteArtworkIds = new java.util.HashSet<>(
+                        favoritesRepository.findFavoriteArtworkIdsByUserId(userId));
 
-                    com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey favKey = new com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey(
-                            artwork.getArtworkId(), userId);
-                    artwork.setIsFavorited(favoritesRepository.existsById(favKey));
+                for (ArtworkEntity artwork : artworks) {
+                    artwork.setIsLiked(likedArtworkIds.contains(artwork.getArtworkId()));
+                    artwork.setIsFavorited(favoriteArtworkIds.contains(artwork.getArtworkId()));
                 }
             }
 
@@ -216,14 +240,8 @@ public class ArtworkService {
 
     public List<ArtworkEntity> getArchivedArtworksByArtistId(int artistId) {
         try {
-            // Find all artwork IDs associated with the artist
-            List<Integer> artworkIds = userArtworkRepository.findAll().stream()
-                    .filter(ua -> ua.getId().getArtistId() == artistId)
-                    .map(ua -> ua.getId().getArtworkId())
-                    .collect(Collectors.toList());
-
-            // Fetch artworks by IDs and filter ONLY archived ones
-            return awrepo.findAllById(artworkIds).stream()
+            // Fetch artworks by Artist and filter archived
+            return awrepo.findByArtist_ArtistId(artistId).stream()
                     .filter(a -> Boolean.TRUE.equals(a.isArchived()))
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -258,17 +276,15 @@ public class ArtworkService {
     }
 
     public ArtworkEntity archiveArtwork(int artworkId, boolean isArchived, int requestingArtistId) {
-        // Verify ownership
-        com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey key = new com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey(
-                artworkId, requestingArtistId);
+        ArtworkEntity artwork = awrepo.findById(artworkId)
+                .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
 
-        if (!userArtworkRepository.existsById(key)) {
+        // Verify ownership
+        if (artwork.getArtist() == null || artwork.getArtist().getArtistId() != requestingArtistId) {
             throw new IllegalArgumentException(
                     "Unauthorized: User " + requestingArtistId + " does not own artwork " + artworkId);
         }
 
-        ArtworkEntity artwork = awrepo.findById(artworkId)
-                .orElseThrow(() -> new NoSuchElementException("Artwork " + artworkId + " does not exist."));
         artwork.setArchived(isArchived);
         return awrepo.save(artwork);
     }
@@ -278,57 +294,78 @@ public class ArtworkService {
     // Delete
     // Delete
     public String deleteArtwork(int artworkId, int requestingArtistId) {
-        String msg = "";
+        try {
+            ArtworkEntity artwork = awrepo.findById(artworkId).orElse(null);
 
-        if (requestingArtistId > 0) {
-            com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey key = new com.appdev.siventin.lugatimang3.entity.UserArtworkEntity.UserArtworkKey(
-                    artworkId, requestingArtistId);
-            if (!userArtworkRepository.existsById(key)) {
-                return "Unauthorized: User " + requestingArtistId + " does not own artwork " + artworkId;
+            if (artwork == null) {
+                return "Artwork " + artworkId + " does not exist.";
             }
-        }
 
-        if (awrepo.existsById(artworkId)) {
-            // 1. Delete from UserArtwork (Link to Artist)
-            List<UserArtworkEntity> userArtworks = userArtworkRepository.findAll().stream()
-                    .filter(ua -> ua.getId().getArtworkId() == artworkId)
-                    .collect(Collectors.toList());
-            userArtworkRepository.deleteAll(userArtworks);
+            // Verify ownership
+            if (requestingArtistId > 0) {
+                boolean isOwner = artwork.getArtist() != null
+                        && artwork.getArtist().getArtistId() == requestingArtistId;
+                if (!isOwner) {
+                    return "Unauthorized: User " + requestingArtistId + " does not own artwork " + artworkId;
+                }
+            }
 
-            // 2. Delete from Favorites
+            // 1. Delete Reports (Must be first to avoid FK issues with Reported Item)
+            List<com.appdev.siventin.lugatimang3.entity.ReportEntity> reports = reportRepository
+                    .findByReportedItemIdAndItemType(artworkId,
+                            com.appdev.siventin.lugatimang3.entity.ReportEntity.ReportItemType.ARTWORK);
+            if (!reports.isEmpty()) {
+                reportRepository.deleteAll(reports);
+            }
+
+            // 2. Delete Legacy UserArtwork Entry (Native Query)
+            awrepo.deleteLegacyUserArtwork(artworkId);
+
+            // 3. Delete from Favorites
             List<com.appdev.siventin.lugatimang3.entity.FavoritesEntity> favorites = favoritesRepository.findAll()
                     .stream()
                     .filter(f -> f.getId().getArtworkId() == artworkId)
                     .collect(Collectors.toList());
-            favoritesRepository.deleteAll(favorites);
+            if (!favorites.isEmpty()) {
+                favoritesRepository.deleteAll(favorites);
+            }
 
-            // 3. Delete from ArtworkLikes
+            // 4. Delete from ArtworkLikes
             List<com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity> likes = artworkLikesRepository.findAll()
                     .stream()
                     .filter(l -> l.getId().getArtworkId() == artworkId)
                     .collect(Collectors.toList());
-            artworkLikesRepository.deleteAll(likes);
+            if (!likes.isEmpty()) {
+                artworkLikesRepository.deleteAll(likes);
+            }
 
-            // 4. Delete from ArtworkTags
+            // 5. Delete from ArtworkTags
             List<com.appdev.siventin.lugatimang3.entity.ArtworkTagEntity> tags = artworkTagRepository.findAll()
                     .stream()
                     .filter(t -> t.getId().getArtworkId() == artworkId)
                     .collect(Collectors.toList());
-            artworkTagRepository.deleteAll(tags);
+            if (!tags.isEmpty()) {
+                artworkTagRepository.deleteAll(tags);
+            }
 
-            // 5. Delete from CommentOnArtwork (Link to Comments)
-            List<com.appdev.siventin.lugatimang3.entity.CommentOnArtworkEntity> commentLinks = commentOnArtworkRepository
-                    .findAll().stream().filter(c -> c.getId().getArtworkId() == artworkId)
-                    .collect(Collectors.toList());
-            commentOnArtworkRepository.deleteAll(commentLinks);
+            // 6. Delete Comments (And their legacy table entries if any)
+            List<com.appdev.siventin.lugatimang3.entity.CommentEntity> comments = commentRepository
+                    .findByArtwork_ArtworkId(artworkId);
+            if (!comments.isEmpty()) {
+                // We need to clean up legacy user_comment entries for these comments too
+                for (com.appdev.siventin.lugatimang3.entity.CommentEntity comment : comments) {
+                    commentRepository.deleteLegacyUserComment(comment.getCommentId());
+                }
+                commentRepository.deleteAll(comments);
+            }
 
-            // 6. Delete the Artwork itself
+            // 7. Delete the Artwork itself
             awrepo.deleteById(artworkId);
-            msg = "Artwork " + artworkId + " is successfully deleted!";
-        } else {
-            msg = "Artwork " + artworkId + " does not exist.";
+            return "Artwork " + artworkId + " is successfully deleted!";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error deleting artwork: " + e.getMessage();
         }
-        return msg;
     }
 
     public ArtworkEntity likeArtwork(int artworkId, int userId) {
@@ -390,14 +427,13 @@ public class ArtworkService {
 
         List<ArtworkEntity> artworks = awrepo.findAllById(artworkIds);
 
-        // Populate artist for each artwork
+        // Populate artist for each artwork (Managed by JPA)
+        // No manual lookup needed as direct relationship exists.
         for (ArtworkEntity artwork : artworks) {
-            // Find artist ID from UserArtwork
-            userArtworkRepository.findAll().stream().filter(ua -> ua.getId().getArtworkId() == artwork.getArtworkId())
-                    .findFirst().ifPresent(ua -> {
-                        artistRepository.findById(ua.getId().getArtistId())
-                                .ifPresent(artist -> artwork.setArtist(artist));
-                    });
+            // Ensure artist loaded if needed (though JPA does this)
+            if (artwork.getArtist() == null) {
+                // logging or handling if needed
+            }
 
             // Also populate displayTags as usual
             if (artwork.getArtworkTags() != null) {
@@ -409,11 +445,14 @@ public class ArtworkService {
             }
 
             // And isLiked status
-            if (userId > 0) {
-                com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
-                        artwork.getArtworkId(), userId);
-                artwork.setIsLiked(artworkLikesRepository.existsById(key));
+            // Batch fetch logic outside loop for optimization
+        }
 
+        if (userId > 0) {
+            java.util.Set<Integer> likedArtworkIds = new java.util.HashSet<>(
+                    artworkLikesRepository.findLikedArtworkIdsByUserId(userId));
+            for (ArtworkEntity artwork : artworks) {
+                artwork.setIsLiked(likedArtworkIds.contains(artwork.getArtworkId()));
                 // Since this IS the favorite list of 'userId', isFavorited is true.
                 artwork.setIsFavorited(true);
             }
@@ -445,14 +484,14 @@ public class ArtworkService {
             }
 
             if (userId > 0) {
-                for (ArtworkEntity artwork : artworks) {
-                    com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey key = new com.appdev.siventin.lugatimang3.entity.ArtworkLikesEntity.ArtworkLikesKey(
-                            artwork.getArtworkId(), userId);
-                    artwork.setIsLiked(artworkLikesRepository.existsById(key));
+                java.util.Set<Integer> likedArtworkIds = new java.util.HashSet<>(
+                        artworkLikesRepository.findLikedArtworkIdsByUserId(userId));
+                java.util.Set<Integer> favoriteArtworkIds = new java.util.HashSet<>(
+                        favoritesRepository.findFavoriteArtworkIdsByUserId(userId));
 
-                    com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey favKey = new com.appdev.siventin.lugatimang3.entity.FavoritesEntity.FavoritesKey(
-                            artwork.getArtworkId(), userId);
-                    artwork.setIsFavorited(favoritesRepository.existsById(favKey));
+                for (ArtworkEntity artwork : artworks) {
+                    artwork.setIsLiked(likedArtworkIds.contains(artwork.getArtworkId()));
+                    artwork.setIsFavorited(favoriteArtworkIds.contains(artwork.getArtworkId()));
                 }
             }
             return artworks;

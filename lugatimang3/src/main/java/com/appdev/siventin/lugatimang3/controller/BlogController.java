@@ -42,6 +42,12 @@ public class BlogController {
         return bservice.getBlogsByArtistId(artistId, userId);
     }
 
+    @GetMapping("/getBlogById/{blogId}")
+    public BlogEntity getBlogById(@PathVariable int blogId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return bservice.getBlogById(blogId, userId);
+    }
+
     @PutMapping("/updateBlog")
     public BlogEntity updateBlog(@RequestParam int blogId, @RequestBody BlogEntity newBlogDetails) {
         return bservice.updateBlog(blogId, newBlogDetails);

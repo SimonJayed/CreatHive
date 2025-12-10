@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BlogsFeed from './blogs/BlogsFeed';
+import BlogDetails from './blogs/BlogDetails';
 import UploadBlog from './UploadBlog';
 import UploadArtwork from './UploadArtwork';
 import Explore from './Explore';
@@ -21,7 +22,7 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         const path = window.location.pathname.substring(1);
         const parts = path.split('/');
         const mainTab = parts[0];
-        const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'learning', 'challenges', 'moderation', 'artwork'];
+        const validTabs = ['home', 'blogs', 'blog', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'learning', 'challenges', 'moderation', 'artwork'];
         return validTabs.includes(mainTab) ? mainTab : 'home';
     });
 
@@ -36,6 +37,14 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
     const [artworkId, setArtworkId] = useState(() => {
         const path = window.location.pathname;
         if (path.startsWith('/artwork/')) {
+            return path.split('/')[2];
+        }
+        return null;
+    });
+
+    const [blogId, setBlogId] = useState(() => {
+        const path = window.location.pathname;
+        if (path.startsWith('/blog/')) {
             return path.split('/')[2];
         }
         return null;
@@ -64,9 +73,16 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         } else if (tab === 'artwork' && data?.id) {
             setArtworkId(data.id);
             window.history.pushState({}, "", `/artwork/${data.id}`);
+        } else if (tab === 'blog' && (typeof data === 'string' || typeof data === 'number')) {
+            setBlogId(data);
+            window.history.pushState({}, "", `/blog/${data}`);
+        } else if (tab === 'blog' && data?.id) {
+            setBlogId(data.id);
+            window.history.pushState({}, "", `/blog/${data.id}`);
         } else {
             setProfileId(null);
             setArtworkId(null);
+            setBlogId(null);
             window.history.pushState({}, "", `/${tab}`);
         }
     };
@@ -76,16 +92,19 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
             const path = window.location.pathname.substring(1);
             const parts = path.split('/');
             const mainTab = parts[0];
-            const validTabs = ['home', 'blogs', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'learning', 'challenges', 'moderation', 'artwork'];
+            const validTabs = ['home', 'blogs', 'blog', 'upload-blog', 'explore', 'upload-artwork', 'profile', 'learning', 'challenges', 'moderation', 'artwork'];
             if (validTabs.includes(mainTab)) {
                 setActiveTabState(mainTab);
                 if (mainTab === 'profile' && parts[1]) {
                     setProfileId(parts[1]);
                 } else if (mainTab === 'artwork' && parts[1]) {
                     setArtworkId(parts[1]);
+                } else if (mainTab === 'blog' && parts[1]) {
+                    setBlogId(parts[1]);
                 } else {
                     setProfileId(null);
                     setArtworkId(null);
+                    setBlogId(null);
                 }
             }
         };
@@ -106,6 +125,8 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
                 );
             case 'blogs':
                 return <BlogsFeed onNavigate={setActiveTab} currentUser={artistData} initialData={navData} />;
+            case 'blog':
+                return <BlogDetails blogId={blogId} currentUser={artistData} onNavigate={setActiveTab} />;
             case 'upload-blog':
                 return <UploadBlog artistData={artistData} onNavigate={setActiveTab} blogToEdit={navData?.blogToEdit} />;
             case 'explore':

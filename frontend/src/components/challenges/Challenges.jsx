@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import ArtworkCard from '../artworks/ArtworkCard';
 import '../../styles/Challenges.css';
 import { likeArtwork, favoriteArtwork } from '../../api/artworkApi';
-// Remove unused import from userArtworkApi if it was only for toggleFavorite
-// import { toggleFavorite } from '../../api/userArtworkApi';
 
 function Challenges({ currentUser, onNavigate }) {
     const [challenge, setChallenge] = useState(null);

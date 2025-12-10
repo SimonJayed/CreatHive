@@ -23,6 +23,18 @@ public class BlogEntity {
     @Column(name = "date_posted")
     private java.sql.Timestamp datePosted;
 
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name = "artist_id")
+    private ArtistEntity author;
+
+    public ArtistEntity getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(ArtistEntity author) {
+        this.author = author;
+    }
+
     public BlogEntity() {
         super();
     }

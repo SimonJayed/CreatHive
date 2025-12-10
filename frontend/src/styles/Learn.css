@@ -9,12 +9,12 @@
 .learn-title {
     font-size: 2.5rem;
     margin-bottom: 8px;
-    color: var(--text-color);
+    /* Color handled inline for consistency with Explore */
 }
 
 .learn-subtitle {
     font-size: 1.1rem;
-    color: #666;
+    color: #ccc;
     margin-bottom: 40px;
 }
 
@@ -24,8 +24,10 @@
     gap: 10px;
     font-size: 1.5rem;
     margin-bottom: 20px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    /* Dark mode compatible border */
     padding-bottom: 10px;
+    color: var(--primary-color);
 }
 
 .section-icon {
@@ -34,93 +36,98 @@
 
 .resource-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
     margin-bottom: 50px;
 }
 
 .resource-card {
-    background: white;
+    background: #1a1a1a;
+    /* Dark background */
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s;
-    border: 1px solid #eee;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #333;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
 }
 
 .resource-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    border-color: var(--primary-color);
 }
 
-/* Video Card specific */
-.video-thumbnail {
-    height: 180px;
-    background: #333;
+.resource-thumbnail {
+    height: 160px;
+    background-color: #333;
+    background-size: cover;
+    background-position: center;
+    position: relative;
     display: flex;
-    /**/
     justify-content: center;
     align-items: center;
-    cursor: pointer;
 }
 
-.video-thumbnail:hover {
-    background: #444;
+.resource-overlay {
+    background: rgba(0, 0, 0, 0.4);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.resource-card:hover .resource-overlay {
+    opacity: 1;
 }
 
 .resource-info {
     padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .resource-info h3 {
     margin: 0 0 8px 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    color: white;
 }
 
 .resource-info p {
     font-size: 0.9rem;
-    color: #777;
-    margin: 0 0 12px 0;
+    color: #aaa;
+    margin: 0 0 16px 0;
+    flex: 1;
 }
 
-.duration {
-    font-size: 0.8rem;
-    background: #f0f0f0;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: #555;
-    font-weight: 500;
+.source-tag {
+    font-size: 0.75rem;
+    background: rgba(255, 184, 0, 0.1);
+    color: var(--primary-color);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    align-self: flex-start;
+    font-weight: 600;
 }
 
-/* Download Card specific */
-.download-card {
-    display: flex;
-    align-items: center;
-    padding: 0;
+/* New standard classes */
+.learn-main-title {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    font-family: var(--font-family);
+    font-size: 32px;
+    font-weight: bold;
 }
 
-.download-icon-area {
-    width: 80px;
-    height: 100%;
-    background: var(--secondary-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--button-text);
-    min-height: 100px;
-}
-
-.btn-download {
-    background: var(--text-color);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-top: 8px;
-}
-
-.btn-download:hover {
-    background: black;
+.learn-subtitle-text {
+    color: var(--secondary-text-color);
+    font-size: 16px;
+    margin-bottom: 40px;
 }

@@ -3,11 +3,11 @@ import { usePopup } from '../../context/PopupContext';
 import { getArtworkById, likeArtwork, favoriteArtwork } from '../../api/artworkApi';
 import { getCommentsByArtworkId, addCommentToArtwork } from '../../api/commentApi';
 import { getAllArtists } from '../../api/artistApi';
-import { getAllUserComments } from '../../api/userCommentApi';
 import { Hexagon, MessageCircle, Share2, Star, Flag, ArrowLeft } from 'lucide-react';
 import ReportModal from '../common/ReportModal';
 import TagList from '../common/TagList';
 import LoadingSpinner from '../common/LoadingSpinner';
+import CommentSection from '../common/CommentSection';
 import '../../styles/ArtworkDetails.css'; // New styles
 
 function ArtworkDetails({ artworkId, currentUser, onNavigate }) {
@@ -32,26 +32,28 @@ function ArtworkDetails({ artworkId, currentUser, onNavigate }) {
             const artworkData = await getArtworkById(artworkId, userId);
             const commentsData = await getCommentsByArtworkId(artworkId);
             const artistsData = await getAllArtists();
-            const userCommentsData = await getAllUserComments();
+            // const userCommentsData = await getAllUserComments(); // Removed
 
             // Map artists
             const aMap = {};
             artistsData.forEach(a => aMap[a.artistId] = a);
             setArtistsMap(aMap);
 
-            // Map comment -> user
-            const cUserMap = {};
-            userCommentsData.forEach(link => {
-                cUserMap[link.id.commentId] = link.id.artistId;
-            });
-            setCommentUserMap(cUserMap);
-
             setArtwork(artworkData);
 
             // Enrich comments with artist data
             const enrichedComments = commentsData.map(comment => {
-                const artistId = cUserMap[comment.commentId];
-                const artist = aMap[artistId];
+                // Use new direct Author relationship
+                let artist = comment.author;
+
+                // Fallback (defensive)
+                if (!artist && comment.authorId) {
+                    artist = aMap[comment.authorId];
+                }
+
+                // If completely missing, try to find by ID if authorId exists in comment... 
+                // but typically comment.author should be present.
+
                 return {
                     ...comment,
                     artist: artist || { name: 'Unknown', profileImage: null, artistId: 0 }
@@ -244,56 +246,15 @@ function ArtworkDetails({ artworkId, currentUser, onNavigate }) {
 
                 {/* Comments Feed - Toggleable */}
                 {showComments && (
-                    <div className="comments-section">
-                        <div className="comments-label">Comments</div>
-                        <div className="comments-feed">
-                            {comments.map(comment => (
-                                <div key={comment.commentId} className="comment-item">
-                                    <img
-                                        src={comment.artist?.profileImage || '/images/profile/default_profile.png'}
-                                        alt={comment.artist?.name || 'User'}
-                                        className="comment-avatar"
-                                        onError={(e) => { e.target.src = '/images/profile/default_profile.png'; }}
-                                        onClick={() => onNavigate && onNavigate('profile', comment.artist?.artistId)}
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                    <div className="comment-content">
-                                        <div className="comment-meta">
-                                            <span
-                                                className="comment-author-name"
-                                                onClick={() => onNavigate && onNavigate('profile', comment.artist?.artistId)}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                {comment.artist?.name || 'Unknown'}
-                                            </span>
-                                            <span className="comment-timestamp">
-                                                {formatDate(comment.creationDate)}
-                                            </span>
-                                        </div>
-                                        <p className="comment-text">{comment.content}</p>
-                                    </div>
-                                </div>
-                            ))}
-                            {comments.length === 0 && (
-                                <div style={{ textAlign: 'center', padding: '20px', opacity: 0.6, fontSize: '14px' }}>
-                                    No comments yet. Be the first to share your thoughts!
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Footer Input */}
-                        <div className="artwork-footer-input">
-                            <input
-                                id="comment-input-main"
-                                type="text"
-                                placeholder="Add a comment..."
-                                className="input-hexagon width-full comment-input-field wide"
-                                value={commentText}
-                                onChange={(e) => setCommentText(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
-                            />
-                        </div>
-                    </div>
+                    <CommentSection
+                        comments={comments}
+                        onAddComment={handleAddComment}
+                        commentText={commentText}
+                        setCommentText={setCommentText}
+                        currentUser={currentUser}
+                        onNavigate={onNavigate}
+                        loading={false}
+                    />
                 )}
             </div>
 

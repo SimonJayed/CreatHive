@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Hexagon, MessageCircle, Share2, FileQuestion, ArrowUpDown, Trash2, Edit2, Flag } from 'lucide-react';
 import TagList from '../common/TagList';
 import ReportModal from '../common/ReportModal';
+import CommentSection from '../common/CommentSection';
 
 const formatDate = (dateString) => {
     if (!dateString) return 'Unknown Date';
@@ -91,7 +92,14 @@ const BlogCard = ({
             </div>
 
             {/* Title */}
-            <h4 className="blog-title">{blog.title}</h4>
+            {/* Title */}
+            <h4
+                className="blog-title"
+                onClick={() => onNavigate && onNavigate('blog', blog.blogId)}
+                style={{ cursor: 'pointer' }}
+            >
+                {blog.title}
+            </h4>
 
             {/* Tags Display */}
             {blog.blogTags && blog.blogTags.length > 0 && (
@@ -135,43 +143,15 @@ const BlogCard = ({
 
             {/* Comments Section */}
             {isOpen && (
-                <div className="comments-section">
-                    <div className="comment-input-wrapper">
-                        <input
-                            type="text"
-                            value={commentText}
-                            onChange={(e) => setCommentText(e.target.value)}
-                            placeholder="Write a comment..."
-                            className="input-hexagon comment-input"
-                        />
-                        <button onClick={() => onAddComment(blog.blogId)} className="button-hexagon post-comment-btn">Post</button>
-                    </div>
-                    <div className="comments-list">
-                        {comments?.map(comment => {
-                            // Resolve commenter: Prefer direct artist object, fallback to map lookups
-                            const commenterId = comment.artist?.artistId || commentUserMap[comment.commentId];
-                            const commenter = comment.artist || artistsMap[commenterId] || { name: 'Unknown', profileImage: null };
-
-                            return (
-                                <div key={comment.commentId} className="comment-item">
-                                    <img
-                                        src={commenter.profileImage || '/images/profile/default_profile.png'}
-                                        alt={commenter.name}
-                                        className="comment-avatar"
-                                        onError={(e) => { e.target.src = '/images/profile/default_profile.png'; }}
-                                    />
-                                    <div>
-                                        <div className="comment-header">
-                                            <span className="comment-author">{commenter.name}</span>
-                                            <span className="comment-date">{formatDate(comment.datePosted)}</span>
-                                        </div>
-                                        <p className="comment-content">{comment.content}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+                <CommentSection
+                    comments={comments}
+                    onAddComment={() => onAddComment(blog.blogId)}
+                    commentText={commentText}
+                    setCommentText={setCommentText}
+                    currentUser={currentUser}
+                    onNavigate={onNavigate}
+                    loading={!comments}
+                />
             )}
         </div>
     );

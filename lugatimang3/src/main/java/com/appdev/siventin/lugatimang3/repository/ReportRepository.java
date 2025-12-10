@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<ReportEntity, Integer> {
     List<ReportEntity> findByStatus(ReportEntity.ReportStatus status);
+
+    List<ReportEntity> findByReportedItemIdAndItemType(int reportedItemId, ReportEntity.ReportItemType itemType);
 }

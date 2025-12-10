@@ -626,3 +626,16 @@ Transition the "Upload Blog" feature into a comprehensive "Blogs Feed" where use
 *   **Admin Guide**: Created `Admin.md` detailing:
     *   **Tag Naming Convention**: `frontend/public/images/tags/[tagname].jpg` (lowercase).
     *   **Moderator Access**: Tutorial on promoting users to `MODERATOR`/`ADMIN` role via SQL to access the Moderation Dashboard.
+
+### Learning Page Enhancement (2025-12-10)
+*   **Content**: Populated `Learn.jsx` with legitimate art study resources divided into sections:
+    *   **Fundamentals**: Drawabox (Website), Proko (Video Library).
+    *   **Anatomy & Gesture**: Line of Action (Tool), Quickposes (Tool).
+    *   **Digital Painting & Color**: Ctrl+Paint (Video Courses), Marco Bucci (YouTube).
+    *   **Inspiration & Reference**: Sketchfab (3D Reference), ArtStation (Industry Standard), Google Arts & Culture (Master Study).
+*   **Functionality**: Integrated `usePopup` to show a confirmation dialog ("External Link") when navigating to third-party sites using `window.open`.
+*   **Styling**: Updated `Learn.css` to match the Hive Theme:
+    *   Dark mode card styles.
+    *   Consistent page title with `Explore` page.
+    *   Responsive grid layout.
+*   **Verification**: Validated all links, popups, and styling in browser.

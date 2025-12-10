@@ -37,9 +37,6 @@ public class ArtworkEntity {
     @Transient
     private List<TagEntity> displayTags;
 
-    @Transient
-    private ArtistEntity artist;
-
     public ArtworkEntity() {
     }
 
@@ -139,6 +136,10 @@ public class ArtworkEntity {
     public void setDisplayTags(List<TagEntity> displayTags) {
         this.displayTags = displayTags;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "artist_id")
+    private ArtistEntity artist;
 
     public ArtistEntity getArtist() {
         return artist;
