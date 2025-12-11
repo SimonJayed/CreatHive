@@ -203,24 +203,6 @@ function BlogDetails({ blogId, currentUser, onNavigate }) {
                                         </div>
                                     </div>
 
-                                    {isOwner && (
-                                        <div className="blog-admin-actions">
-                                            <button
-                                                onClick={() => onNavigate('upload-blog', { blogToEdit: blog })}
-                                                className="blog-action-btn"
-                                                title="Edit Blog"
-                                            >
-                                                <Edit2 size={18} />
-                                            </button>
-                                            <button
-                                                onClick={handleDelete}
-                                                className="blog-action-btn"
-                                                title="Delete Blog"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
 

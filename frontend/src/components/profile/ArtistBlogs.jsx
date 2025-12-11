@@ -191,7 +191,9 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
         // Tag Filter
         if (selectedTagIds.length > 0) {
             result = result.filter(blog => {
-                const blogTagIds = blog.tags ? blog.tags.map(t => t.tagId) : [];
+                // Handle both direct tags array and blogTags associative array
+                const tags = blog.tags || (blog.blogTags ? blog.blogTags.map(bt => bt.tag) : []);
+                const blogTagIds = tags.map(t => t.tagId);
                 return selectedTagIds.every(id => blogTagIds.includes(id));
             });
         }
@@ -202,29 +204,7 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
     return (
         <div className="artist-blogs-container">
             <div className="artist-blogs-header">
-                {/* Search Bar - Center/Left aligned roughly */}
-                <div style={{ flex: 1, maxWidth: '600px', marginRight: '20px' }}>
-                    <SearchBar
-                        placeholder="Search blogs..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-
-                {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === artist?.artistId && (
-                    <button
-                        onClick={() => onNavigate && onNavigate('upload-blog')}
-                        className="button-hexagon upload-blog-btn"
-                        style={{ whiteSpace: 'nowrap' }}
-                    >
-                        + Upload Blog
-                    </button>
-                )}
-            </div>
-
-            {/* Sticky Filter Header - Standardized */}
-            <div className="blogs-filter-header" style={{ marginBottom: '20px', marginLeft: 0, marginRight: 0, width: '100%', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
                     <FilterSort
                         type="blog"
                         sortOptions={[
@@ -243,16 +223,34 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
                             setSearchQuery('');
                         }}
                     />
-
-                    {selectedTagIds.length > 0 && (
-                        <span style={{ color: 'var(--primary-color)', fontSize: '14px' }}>
-                            Filtering by: <b>
-                                {selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name).join(', ')}
-                            </b>
-                        </span>
-                    )}
+                    <div style={{ flex: 1, minWidth: '200px', maxWidth: '400px' }}>
+                        <SearchBar
+                            placeholder="Search blogs..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
+
+                {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === artist?.artistId && (
+                    <button
+                        onClick={() => onNavigate && onNavigate('upload-blog')}
+                        className="button-hexagon upload-blog-btn"
+                        style={{ whiteSpace: 'nowrap' }}
+                    >
+                        + Upload Blog
+                    </button>
+                )}
             </div>
+
+            {/* Active Filters Display */}
+            {selectedTagIds.length > 0 && (
+                <div style={{ marginBottom: '20px', color: 'var(--primary-color)', fontSize: '14px' }}>
+                    Filtering by: <b>
+                        {selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name).join(', ')}
+                    </b>
+                </div>
+            )}
 
             {filteredAndSortedBlogs.length > 0 ? (
                 <div className="blog-list">
@@ -278,6 +276,7 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
                                 }
                             }}
                             selectedTagIds={selectedTagIds}
+                            onNavigate={onNavigate}
                         />
                     ))}
                 </div>

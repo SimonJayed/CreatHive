@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Menu } from 'lucide-react';
 import BlogsFeed from './blogs/BlogsFeed';
 import BlogDetails from './blogs/BlogDetails';
 import UploadBlog from './UploadBlog';
@@ -154,19 +155,45 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         }
     };
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
     return (
         <div className="homepage-container">
             <Sidebar
                 activeTab={activeTab}
-                setActiveTab={setActiveTab}
+                setActiveTab={(tab, data) => {
+                    setActiveTab(tab, data);
+                    setIsSidebarOpen(false); // Close sidebar on nav
+                }}
                 onLogout={onLogout}
                 role={artistData?.role}
+                mobileOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
             />
             <div className="main-content-wrapper">
+                {/* Mobile Menu Button */}
+                <button
+                    className="mobile-menu-btn"
+                    onClick={toggleSidebar}
+                    aria-label="Toggle Menu"
+                >
+                    <Menu size={24} />
+                </button>
+
                 <div className="content-scroll-container">
                     {renderContent()}
                 </div>
             </div>
+
+            {/* Overlay for mobile sidebar */}
+            {isSidebarOpen && (
+                <div
+                    className="sidebar-overlay"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
         </div>
     );
 }

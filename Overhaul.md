@@ -111,6 +111,21 @@ Improve efficiency and reduce frontend complexity by moving recommendation logic
 -   **Artist Blogs Filter**: Standardized the filter UI in `ArtistBlogs.jsx` to match `BlogsFeed.jsx` and `Explore.jsx`. Added `SearchBar`, tag filtering (client-side), and consistent styling using `BlogsFeed.css`.
 -   **Favorites Tab Text**: Fixed the visibility of "You haven't favorited any artworks yet" text in `FavoriteArtworks.css` by changing the color to a readable light grey (`rgba(255, 255, 255, 0.7)`).
 -   **Artist Blogs Search Fix**: Fixed `TypeError` in `ArtistBlogs.jsx` by correctly extracting `e.target.value` from the `SearchBar` change event.
+-   **Mobile Responsiveness**: Implemented a responsive mobile layout for the entire application.
+    -   Added a collapsible Sidebar with a hamburger menu toggle for screens narrower than 768px.
+    -   Updated `Homepage.css` to adjust content margins and width on mobile.
+    -   Updated `Sidebar.css` to handle slide-in/out animations.
+    -   Added state management for the mobile menu in `Homepage.jsx`.
+    -   Added state management for the mobile menu in `Homepage.jsx`.
+-   **Responsive Action Buttons**: Updated `ArtworkDetails.css` and `ArtistBlogs.css` (BlogCard) to allow wrap (`flex-wrap: wrap`) on interaction buttons (Like, Share, etc.) ensuring they adjust gracefully on smaller screens.
+-   **Profile Blogs Layout**: Fixed responsiveness of the Profile "Blogs" tab header (Search Bar + Upload Button) by enabling flex wrapping, preventing overflow on mobile devices.
+-   **Profile Tabs Fix**: Enabled horizontal scrolling for Profile tabs (`.profile-tabs`) on mobile to prevent overflow and ensure all tabs are accessible. Fixed alignment (`justify-content: flex-start`) to prevent left-side clipping.
+-   **Standardized Blogs Filter**: Refactored `ArtistBlogs` filter/search header to align with `ArtistArtworks` structure: `FilterSort`, `SearchBar`, and `Upload` button are now consolidated into a single responsive row.
+-   **Blog Card Interaction**: Fixed `BlogCard` to correctly handle tag clicks via the passed `onTagClick` prop, enabling in-place filtering on the Profile page instead of navigating away.
+-   **Blog Navigation Fix**: Fixed issue where clicking a Blog Card in the Profile page would not redirect to the blog details, by properly passing the `onNavigate` prop down from `ArtistBlogs` to `BlogCard`.
+-   **Blog Filtering Logic**: Corrected data property mismatch (`blog.tags` vs `blog.blogTags`) in `ArtistBlogs` filtering logic, ensuring blogs are correctly filtered when tags are selected.
+-   **Responsive Blog Details**: Updated `BlogDetails.css` to make the action buttons footer (Like, Comment, Share, Report) fully responsive on mobile screens by enabling wrapping and adjusting button sizing. Added global `flex-wrap` to ensure robustness.
+-   **Standardized Button Styles**: Aligned `BlogDetails` action buttons with `ArtworkDetails` styles for consistency (`padding: 8px 12px`, `font-size: 14px`).
 
 ## 2025-12-11: System-Wide Alignment & Standardization
 

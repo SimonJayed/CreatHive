@@ -253,6 +253,11 @@
     .comments-feed {
         max-height: 300px;
     }
+
+    .artwork-action-item {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
 }
 
 /* Content */
@@ -294,6 +299,8 @@
     /* Lighter border for white bg */
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .artwork-action-item {

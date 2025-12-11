@@ -130,9 +130,11 @@ const BlogCard = ({
                         readOnly={true}
                         className="blog-card-tags"
                         onTagClick={(tag) => {
-                            // TagList likely handles click internally, but if we need to stop prop:
-                            // We handle it in handleCardClick check
-                            if (onNavigate) onNavigate('blogs', { tagId: tag.tagId });
+                            if (onTagClick) {
+                                onTagClick(tag);
+                            } else if (onNavigate) {
+                                onNavigate('blogs', { tagId: tag.tagId });
+                            }
                         }}
                     />
                 </div>

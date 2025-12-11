@@ -7,6 +7,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .blog-list {
@@ -108,6 +110,8 @@
     gap: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    /* Allow wrapping on small screens */
 }
 
 .blog-action {

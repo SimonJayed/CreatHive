@@ -18,7 +18,7 @@ const baseNavItems = [
 // It does NOT receive artistData. I need to update it to receive artistData or role.
 // For now, I will modify the component to accept `role`.
 
-function Sidebar({ activeTab, setActiveTab, onLogout, role }) {
+function Sidebar({ activeTab, setActiveTab, onLogout, role, mobileOpen }) {
     const navItems = [...baseNavItems];
 
     if (role === 'MODERATOR' || role === 'ADMIN') {
@@ -27,7 +27,7 @@ function Sidebar({ activeTab, setActiveTab, onLogout, role }) {
     }
 
     return (
-        <div className="sidebar">
+        <div className={`sidebar ${mobileOpen ? 'open' : ''}`}>
             {/* Logo */}
             <div className="sidebar-logo">
                 <Hexagon size={40} color="#FFB800" fill="#FFB800" fillOpacity={0.2} strokeWidth={2} className="icon-hexagon" />
