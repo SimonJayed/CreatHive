@@ -60,8 +60,8 @@ export async function getFavoriteArtworks(userId) {
     return res.json();
 }
 
-export async function getArchivedArtworksByArtistId(artistId) {
-    const res = await fetch(`${BASE_URL}/getArchivedArtworksByArtistId/${artistId}`);
+export async function getArchivedArtworksByArtistId(artistId, userId = 0) {
+    const res = await fetch(`${BASE_URL}/getArchivedArtworksByArtistId/${artistId}?userId=${userId}`);
     if (!res.ok) return [];
     return res.json();
 }
@@ -75,5 +75,11 @@ export async function archiveArtwork(artworkId, isArchived, artistId) {
 
 export async function getArtworksByTagId(tagId, userId = 0) {
     const res = await fetch(`${BASE_URL}/getArtworksByTagId/${tagId}?userId=${userId}`);
+    return res.json();
+}
+
+export async function getRelatedArtworks(artworkId, userId = 0) {
+    const res = await fetch(`${BASE_URL}/getRelatedArtworks/${artworkId}?userId=${userId}`);
+    if (!res.ok) return [];
     return res.json();
 }

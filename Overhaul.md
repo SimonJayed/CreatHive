@@ -25,6 +25,89 @@ Remove unused legacy code and eliminate potential errors.
     -   **Component Refactor**: Updated `Explore.jsx`, `Challenges.jsx`, `ArtistBlogs.jsx`, `BlogDetails.jsx`, and `ArtworkDetails.jsx` to remove dependencies on these legacy APIs and use direct entity relationships (`blog.author`, `artwork.artist`) instead.
     -   **Code Cleanup**: Removed residual debug `console.log` statements from production code.
 
+## 2025-12-11: Fix Report Modal Z-Index Issue
+
+### Objective
+Resolve the issue where the Custom Popup (e.g., "Required reason" alert) was appearing behind the Report Modal.
+
+### Changes Implemented
+1.  **CSS Fix**:
+    -   **Popup.css**: Increased `z-index` of `.popup-overlay` from `2000` to `3000` to ensure it always stacks on top of `ReportModal` (which has `z-index: 2000` and is portaled to the body).
+
+## 2025-12-11: Refine Blog Details Page
+
+### Objective
+Enhance `BlogDetails.jsx` to match the visual structure of `ArtworkDetails.jsx` for consistency, including shareable links and standardized administration actions.
+
+### Changes Implemented
+1.  **Layout Refactor**:
+    -   **Structure**: Reordered to [Title -> Meta Row (Avatar + Name + Timestamp + Actions) -> Content -> Tags -> Footer Actions].
+    -   **Styling**: Updated `BlogDetails.css` to mirror `ArtworkDetails.css`, utilizing standard font sizes (Title: 36px, Content: 18px), spacing, and color tokens.
+    -   **Actions Bar**: Adjusted footer actions (Like, Comment, Share, Report) to use `justify-content: space-around` for full-width distribution.
+2.  **Navigation**:
+    -   verified `/blog/:id` routing exists in `Homepage.jsx`.
+    -   Ensured clicking "Share" copies the correct `/blog/123` link.
+
+## 2025-12-11: Implement Details Page Recommendations & Sidebar
+
+### Objective
+Update `ArtworkDetails` and `BlogDetails` pages to include a 2-column layout with a "You might also like" sidebar showing related content based on tags.
+
+### Changes Implemented
+1.  **New Component**:
+    -   **RelatedItems.jsx**: A reusable sidebar component that displays a list of related artworks or blogs. It renders a card for each item with title, author, and image (for artworks).
+2.  **Layout Logic**:
+    -   **ArtworkDetails.jsx**: Fetched related artworks using `getArtworksByTagId` (based on the first artwork tag). Implemented a 2-column CSS Grid layout (`1fr 300px`) where recommendations sit on the right (desktop) or stack below (mobile).
+    -   **BlogDetails.jsx**: Fetched related blogs using `getBlogsByTagId`. Implemented the same 2-column layout logic.
+3.  **Styling**:
+    -   Updated `ArtworkDetails.css` and `BlogDetails.css` to use `.artwork-content-grid` / `.blog-content-grid` for layout management.
+    -   Added responsive media queries to stack columns on screens narrower than 900px.
+4.  **Navigation**:
+    -   Clicking a recommendation uses `onNavigate` to seamlessly switch to the new item.
+    -   Fixed accidental markdown artifacts in `BlogDetails.jsx`.
+    -   Fixed import error in `BlogDetails.jsx` by using `addComment` (aliased).
+    -   Enhanced `ArtworkDetails` to fetch "More from this artist" and merge with tag-based recommendations.
+    -   Updated `RelatedItems` to show a friendly empty state message.
+    -   Fixed import error in `BlogDetails.jsx` by using `addComment` (aliased).
+    -   Enhanced `ArtworkDetails` to fetch "More from this artist" and merge with tag-based recommendations.
+    -   Updated `RelatedItems` to show a friendly empty state message.
+    -   Updated `BlogDetails` logic for consistency.
+    -   Converted related items to `<a>` tags for better accessibility and "Open in new tab" support.
+
+    -   Converted related items to `<a>` tags for better accessibility and "Open in new tab" support.
+
+## 2025-12-11: Refactor Recommendations to Backend
+
+### Objective
+Improve efficiency and reduce frontend complexity by moving recommendation logic (Author + Tag matching) to the backend.
+
+### Changes Implemented
+1.  **Backend Logic**:
+    -   **ArtworkService / BlogService**: Implemented `getRelatedArtworks` / `getRelatedBlogs`.
+    -   **Repositories**: Added querying logic to find items by same artist OR matching tags, excluding current ID.
+    -   **Controllers**: Exposed `/getRelatedArtworks/{id}` and `/getRelatedBlogs/{id}` endpoints.
+2.  **Frontend Updates**:
+    -   **API**: Updated `artworkApi.js` and `blogApi.js` to consume new endpoints.
+    -   **Components**: Refactored `ArtworkDetails.jsx` and `BlogDetails.jsx` to replace complex client-side filtering with a single API call.
+    -   **Fixes**: Resolved syntax errors (accidental markdown artifacts) in JSX files.
+
+### UI & Navigation Refinement
+-   **Button Consistency**: Fixed `ArtworkDetails` and `BlogDetails` Like/Comment buttons to match Share/Report style (removed borders/background) by correcting class name typos.
+-   **Blog Recommendations**: Updated `RelatedItems` to hide images when displaying related blogs.
+-   **Navigation**: Fixed `Homepage.jsx` to accept numeric IDs for 'artwork' tab navigation. Added `window.scrollTo(0, 0)` in `RelatedItems` for better UX.
+
+### Visual & Readability Improvements
+-   **Empty State**: Fixed unreadable "No related items" text by setting a white background in `RelatedItems.css`.
+-   **Artwork Recommendations**: Implemented robust image handling in `ArtworkDetails.jsx` to dynamically detect and append data URI prefixes, correcting missing images.
+-   **Blog Details Layout**: Rearranged `BlogDetails` to match user preference: Content (no label) -> Tags -> Timestamp (bottom). Removed "Description" label.
+-   **Homepage Content**: Updated "Why CreatHive?" section text and feature cards ("Creative Challenges", "Learn & Grow") to match design mockup.
+-   **Back Buttons**: Updated `ArtworkDetails` and `BlogDetails` back buttons to use `var(--primary-color)` (yellow/gold) to match page titles.
+-   **Blog Card Clickability**: Enhanced `BlogCard` to be fully clickable, improving navigation to details page while preventing accidental clicks on interactive elements.
+-   **Report Modal Fix**: Prevented `ReportModal` interactions from triggering parent `BlogCard` click navigation by stopping event propagation.
+-   **Archiving Fix**: Refactored `getArchivedArtworksByArtistId` (backend and frontend) to accept `userId`, ensuring `isLiked` and `isFavorited` statuses are correctly populated for archived artworks.
+-   **Profile Header**: Updated `ProfileHeader` to display the username (`@username`) and removed the email address display for cleaner profile aesthetics.
+-   **Page Title Standardization**: Standardized main page titles (Explore, Blogs, Challenges, Learn, Profile) to `clamp(24px, 4vw, 32px)` for consistency and responsiveness.
+
 ## 2025-12-11: System-Wide Alignment & Standardization
 
 ### Summary

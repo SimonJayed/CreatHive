@@ -95,7 +95,7 @@ function Profile({ userData: currentUser, onNavigate, onProfileUpdate, viewingAr
             if (Array.isArray(favorites)) setFavoriteArtworks(favorites);
 
             if (isOwner) {
-                const archived = await getArchivedArtworksByArtistId(artistId);
+                const archived = await getArchivedArtworksByArtistId(artistId, currentUser ? currentUser.artistId : 0);
                 if (Array.isArray(archived)) {
                     const currentArtistInfo = artistObj || profileData || { artistId, name: 'Artist' };
                     const archivedWithArtist = archived.map(a => ({

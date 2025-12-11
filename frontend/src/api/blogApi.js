@@ -78,6 +78,12 @@ export async function getBlogsByTagId(tagId, userId = 0) {
   return res.json();
 }
 
+export async function getRelatedBlogs(blogId, userId = 0) {
+  const res = await fetch(`${BASE_URL}/getRelatedBlogs/${blogId}?userId=${userId}`);
+  if (!res.ok) return [];
+  return res.json();
+}
+
 export async function getTagsByBlogId(blogId) {
   const res = await fetch(`${BASE_URL}/getTagsByBlogId/${blogId}`);
   return res.json();

@@ -66,8 +66,8 @@ function Homepage({ onLogout, artistData, onProfileUpdate }) {
         } else if (tab === 'profile' && data?.id) {
             setProfileId(data.id);
             window.history.pushState({}, "", `/profile/${data.id}`);
-        } else if (tab === 'artwork' && typeof data === 'string') {
-            // support setActiveTab('artwork', '123')
+        } else if (tab === 'artwork' && (typeof data === 'string' || typeof data === 'number')) {
+            // support setActiveTab('artwork', '123') or 123
             setArtworkId(data);
             window.history.pushState({}, "", `/artwork/${data}`);
         } else if (tab === 'artwork' && data?.id) {

@@ -28,6 +28,7 @@
     margin: 0;
     font-family: var(--font-family);
     letter-spacing: var(--letter-spacing-wide);
+    font-size: clamp(24px, 4vw, 32px);
 }
 
 .blogs-controls {

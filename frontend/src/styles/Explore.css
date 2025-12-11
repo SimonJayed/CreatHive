@@ -1,6 +1,6 @@
 .explore-container {
     min-height: 100vh;
-    padding: 60px 80px;
+    padding: 20px 20px;
     /* overflow properties removed to let parent scroll */
     display: flex;
     flex-direction: column;

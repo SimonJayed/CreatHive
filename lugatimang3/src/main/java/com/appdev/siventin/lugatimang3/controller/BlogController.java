@@ -83,4 +83,10 @@ public class BlogController {
     public void updateBlogTags(@RequestParam int blogId, @RequestBody List<Integer> tagIds) {
         bservice.updateBlogTags(blogId, tagIds);
     }
+
+    @GetMapping("/getRelatedBlogs/{blogId}")
+    public List<BlogEntity> getRelatedBlogs(@PathVariable int blogId,
+            @RequestParam(required = false, defaultValue = "0") int userId) {
+        return bservice.getRelatedBlogs(blogId, userId);
+    }
 }

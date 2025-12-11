@@ -2,6 +2,7 @@ package com.appdev.siventin.lugatimang3.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -306,6 +307,47 @@ public class BlogService {
             if (!existingTagIds.contains(newTagId)) {
                 insertBlogTag(blogId, newTagId);
             }
+        }
+    }
+
+    public List<BlogEntity> getRelatedBlogs(int blogId, int userId) {
+        try {
+            BlogEntity currentBlog = brepo.findById(blogId).orElse(null);
+            if (currentBlog == null)
+                return java.util.Collections.emptyList();
+
+            int artistId = currentBlog.getAuthor() != null ? currentBlog.getAuthor().getArtistId() : -1;
+            List<Integer> tagIds = java.util.Collections.emptyList();
+            if (currentBlog.getBlogTags() != null) {
+                tagIds = currentBlog.getBlogTags().stream()
+                        .map(bt -> bt.getTag().getTagId())
+                        .collect(Collectors.toList());
+            }
+
+            if (artistId == -1 && tagIds.isEmpty())
+                return java.util.Collections.emptyList();
+            if (tagIds.isEmpty())
+                tagIds = java.util.Collections.singletonList(-1);
+
+            List<BlogEntity> related = brepo.findRelatedBlogs(
+                    artistId,
+                    tagIds,
+                    blogId,
+                    org.springframework.data.domain.PageRequest.of(0, 5));
+
+            // Populate like status if needed
+            if (userId > 0) {
+                java.util.Set<Integer> likedBlogIds = new java.util.HashSet<>(
+                        blogLikesRepository.findLikedBlogIdsByUserId(userId));
+
+                for (BlogEntity blog : related) {
+                    blog.setIsLiked(likedBlogIds.contains(blog.getBlogId()));
+                }
+            }
+            return related;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
         }
     }
 }

@@ -43,7 +43,9 @@ function ProfileHeader({
                         className="profile-name"
                         inputClassName="profile-name-input"
                     />
-                    <p className="profile-email">{profileData.email}</p>
+                    {profileData.username && (
+                        <p className="profile-username">@{profileData.username}</p>
+                    )}
                 </div>
             </div>
 

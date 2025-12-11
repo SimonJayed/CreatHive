@@ -9,13 +9,13 @@ function FeaturesSection() {
         },
         {
             icon: '✏️',
-            title: 'Art Fights',
-            text: 'Participate in creative battles where you draw characters or styles created by other users. Win points and recognition!'
+            title: 'Creative Challenges',
+            text: 'Participate in daily creative challenges to build your streak. Stay consistent, improve your skills, and earn recognition!'
         },
         {
             icon: '🏆',
             title: 'Learn & Grow',
-            text: 'Access tutorials, participate in challenges, and connect with mentors to improve your artistic skills.'
+            text: 'Expand your skills with our curated collection of external tutorials, practice sheets, and industry standard resources.'
         }
     ];
 

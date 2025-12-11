@@ -44,7 +44,7 @@ function ReportModal({ isOpen, onClose, reporterId, reportedItemId, itemType }) 
 
     const modalContent = (
         <div className="report-modal-overlay">
-            <div className="report-modal-content">
+            <div className="report-modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Report Content</h2>
                 <p>Help us understand why this content is inappropriate.</p>
 

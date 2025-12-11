@@ -38,8 +38,28 @@ const BlogCard = ({
     const isOwner = currentUser?.artistId === blog.artist?.artistId;
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
+    const handleCardClick = (e) => {
+        // Prevent navigation if clicking interactive elements
+        if (
+            e.target.closest('button') ||
+            e.target.closest('.blog-avatar') ||
+            e.target.closest('.blog-author') ||
+            e.target.closest('.tag-item') ||
+            e.target.closest('a')
+        ) {
+            return;
+        }
+        if (onNavigate) {
+            onNavigate('blog', blog.blogId);
+        }
+    };
+
     return (
-        <div className="card-hexagon blog-card">
+        <div
+            className="card-hexagon blog-card"
+            onClick={handleCardClick}
+            style={{ cursor: 'pointer' }}
+        >
             {/* Header */}
             <div className="blog-header">
                 <img
@@ -47,13 +67,19 @@ const BlogCard = ({
                     alt={blog.artist?.name}
                     className="blog-avatar"
                     onError={(e) => { e.target.src = '/images/profile/default_profile.png'; }}
-                    onClick={() => onNavigate && onNavigate('profile', blog.artist?.artistId)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (onNavigate) onNavigate('profile', blog.artist?.artistId);
+                    }}
                     style={{ cursor: 'pointer' }}
                 />
                 <div className="blog-meta">
                     <span
                         className="blog-author"
-                        onClick={() => onNavigate && onNavigate('profile', blog.artist?.artistId)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (onNavigate) onNavigate('profile', blog.artist?.artistId);
+                        }}
                         style={{ cursor: 'pointer' }}
                     >
                         {blog.artist?.name}
@@ -71,7 +97,7 @@ const BlogCard = ({
                     <div className="blog-admin-actions" style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
                         {onEdit && (
                             <button
-                                onClick={() => onEdit(blog)}
+                                onClick={(e) => { e.stopPropagation(); onEdit(blog); }}
                                 className="edit-blog-btn icon-hexagon"
                                 title="Edit Blog"
                             >
@@ -80,7 +106,7 @@ const BlogCard = ({
                         )}
                         {onDelete && (
                             <button
-                                onClick={() => onDelete(blog.blogId)}
+                                onClick={(e) => { e.stopPropagation(); onDelete(blog.blogId); }}
                                 className="delete-blog-btn icon-hexagon"
                                 title="Delete Blog"
                             >
@@ -92,12 +118,7 @@ const BlogCard = ({
             </div>
 
             {/* Title */}
-            {/* Title */}
-            <h4
-                className="blog-title"
-                onClick={() => onNavigate && onNavigate('blog', blog.blogId)}
-                style={{ cursor: 'pointer' }}
-            >
+            <h4 className="blog-title">
                 {blog.title}
             </h4>
 
@@ -108,7 +129,11 @@ const BlogCard = ({
                         tags={blog.blogTags.map(bt => bt.tag)}
                         readOnly={true}
                         className="blog-card-tags"
-                        onTagClick={(tag) => onNavigate && onNavigate('blogs', { tagId: tag.tagId })}
+                        onTagClick={(tag) => {
+                            // TagList likely handles click internally, but if we need to stop prop:
+                            // We handle it in handleCardClick check
+                            if (onNavigate) onNavigate('blogs', { tagId: tag.tagId });
+                        }}
                     />
                 </div>
             )}
@@ -118,17 +143,17 @@ const BlogCard = ({
 
             {/* Footer */}
             <div className="blog-footer">
-                <button className="blog-action" onClick={() => onLike(blog.blogId)}>
+                <button className="blog-action" onClick={(e) => { e.stopPropagation(); onLike(blog.blogId); }}>
                     <span className={`icon-hexagon ${blog.isLiked ? 'active' : ''}`}>
                         <Hexagon size={18} color={blog.isLiked ? "var(--primary-color)" : "currentColor"} fill={blog.isLiked ? "var(--primary-color)" : "none"} />
                     </span>
                     Like ({blog.likeCount || 0})
                 </button>
-                <button className="blog-action" onClick={() => onToggle(blog.blogId)}>
+                <button className="blog-action" onClick={(e) => { e.stopPropagation(); onToggle(blog.blogId); }}>
                     <span className="icon-hexagon"><MessageCircle size={18} /></span> Comments
                 </button>
-                <button className="blog-action" onClick={() => onShare(blog.blogId)}><span className="icon-hexagon"><Share2 size={18} /></span> Share</button>
-                <button className="blog-action" onClick={() => setIsReportModalOpen(true)} title="Report Content">
+                <button className="blog-action" onClick={(e) => { e.stopPropagation(); onShare(blog.blogId); }}><span className="icon-hexagon"><Share2 size={18} /></span> Share</button>
+                <button className="blog-action" onClick={(e) => { e.stopPropagation(); setIsReportModalOpen(true); }} title="Report Content">
                     <span className="icon-hexagon"><Flag size={18} /></span> Report
                 </button>
             </div>
@@ -143,15 +168,17 @@ const BlogCard = ({
 
             {/* Comments Section */}
             {isOpen && (
-                <CommentSection
-                    comments={comments}
-                    onAddComment={() => onAddComment(blog.blogId)}
-                    commentText={commentText}
-                    setCommentText={setCommentText}
-                    currentUser={currentUser}
-                    onNavigate={onNavigate}
-                    loading={!comments}
-                />
+                <div onClick={(e) => e.stopPropagation()}>
+                    <CommentSection
+                        comments={comments}
+                        onAddComment={() => onAddComment(blog.blogId)}
+                        commentText={commentText}
+                        setCommentText={setCommentText}
+                        currentUser={currentUser}
+                        onNavigate={onNavigate}
+                        loading={!comments}
+                    />
+                </div>
             )}
         </div>
     );

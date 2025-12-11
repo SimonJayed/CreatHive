@@ -19,4 +19,11 @@ public interface ArtworkRepository extends JpaRepository<ArtworkEntity, Integer>
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.data.jpa.repository.Query(value = "DELETE FROM user_artwork WHERE artwork_id = :artworkId", nativeQuery = true)
     void deleteLegacyUserArtwork(@org.springframework.data.repository.query.Param("artworkId") int artworkId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT a FROM ArtworkEntity a LEFT JOIN a.artworkTags at WHERE (a.artist.artistId = :artistId OR at.tag.tagId IN :tagIds) AND a.artworkId != :excludeId AND a.isArchived = false")
+    List<ArtworkEntity> findRelatedArtworks(
+            @org.springframework.data.repository.query.Param("artistId") int artistId,
+            @org.springframework.data.repository.query.Param("tagIds") List<Integer> tagIds,
+            @org.springframework.data.repository.query.Param("excludeId") int excludeId,
+            org.springframework.data.domain.Pageable pageable);
 }

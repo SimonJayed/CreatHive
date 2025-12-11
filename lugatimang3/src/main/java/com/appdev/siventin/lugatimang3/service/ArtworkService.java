@@ -238,12 +238,38 @@ public class ArtworkService {
         }
     }
 
-    public List<ArtworkEntity> getArchivedArtworksByArtistId(int artistId) {
+    public List<ArtworkEntity> getArchivedArtworksByArtistId(int artistId, int userId) {
         try {
             // Fetch artworks by Artist and filter archived
-            return awrepo.findByArtist_ArtistId(artistId).stream()
+            List<ArtworkEntity> disabledArtworks = awrepo.findByArtist_ArtistId(artistId).stream()
                     .filter(a -> Boolean.TRUE.equals(a.isArchived()))
                     .collect(Collectors.toList());
+
+            // Populate displayTags
+            for (ArtworkEntity artwork : disabledArtworks) {
+                if (artwork.getArtworkTags() != null) {
+                    List<com.appdev.siventin.lugatimang3.entity.TagEntity> tags = artwork.getArtworkTags().stream()
+                            .map(at -> at.getTag())
+                            .collect(Collectors.toList());
+                    artwork.setDisplayTags(tags);
+                } else {
+                    artwork.setDisplayTags(java.util.Collections.emptyList());
+                }
+            }
+
+            if (userId > 0) {
+                java.util.Set<Integer> likedArtworkIds = new java.util.HashSet<>(
+                        artworkLikesRepository.findLikedArtworkIdsByUserId(userId));
+                java.util.Set<Integer> favoriteArtworkIds = new java.util.HashSet<>(
+                        favoritesRepository.findFavoriteArtworkIdsByUserId(userId));
+
+                for (ArtworkEntity artwork : disabledArtworks) {
+                    artwork.setIsLiked(likedArtworkIds.contains(artwork.getArtworkId()));
+                    artwork.setIsFavorited(favoriteArtworkIds.contains(artwork.getArtworkId()));
+                }
+            }
+
+            return disabledArtworks;
         } catch (Exception e) {
             e.printStackTrace();
             return java.util.Collections.emptyList();
@@ -502,4 +528,63 @@ public class ArtworkService {
         }
     }
 
+    public List<ArtworkEntity> getRelatedArtworks(int artworkId, int userId) {
+        try {
+            ArtworkEntity currentArtwork = awrepo.findById(artworkId).orElse(null);
+            if (currentArtwork == null)
+                return java.util.Collections.emptyList();
+
+            int artistId = currentArtwork.getArtist() != null ? currentArtwork.getArtist().getArtistId() : -1;
+            List<Integer> tagIds = java.util.Collections.emptyList();
+            if (currentArtwork.getArtworkTags() != null) {
+                tagIds = currentArtwork.getArtworkTags().stream()
+                        .map(at -> at.getTag().getTagId())
+                        .collect(Collectors.toList());
+            }
+
+            // If no tags and no artist, can't find related
+            if (artistId == -1 && tagIds.isEmpty())
+                return java.util.Collections.emptyList();
+
+            // Handle empty tag list to avoid SQL IN empty set error if JPA doesn't handle
+            // it
+            if (tagIds.isEmpty())
+                tagIds = java.util.Collections.singletonList(-1);
+
+            List<ArtworkEntity> related = awrepo.findRelatedArtworks(
+                    artistId,
+                    tagIds,
+                    artworkId,
+                    org.springframework.data.domain.PageRequest.of(0, 5));
+
+            // Populate transient fields (tags, likes, favs)
+            for (ArtworkEntity artwork : related) {
+                // Tags
+                if (artwork.getArtworkTags() != null) {
+                    List<com.appdev.siventin.lugatimang3.entity.TagEntity> tags = artwork.getArtworkTags().stream()
+                            .map(at -> at.getTag()).collect(Collectors.toList());
+                    artwork.setDisplayTags(tags);
+                } else {
+                    artwork.setDisplayTags(java.util.Collections.emptyList());
+                }
+            }
+
+            if (userId > 0) {
+                java.util.Set<Integer> likedArtworkIds = new java.util.HashSet<>(
+                        artworkLikesRepository.findLikedArtworkIdsByUserId(userId));
+                java.util.Set<Integer> favoriteArtworkIds = new java.util.HashSet<>(
+                        favoritesRepository.findFavoriteArtworkIdsByUserId(userId));
+
+                for (ArtworkEntity artwork : related) {
+                    artwork.setIsLiked(likedArtworkIds.contains(artwork.getArtworkId()));
+                    artwork.setIsFavorited(favoriteArtworkIds.contains(artwork.getArtworkId()));
+                }
+            }
+
+            return related;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.Collections.emptyList();
+        }
+    }
 }

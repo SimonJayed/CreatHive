@@ -1,30 +1,50 @@
 /* Main Container */
-.artwork-details-container {
+.artwork-details-page {
     padding: 20px;
-    max-width: 1000px;
+    max-width: 1300px;
+    /* Increased max-width for 2 columns */
     margin: 0 auto;
     color: var(--text-color);
     box-sizing: border-box;
+    min-height: 100vh;
+}
+
+.artwork-details-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    height: auto;
-    overflow-y: visible;
+}
+
+.artwork-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    /* Main content vs Sidebar */
+    gap: 30px;
+    align-items: start;
+}
+
+.artwork-main-column {
+    min-width: 0;
+    /* Prevent overflow issues in grid */
+}
+
+.artwork-sidebar-column {
+    position: relative;
+    /* For sticky child */
 }
 
 /* Back Button */
 .artwork-back-btn {
     background: none;
     border: none;
-    color: var(--text-color);
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     font-size: 16px;
     font-family: var(--font-family);
-    opacity: 0.7;
+    opacity: 0.8;
     transition: opacity 0.2s;
     flex-shrink: 0;
 }
@@ -210,36 +230,28 @@
 }
 
 /* Responsive Adjustments */
-@media (max-width: 800px) {
-    .artwork-details-container {
-        height: auto;
-        overflow-y: auto;
+@media (max-width: 900px) {
+    .artwork-content-grid {
+        grid-template-columns: 1fr;
+        /* Stack vertically */
     }
 
-    .artwork-main-content {
-        flex-direction: column;
-        overflow: visible;
+    .artwork-details-page {
+        padding: 15px;
     }
 
-    .artwork-card {
-        height: auto;
-        overflow: visible;
+    .artwork-sidebar-column {
+        order: 2;
+        /* Sidebar below main content */
+        margin-top: 20px;
     }
 
     .artwork-image-section {
-        height: 400px;
-        /* Fixed height for mobile image */
-    }
-
-    .artwork-details-section {
-        flex: none;
-        width: 100%;
-        overflow: visible;
+        height: auto;
     }
 
     .comments-feed {
         max-height: 300px;
-        /* Fallback for mobile */
     }
 }
 
