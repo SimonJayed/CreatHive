@@ -3,10 +3,13 @@ import { usePopup } from '../../context/PopupContext';
 import { likeBlog, deleteBlog } from '../../api/blogApi';
 import { addComment, getCommentsByBlogId } from '../../api/commentApi';
 import { getAllArtists } from '../../api/artistApi';
+import { getAllTags } from '../../api/tagApi';
 import { Hexagon, MessageCircle, Share2, FileQuestion, Trash2 } from 'lucide-react';
 import FilterSort from '../common/FilterSort';
+import SearchBar from '../common/SearchBar';
 import BlogCard from '../blogs/BlogCard';
 import '../../styles/ArtistBlogs.css';
+import '../../styles/BlogsFeed.css'; // For filter styles
 
 function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
     const { showAlert, showConfirm } = usePopup();
@@ -159,35 +162,101 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
         if (onNavigate) onNavigate('upload-blog', { blogToEdit: blog });
     };
 
+    const [allTags, setAllTags] = useState([]);
+    const [selectedTagIds, setSelectedTagIds] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            const tags = await getAllTags();
+            setAllTags(tags || []);
+        };
+        fetchTags();
+    }, []);
+
+    const filteredAndSortedBlogs = useMemo(() => {
+        let result = [...sortedBlogs];
+
+        // Search Filter
+        if (searchQuery) {
+            const lowerQuery = searchQuery.toLowerCase();
+            result = result.filter(blog =>
+                blog.title.toLowerCase().includes(lowerQuery) ||
+                blog.content.toLowerCase().includes(lowerQuery) ||
+                blog.artist?.name.toLowerCase().includes(lowerQuery) ||
+                blog.artist?.username?.toLowerCase().includes(lowerQuery)
+            );
+        }
+
+        // Tag Filter
+        if (selectedTagIds.length > 0) {
+            result = result.filter(blog => {
+                const blogTagIds = blog.tags ? blog.tags.map(t => t.tagId) : [];
+                return selectedTagIds.every(id => blogTagIds.includes(id));
+            });
+        }
+
+        return result;
+    }, [sortedBlogs, searchQuery, selectedTagIds]);
+
     return (
         <div className="artist-blogs-container">
             <div className="artist-blogs-header">
-
-                {/* Sort Filter */}
-                <FilterSort
-                    type="blog"
-                    sortOptions={[
-                        { label: 'Newest First', value: 'newest' },
-                        { label: 'Oldest First', value: 'oldest' }
-                    ]}
-                    activeSort={sortOrder}
-                    onSortChange={setSortOrder}
-                    onClear={() => setSortOrder('newest')}
-                />
+                {/* Search Bar - Center/Left aligned roughly */}
+                <div style={{ flex: 1, maxWidth: '600px', marginRight: '20px' }}>
+                    <SearchBar
+                        placeholder="Search blogs..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
 
                 {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === artist?.artistId && (
                     <button
                         onClick={() => onNavigate && onNavigate('upload-blog')}
                         className="button-hexagon upload-blog-btn"
+                        style={{ whiteSpace: 'nowrap' }}
                     >
                         + Upload Blog
                     </button>
                 )}
             </div>
 
-            {localBlogs.length > 0 ? (
+            {/* Sticky Filter Header - Standardized */}
+            <div className="blogs-filter-header" style={{ marginBottom: '20px', marginLeft: 0, marginRight: 0, width: '100%', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+                    <FilterSort
+                        type="blog"
+                        sortOptions={[
+                            { label: 'Newest First', value: 'newest' },
+                            { label: 'Oldest First', value: 'oldest' },
+                        ]}
+                        activeSort={sortOrder}
+                        onSortChange={setSortOrder}
+                        showFilter={true}
+                        filterOptions={allTags}
+                        activeFilters={selectedTagIds}
+                        onFilterChange={setSelectedTagIds}
+                        onClear={() => {
+                            setSortOrder('newest');
+                            setSelectedTagIds([]);
+                            setSearchQuery('');
+                        }}
+                    />
+
+                    {selectedTagIds.length > 0 && (
+                        <span style={{ color: 'var(--primary-color)', fontSize: '14px' }}>
+                            Filtering by: <b>
+                                {selectedTagIds.map(id => allTags.find(t => t.tagId === id)?.name).join(', ')}
+                            </b>
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            {filteredAndSortedBlogs.length > 0 ? (
                 <div className="blog-list">
-                    {localBlogs.map((blog) => (
+                    {filteredAndSortedBlogs.map((blog) => (
                         <BlogCard
                             key={blog.blogId}
                             blog={blog}
@@ -203,6 +272,12 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
                             commentText={commentText}
                             setCommentText={setCommentText}
                             artistsMap={artistsMap}
+                            onTagClick={(tag) => {
+                                if (!selectedTagIds.includes(tag.tagId)) {
+                                    setSelectedTagIds([...selectedTagIds, tag.tagId]);
+                                }
+                            }}
+                            selectedTagIds={selectedTagIds}
                         />
                     ))}
                 </div>
@@ -210,17 +285,19 @@ function ArtistBlogs({ blogs, artist, onNavigate, currentUser }) {
                 <div className="no-blogs-container">
                     <span className="no-blogs-icon"><FileQuestion size={48} /></span>
                     <h3 className="no-blogs-title">
-                        No blogs yet
+                        {searchQuery || selectedTagIds.length > 0 ? 'No matching blogs found' : 'No blogs yet'}
                     </h3>
                     <p className="no-blogs-text">
-                        Share your imagination and inspire the Hiveminds community!
+                        {searchQuery || selectedTagIds.length > 0 ? 'Try adjusting your filters.' : 'Share your imagination and inspire the Hiveminds community!'}
                     </p>
-                    <button
-                        onClick={() => onNavigate && onNavigate('upload-blog')}
-                        className="button-hexagon"
-                    >
-                        Upload your blog
-                    </button>
+                    {JSON.parse(localStorage.getItem('currentArtist'))?.artistId === artist?.artistId && !searchQuery && selectedTagIds.length === 0 && (
+                        <button
+                            onClick={() => onNavigate && onNavigate('upload-blog')}
+                            className="button-hexagon"
+                        >
+                            Upload your blog
+                        </button>
+                    )}
                 </div>
             )}
         </div>

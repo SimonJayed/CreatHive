@@ -316,9 +316,6 @@ public class ArtworkService {
     }
 
     // Delete
-    @SuppressWarnings("unused")
-    // Delete
-    // Delete
     public String deleteArtwork(int artworkId, int requestingArtistId) {
         try {
             ArtworkEntity artwork = awrepo.findById(artworkId).orElse(null);
@@ -346,6 +343,19 @@ public class ArtworkService {
 
             // 2. Delete Legacy UserArtwork Entry (Native Query)
             awrepo.deleteLegacyUserArtwork(artworkId);
+
+            // Streak Rollback Logic: If this artwork is a challenge entry, decrement user
+            // streak
+            if (artwork.getChallenge() != null) {
+                com.appdev.siventin.lugatimang3.entity.ArtistEntity artist = artwork.getArtist();
+                if (artist != null) {
+                    int currentStreak = artist.getStreak() != null ? artist.getStreak() : 0;
+                    if (currentStreak > 0) {
+                        artist.setStreak(currentStreak - 1);
+                        artistRepository.save(artist);
+                    }
+                }
+            }
 
             // 3. Delete from Favorites
             List<com.appdev.siventin.lugatimang3.entity.FavoritesEntity> favorites = favoritesRepository.findAll()

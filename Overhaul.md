@@ -107,6 +107,10 @@ Improve efficiency and reduce frontend complexity by moving recommendation logic
 -   **Archiving Fix**: Refactored `getArchivedArtworksByArtistId` (backend and frontend) to accept `userId`, ensuring `isLiked` and `isFavorited` statuses are correctly populated for archived artworks.
 -   **Profile Header**: Updated `ProfileHeader` to display the username (`@username`) and removed the email address display for cleaner profile aesthetics.
 -   **Page Title Standardization**: Standardized main page titles (Explore, Blogs, Challenges, Learn, Profile) to `clamp(24px, 4vw, 32px)` for consistency and responsiveness.
+-   **Challenge Streak Logic**: Implemented "Streak Rollback" - if a user deletes a challenge entry, their streak is automatically decremented by 1 to prevent exploits.
+-   **Artist Blogs Filter**: Standardized the filter UI in `ArtistBlogs.jsx` to match `BlogsFeed.jsx` and `Explore.jsx`. Added `SearchBar`, tag filtering (client-side), and consistent styling using `BlogsFeed.css`.
+-   **Favorites Tab Text**: Fixed the visibility of "You haven't favorited any artworks yet" text in `FavoriteArtworks.css` by changing the color to a readable light grey (`rgba(255, 255, 255, 0.7)`).
+-   **Artist Blogs Search Fix**: Fixed `TypeError` in `ArtistBlogs.jsx` by correctly extracting `e.target.value` from the `SearchBar` change event.
 
 ## 2025-12-11: System-Wide Alignment & Standardization
 
