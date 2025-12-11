@@ -127,7 +127,7 @@ function BlogDetails({ blogId, currentUser, onNavigate }) {
     };
 
     const handleShare = () => {
-        const url = `${window.location.origin} /blog/${blogId} `;
+        const url = `${window.location.origin}/blog/${blogId}`;
         navigator.clipboard.writeText(url);
         showAlert(
             "Share Blog",

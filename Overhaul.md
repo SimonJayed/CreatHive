@@ -126,6 +126,7 @@ Improve efficiency and reduce frontend complexity by moving recommendation logic
 -   **Blog Filtering Logic**: Corrected data property mismatch (`blog.tags` vs `blog.blogTags`) in `ArtistBlogs` filtering logic, ensuring blogs are correctly filtered when tags are selected.
 -   **Responsive Blog Details**: Updated `BlogDetails.css` to make the action buttons footer (Like, Comment, Share, Report) fully responsive on mobile screens by enabling wrapping and adjusting button sizing. Added global `flex-wrap` to ensure robustness.
 -   **Standardized Button Styles**: Aligned `BlogDetails` action buttons with `ArtworkDetails` styles for consistency (`padding: 8px 12px`, `font-size: 14px`).
+-   **Share Link Fix**: Removed erroneous spaces from the share URL generation in both `BlogDetails.jsx` and `ArtworkDetails.jsx`, ensuring copied links are valid (e.g., `.../blog/123` instead of `... /blog/123`).
 
 ## 2025-12-11: System-Wide Alignment & Standardization
 

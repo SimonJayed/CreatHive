@@ -146,7 +146,7 @@ function ArtworkDetails({ artworkId, currentUser, onNavigate }) {
     };
 
     const handleShare = () => {
-        const url = `${window.location.origin} /artwork/${artworkId} `;
+        const url = `${window.location.origin}/artwork/${artworkId}`;
         navigator.clipboard.writeText(url);
         showAlert(
             "Share Artwork",
